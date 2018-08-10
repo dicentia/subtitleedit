@@ -162,6 +162,11 @@ namespace Nikse.SubtitleEdit.Logic
                 }
 
                 var args = new List<string>(arguments.Skip(4).Select(s => s.Trim()));
+
+                Console.WriteLine("Arguments: " + String.Join(", ", args));
+
+                var targetTimeCodeFormat = GetArgument(args, "targettcformat:");
+                var targetLanguage = GetArgument(args, "targetlanguage:");
                 var offset = GetArgument(args, "offset:");
                 var targetFrameRate = GetFrameRate(args, "targetfps");
                 var frameRate = GetFrameRate(args, "fps");
@@ -629,7 +634,7 @@ namespace Nikse.SubtitleEdit.Logic
                         }
                         else if (!done)
                         {
-                            BatchConvertSave(targetFormat, offset, targetEncoding, outputFolder, count, ref converted, ref errors, formats, fileName, sub, format, overwrite, pacCodePage, targetFrameRate, multipleReplaceImportFiles, actions, resolution);
+                            BatchConvertSave(targetFormat, offset, targetEncoding, outputFolder, count, ref converted, ref errors, formats, fileName, sub, format, overwrite, pacCodePage, targetFrameRate, multipleReplaceImportFiles, actions, resolution, false, targetTimeCodeFormat, targetLanguage);
                         }
                     }
                     else
@@ -867,10 +872,11 @@ namespace Nikse.SubtitleEdit.Logic
         internal static bool BatchConvertSave(string targetFormat, string offset, Encoding targetEncoding, string outputFolder, int count, ref int converted, ref int errors,
                                               List<SubtitleFormat> formats, string fileName, Subtitle sub, SubtitleFormat format, bool overwrite,
                                               int pacCodePage, double? targetFrameRate, IEnumerable<string> multipleReplaceImportFiles, List<BatchAction> actions, Point? res = null,
-                                              bool autoDetectLanguage = false)
+                                              bool autoDetectLanguage = false, string targetTimeCodeFormat = "", string targetLanguage = "")
         {
             actions = actions ?? new List<BatchAction>();
             double oldFrameRate = Configuration.Settings.General.CurrentFrameRate;
+
             try
             {
                 // adjust offset
@@ -984,6 +990,12 @@ namespace Nikse.SubtitleEdit.Logic
                         {
                             targetEncoding = Encoding.UTF8;
                         }
+
+                        if (!string.IsNullOrEmpty(targetTimeCodeFormat))
+                            sf.SetTimeCodeFormat(targetTimeCodeFormat);
+
+                        if (!string.IsNullOrEmpty(targetLanguage))
+                            sf.Language = targetLanguage;
 
                         try
                         {

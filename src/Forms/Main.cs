@@ -445,6 +445,21 @@ namespace Nikse.SubtitleEdit.Forms
 
                 var fileName = string.Empty;
                 var args = Environment.GetCommandLineArgs();
+
+                /*args = new string[] {
+                    "debug",
+                    "/convert",
+                    "For-No-Good-Reason-24fps-DK-[language-da].pac",
+                    "NetflixTimedText", //ItunesTimedText, TimedText1.0
+                    @"/inputfolder:\\mc-data.dicentia.dk\mediacloud\tests\subtitle-convertion\new-build\in\",
+                    @"/outputfolder:\\mc-data.dicentia.dk\mediacloud\tests\subtitle-convertion\new-build\out\",
+                    "/fps:24",
+                    "/targetfps:24",
+                    "/targettcformat:frames",
+                    "/targetlanguage:da",
+                    "/overwrite"
+                };*/
+
                 int srcLineNumber = -1;
                 if (args.Length >= 2 && (args[1].Equals("/convert", StringComparison.OrdinalIgnoreCase) || args[1].Equals("/?", StringComparison.Ordinal) ||
                     args[1].Equals("/help", StringComparison.OrdinalIgnoreCase) || args[1].Equals("-help", StringComparison.OrdinalIgnoreCase)))
@@ -3894,13 +3909,6 @@ namespace Nikse.SubtitleEdit.Forms
                 {
                     mediaPlayer.PauseAndDisposePlayer();
                 }
-                timeUpDownVideoPositionAdjust.TimeCode = new TimeCode();
-                timeUpDownVideoPositionAdjust.Enabled = false;
-                timeUpDownVideoPosition.TimeCode = new TimeCode();
-                timeUpDownVideoPosition.Enabled = false;
-                trackBarWaveformPosition.Value = 0;
-                timeUpDownStartTime.TimeCode = new TimeCode();
-                numericUpDownDuration.Value = 0;
             }
 
             _sourceViewChange = false;
@@ -16672,8 +16680,7 @@ namespace Nikse.SubtitleEdit.Forms
             _mainEditReverseStartAndEndingForRTL = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainEditReverseStartAndEndingForRTL);
             _mainListViewCopyText = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewCopyText);
             copyOriginalTextToCurrentToolStripMenuItem.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewCopyTextFromOriginalToCurrent);
-            columnDeleteTextOnlyToolStripMenuItem.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnDeleteText);
-            toolStripMenuItemColumnDeleteText.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnDeleteTextAndShiftUp);
+            toolStripMenuItemColumnDeleteText.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnDeleteText);
             ShiftTextCellsDownToolStripMenuItem.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnInsertText);
             toolStripMenuItemPasteSpecial.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnPaste);
             moveTextUpToolStripMenuItem.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnTextUp);
@@ -18677,9 +18684,6 @@ namespace Nikse.SubtitleEdit.Forms
                 return;
 
             Configuration.Settings.General.Undocked = true;
-            Configuration.Settings.General.SplitContainerMainSplitterDistance = splitContainerMain.SplitterDistance;
-            Configuration.Settings.General.SplitContainer1SplitterDistance = splitContainer1.SplitterDistance;
-            Configuration.Settings.General.SplitContainerListViewAndTextSplitterDistance = splitContainerListViewAndText.SplitterDistance;
 
             var top = Math.Max(Top, 0);
             var left = Math.Max(Left, 0);
@@ -18793,10 +18797,6 @@ namespace Nikse.SubtitleEdit.Forms
             undockVideoControlsToolStripMenuItem.Visible = true;
             redockVideoControlsToolStripMenuItem.Visible = false;
             SubtitleListview1.SelectIndexAndEnsureVisible(_subtitleListViewIndex, true);
-
-            splitContainerMain.SplitterDistance = Configuration.Settings.General.SplitContainerMainSplitterDistance;
-            splitContainer1.SplitterDistance = Configuration.Settings.General.SplitContainer1SplitterDistance;
-            splitContainerListViewAndText.SplitterDistance = Configuration.Settings.General.SplitContainerListViewAndTextSplitterDistance;
         }
 
         private void Bw_DoWork(object sender, DoWorkEventArgs e)
