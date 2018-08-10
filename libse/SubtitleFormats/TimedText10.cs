@@ -116,19 +116,19 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             foreach (var ns in NameSpaces)
             {
-                if (ns.IsPrimary)
-                {
-                    attrs.Add("xmlns=\"" + ns.Url + "\"");
-                    continue;
-                }
+                string prefix = (ns.IsPrimary) ?
+                    "xmlns" :
+                    "xmlns:" + ns.Prefix;
 
-                attrs.Add("xmlns:" + ns.Prefix + "=\"" + ns.Url + "\"");
+                attrs.Add(prefix + "=\"" + ns.Url + "\"");
             }
 
             attrs.Add("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
             attrs.Add("xml:lang=\"" + Language + "\"");
 
-            string timeBase = (Configuration.Settings.SubtitleSettings.TimedText10TimeCodeFormat == "frames") ? "smpte" : "media";
+            string timeBase = (Configuration.Settings.SubtitleSettings.TimedText10TimeCodeFormat == "frames") ? 
+                "smpte" : 
+                "media";
 
             attrs.Add("ttp:timeBase=\"" + timeBase + "\"");
 
