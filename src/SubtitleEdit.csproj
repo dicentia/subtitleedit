@@ -13,7 +13,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{511A5B59-1C35-4719-8536-23B19AF9B21A}</ProjectGuid>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -49,6 +49,9 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.QuartzTypeLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

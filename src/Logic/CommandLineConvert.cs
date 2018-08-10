@@ -20,12 +20,19 @@ namespace Nikse.SubtitleEdit.Logic
         private static readonly bool IsWindows = !(Configuration.IsRunningOnMac() || Configuration.IsRunningOnLinux());
         private static StreamWriter _stdOutWriter;
         private static bool _consoleAttached;
+        private static bool _showDebugInfo;
 
         internal enum BatchAction
         {
             FixCommonErrors,
             RemoveTextForHI,
             ReDoCasing
+        }
+
+        public static void WriteDebugLine(string line)
+        {
+            if(_showDebugInfo)
+                _stdOutWriter.WriteLine("[debug] " + line);
         }
 
         public static void Convert(string title, string[] arguments) // E.g.: /convert *.txt SubRip
@@ -93,6 +100,8 @@ namespace Nikse.SubtitleEdit.Logic
                     _stdOutWriter.WriteLine("        /offset:hh:mm:ss:ms");
                     _stdOutWriter.WriteLine("        /fps:<frame rate>");
                     _stdOutWriter.WriteLine("        /targetfps:<frame rate>");
+                    _stdOutWriter.WriteLine("        /targettcformat:<source|seconds|milliseconds|ticks|hh:mm:ss.ms|hh:mm:ss.ms-two-digits|hh:mm:ss,ms|frames>  [Sets the timecode format. Default is <source>. Only valid for TimedText1.0 + variations]");
+                    _stdOutWriter.WriteLine("        /targetlanguage:<language code>  [Sets the language code displayed in the output file (E.g. da_DK). Only valid for TimedText1.0 + variations]");
                     _stdOutWriter.WriteLine("        /encoding:<encoding name>");
                     _stdOutWriter.WriteLine("        /pac-codepage:<code page>");
                     _stdOutWriter.WriteLine("        /resolution:<width,height>");
@@ -105,6 +114,7 @@ namespace Nikse.SubtitleEdit.Logic
                     _stdOutWriter.WriteLine("        /fixcommonerrors");
                     _stdOutWriter.WriteLine("        /redocasing");
                     _stdOutWriter.WriteLine("        /forcedonly");
+                    _stdOutWriter.WriteLine("        /debug  [Displays debug information in the console window]");
                     _stdOutWriter.WriteLine();
                     _stdOutWriter.WriteLine("    example: SubtitleEdit /convert *.srt sami");
                     _stdOutWriter.WriteLine("    list available formats: SubtitleEdit /convert /list");
@@ -163,7 +173,14 @@ namespace Nikse.SubtitleEdit.Logic
 
                 var args = new List<string>(arguments.Skip(4).Select(s => s.Trim()));
 
-                Console.WriteLine("Arguments: " + String.Join(", ", args));
+                _showDebugInfo = GetArgument(args, "debug").Equals("debug");
+
+                WriteDebugLine("Processing the following arguments:");
+
+                foreach (var arg in arguments.Skip(4).Select(s => s.Trim()))
+                {
+                    WriteDebugLine(arg);
+                }
 
                 var targetTimeCodeFormat = GetArgument(args, "targettcformat:");
                 var targetLanguage = GetArgument(args, "targetlanguage:");

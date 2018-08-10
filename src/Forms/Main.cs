@@ -446,6 +446,12 @@ namespace Nikse.SubtitleEdit.Forms
                 var fileName = string.Empty;
                 var args = Environment.GetCommandLineArgs();
 
+                args = new string[] {
+                    "debug",
+                    "/convert",
+                    "/debug"
+                };
+
                 /*args = new string[] {
                     "debug",
                     "/convert",
