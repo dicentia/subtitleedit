@@ -111,6 +111,7 @@ namespace Nikse.SubtitleEdit.Logic
                     _stdOutWriter.WriteLine("        /multiplereplace:<comma separated file name list> ('.' represents the default replace rules)");
                     _stdOutWriter.WriteLine("        /multiplereplace (equivalent to /multiplereplace:.)");
                     _stdOutWriter.WriteLine("        /removetextforhi");
+                    _stdOutWriter.WriteLine("        /removeinfoparagraph  [Removes any informational paragraph found at frame zero]");
                     _stdOutWriter.WriteLine("        /fixcommonerrors");
                     _stdOutWriter.WriteLine("        /redocasing");
                     _stdOutWriter.WriteLine("        /forcedonly");
@@ -184,10 +185,12 @@ namespace Nikse.SubtitleEdit.Logic
 
                 var targetTimeCodeFormat = GetArgument(args, "targettcformat:");
                 var targetLanguage = GetArgument(args, "targetlanguage:");
+                var removeInformationalParagraph = GetArgument(args, "removeinfoparagraph").Equals("removeinfoparagraph");
                 var offset = GetArgument(args, "offset:");
                 var targetFrameRate = GetFrameRate(args, "targetfps");
                 var frameRate = GetFrameRate(args, "fps");
                 var resolution = GetResolution(args);
+
                 if (frameRate.HasValue)
                 {
                     Configuration.Settings.General.CurrentFrameRate = frameRate.Value;
@@ -651,7 +654,9 @@ namespace Nikse.SubtitleEdit.Logic
                         }
                         else if (!done)
                         {
-                            BatchConvertSave(targetFormat, offset, targetEncoding, outputFolder, count, ref converted, ref errors, formats, fileName, sub, format, overwrite, pacCodePage, targetFrameRate, multipleReplaceImportFiles, actions, resolution, false, targetTimeCodeFormat, targetLanguage);
+                            BatchConvertSave(targetFormat, offset, targetEncoding, outputFolder, count, ref converted, ref errors, formats, 
+                                fileName, sub, format, overwrite, pacCodePage, targetFrameRate, multipleReplaceImportFiles, actions, resolution, false, 
+                                targetTimeCodeFormat, targetLanguage, removeInformationalParagraph);
                         }
                     }
                     else
@@ -889,7 +894,7 @@ namespace Nikse.SubtitleEdit.Logic
         internal static bool BatchConvertSave(string targetFormat, string offset, Encoding targetEncoding, string outputFolder, int count, ref int converted, ref int errors,
                                               List<SubtitleFormat> formats, string fileName, Subtitle sub, SubtitleFormat format, bool overwrite,
                                               int pacCodePage, double? targetFrameRate, IEnumerable<string> multipleReplaceImportFiles, List<BatchAction> actions, Point? res = null,
-                                              bool autoDetectLanguage = false, string targetTimeCodeFormat = "", string targetLanguage = "")
+                                              bool autoDetectLanguage = false, string targetTimeCodeFormat = "", string targetLanguage = "", bool removeInfoParagraph = false)
         {
             actions = actions ?? new List<BatchAction>();
             double oldFrameRate = Configuration.Settings.General.CurrentFrameRate;
@@ -1013,6 +1018,8 @@ namespace Nikse.SubtitleEdit.Logic
 
                         if (!string.IsNullOrEmpty(targetLanguage))
                             sf.Language = targetLanguage;
+
+                        sf.RemoveInformationalParagraph = removeInfoParagraph;
 
                         try
                         {

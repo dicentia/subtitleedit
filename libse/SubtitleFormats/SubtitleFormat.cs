@@ -328,6 +328,12 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             set;
         } = "en-US";
 
+        public bool RemoveInformationalParagraph
+        {
+            get;
+            set;
+        }
+
         public virtual bool IsTimeBased => true;
 
         public bool IsFrameBased => !IsTimeBased;

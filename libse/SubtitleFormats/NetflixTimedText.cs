@@ -142,8 +142,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     hasTopCenterRegion = true;
             }
 
+            var relevantParagraphs = subtitle.Paragraphs;
+
+            if (RemoveInformationalParagraph)
+                relevantParagraphs.RemoveAll(p => p.StartFrame == 0);
+
             int no = 0;
-            foreach (var p in subtitle.Paragraphs)
+            foreach (var p in relevantParagraphs)
             {
                 XmlNode paragraph = xml.CreateElement("p", "http://www.w3.org/ns/ttml");
                 string text = p.Text;

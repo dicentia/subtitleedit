@@ -446,25 +446,26 @@ namespace Nikse.SubtitleEdit.Forms
                 var fileName = string.Empty;
                 var args = Environment.GetCommandLineArgs();
 
-                args = new string[] {
-                    "debug",
-                    "/convert",
-                    "/debug"
-                };
-
                 /*args = new string[] {
                     "debug",
                     "/convert",
-                    "For-No-Good-Reason-24fps-DK-[language-da].pac",
-                    "NetflixTimedText", //ItunesTimedText, TimedText1.0
+                    "/debug"
+                };*/
+
+                args = new string[] {
+                    "debug",
+                    "/convert",
+                    "Brabançonne_Trailer_24_NL.pac",
+                    "TimedText1.0", //ItunesTimedText, TimedText1.0, NetflixTimedText
                     @"/inputfolder:\\mc-data.dicentia.dk\mediacloud\tests\subtitle-convertion\new-build\in\",
                     @"/outputfolder:\\mc-data.dicentia.dk\mediacloud\tests\subtitle-convertion\new-build\out\",
                     "/fps:24",
-                    "/targetfps:24",
+                    "/targetfps:25",
                     "/targettcformat:frames",
-                    "/targetlanguage:da",
+                    "/targetlanguage:du",
+                    "/removeinfoparagraph",
                     "/overwrite"
-                };*/
+                };
 
                 int srcLineNumber = -1;
                 if (args.Length >= 2 && (args[1].Equals("/convert", StringComparison.OrdinalIgnoreCase) || args[1].Equals("/?", StringComparison.Ordinal) ||

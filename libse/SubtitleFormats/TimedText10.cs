@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -340,15 +341,21 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 body.AppendChild(div);
             }
 
+            var relevantParagraphs = subtitle.Paragraphs;
+
+            if (RemoveInformationalParagraph)
+                relevantParagraphs.RemoveAll(p => p.StartFrame == 0);
+
             int no = 0;
             var headerStyles = GetStylesFromHeader(ToUtf8XmlString(xml));
             var regions = GetRegionsFromHeader(ToUtf8XmlString(xml));
             var languages = GetUsedLanguages(subtitle);
+
             if (languages.Count > 0)
             {
                 var divParentNode = div.ParentNode;
 
-                foreach (Paragraph p in subtitle.Paragraphs)
+                foreach (Paragraph p in relevantParagraphs)
                 {
                     if (p.Language == null)
                     {
@@ -371,7 +378,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     div.Attributes.Append(attr);
                     divParentNode.AppendChild(div);
                     bool firstParagraph = true;
-                    foreach (Paragraph p in subtitle.Paragraphs)
+                    foreach (Paragraph p in relevantParagraphs)
                     {
                         if (p.Language != null && p.Language.Equals(language, StringComparison.OrdinalIgnoreCase))
                         {
@@ -400,7 +407,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 var divParentNode = div.ParentNode;
 
-                foreach (Paragraph p in subtitle.Paragraphs)
+                foreach (Paragraph p in relevantParagraphs)
                 {
                     if (p.NewSection)
                     {
