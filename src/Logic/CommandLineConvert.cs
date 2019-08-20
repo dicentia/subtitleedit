@@ -197,7 +197,7 @@ namespace Nikse.SubtitleEdit.Logic
 
                 var unconsumedArguments = arguments.Skip(4).Select(s => s.Trim()).Where(s => s.Length > 0).ToList();
 
-                _showDebugInfo = GetArgument(args, "debug").Equals("debug");
+                _showDebugInfo = GetArgument(unconsumedArguments, "debug").Equals("debug");
 
                 WriteDebugLine("Processing the following arguments:");
 
@@ -209,9 +209,9 @@ namespace Nikse.SubtitleEdit.Logic
                 var offset = GetOffset(unconsumedArguments);
                 var resolution = GetResolution(unconsumedArguments);
                 var targetFrameRate = GetFrameRate(unconsumedArguments, "targetfps");
-                var targetTimeCodeFormat = GetArgument(args, "targettcformat:");
-                var targetLanguage = GetArgument(args, "targetlanguage:");
-                var removeInformationalParagraph = GetArgument(args, "removeinfoparagraph").Equals("removeinfoparagraph");
+                var targetTimeCodeFormat = GetArgument(unconsumedArguments, "targettcformat:");
+                var targetLanguage = GetArgument(unconsumedArguments, "targetlanguage:");
+                var removeInformationalParagraph = GetArgument(unconsumedArguments, "removeinfoparagraph").Equals("removeinfoparagraph");
                 var frameRate = GetFrameRate(unconsumedArguments, "fps");
                 if (frameRate.HasValue)
                 {
@@ -659,7 +659,7 @@ namespace Nikse.SubtitleEdit.Logic
                         }
                         else if (!done)
                         {
-                            BatchConvertSave(targetFormat, offset, targetEncoding, outputFolder, count, ref converted, ref errors, formats, fileName, sub, format, null, overwrite, pacCodePage, targetFrameRate, multipleReplaceImportFiles, actions, resolution, targetTimeCodeFormat, targetLanguage, removeInformationalParagraph);
+                            BatchConvertSave(targetFormat, offset, targetEncoding, outputFolder, count, ref converted, ref errors, formats, fileName, sub, format, null, overwrite, pacCodePage, targetFrameRate, multipleReplaceImportFiles, actions, resolution, false, targetTimeCodeFormat, targetLanguage, removeInformationalParagraph);
                         }
                     }
                     else
