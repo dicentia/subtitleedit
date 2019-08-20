@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -14,6 +17,36 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         private static readonly Regex RegexTimeCodes = new Regex(@"^-?\d+:-?\d+:-?\d+\.-?\d+\s*-->\s*-?\d+:-?\d+:-?\d+\.-?\d+", RegexOptions.Compiled);
         private static readonly Regex RegexTimeCodesMiddle = new Regex(@"^-?\d+:-?\d+\.-?\d+\s*-->\s*-?\d+:-?\d+:-?\d+\.-?\d+", RegexOptions.Compiled);
         private static readonly Regex RegexTimeCodesShort = new Regex(@"^-?\d+:-?\d+\.-?\d+\s*-->\s*-?\d+:-?\d+\.-?\d+", RegexOptions.Compiled);
+
+        private static readonly Dictionary<string, Color> DefaultColorClasses = new Dictionary<string, Color>
+        {
+            {
+                "white", Color.FromArgb(255, 255, 255)
+            },
+            {
+                "lime", Color.FromArgb(0, 255, 0)
+            },
+            {
+                "cyan", Color.FromArgb(0,255,255)
+            },
+            {
+                "red", Color.FromArgb(255,0,0)
+            },
+            {
+                "yellow", Color.FromArgb(255,255,0)
+            },
+            {
+                "magenta", Color.FromArgb(255,0,255)
+            },
+            {
+                "blue", Color.FromArgb(0,0,255)
+            },
+            {
+                "black", Color.FromArgb(0,0,0)
+            },
+        };
+
+        private static readonly string[] KnownLanguages = new[] { "arabic", "hebrew", "simplifiedchinese", "traditionalchinese", "thai", "korean", "Japanese" };
 
         public override string Extension => ".vtt";
 
@@ -35,7 +68,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
                 string style = string.Empty;
                 if (!string.IsNullOrEmpty(p.Extra) && subtitle.Header == "WEBVTT")
+                {
                     style = p.Extra;
+                }
+
                 sb.AppendLine(string.Format(paragraphWriteFormat, start, end, positionInfo, FormatText(p), style, Environment.NewLine));
             }
             return sb.ToString().Trim();
@@ -84,7 +120,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         {
             string text = Utilities.RemoveSsaTags(p.Text);
             while (text.Contains(Environment.NewLine + Environment.NewLine))
+            {
                 text = text.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
+            }
 
             text = ColorHtmlToWebVtt(text);
             return text;
@@ -97,12 +135,16 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             string positionInfo = string.Empty;
             bool hadEmptyLine = false;
             int numbers = 0;
+            double addSeconds = 0;
             for (var index = 0; index < lines.Count; index++)
             {
                 string line = lines[index];
                 string next = string.Empty;
-                if (index < lines.Count -1)
+                if (index < lines.Count - 1)
+                {
                     next = lines[index + 1];
+                }
+
                 var s = line;
                 bool isTimeCode = line.Contains("-->");
                 if (isTimeCode && RegexTimeCodesMiddle.IsMatch(s))
@@ -115,7 +157,12 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     s = "00:" + s.Replace("--> ", "--> 00:");
                 }
 
-                if (isTimeCode && RegexTimeCodes.IsMatch(s.TrimStart()))
+                if (index == 1 && s.StartsWith("X-TIMESTAMP-MAP=", StringComparison.OrdinalIgnoreCase) &&
+                    s.IndexOf("MPEGTS:", StringComparison.OrdinalIgnoreCase) > 0)
+                {
+                    addSeconds = GetXTimeStampSeconds(s);
+                }
+                else if (isTimeCode && RegexTimeCodes.IsMatch(s.TrimStart()))
                 {
                     if (p != null)
                     {
@@ -146,7 +193,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 {
                     subtitle.Header = "WEBVTT";
                 }
-                else if (p != null && hadEmptyLine && Utilities.IsInteger(line) && 
+                else if (p != null && hadEmptyLine && Utilities.IsInteger(line.RemoveChar('-')) &&
                          (RegexTimeCodesMiddle.IsMatch(next) ||
                           RegexTimeCodesShort.IsMatch(next) ||
                           RegexTimeCodes.IsMatch(next)))
@@ -157,11 +204,19 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 {
                     string text = positionInfo + line.Trim();
                     if (string.IsNullOrEmpty(text))
+                    {
                         hadEmptyLine = true;
+                    }
+
                     if (string.IsNullOrEmpty(p.Text))
+                    {
                         p.Text = text + Environment.NewLine;
+                    }
                     else
+                    {
                         p.Text += text + Environment.NewLine;
+                    }
+
                     positionInfo = string.Empty;
                 }
             }
@@ -172,7 +227,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 subtitle.Paragraphs.Add(p);
             }
 
-            if (subtitle.Paragraphs.Count > 5 && 
+            if (subtitle.Paragraphs.Count > 5 &&
                 numbers >= subtitle.Paragraphs.Count - 1 &&
                 lines[0] == "WEBVTT FILE")
             {
@@ -185,8 +240,68 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 paragraph.Text = ColorWebVttToHtml(paragraph.Text);
             }
-
+            subtitle.AdjustDisplayTimeUsingSeconds(addSeconds, null);
             subtitle.Renumber();
+        }
+
+        private static double GetXTimeStampSeconds(string input)
+        {
+            var s = input.RemoveChar(' ');
+
+            var subtractSeconds = 0d;
+            var startIndex = s.IndexOf("LOCAL:", StringComparison.OrdinalIgnoreCase);
+            var localSb = new StringBuilder();
+            for (int i = startIndex + 6; i < s.Length; i++)
+            {
+                var ch = s[i];
+                if (char.IsNumber(ch) || ch == ':' || ch == '.')
+                {
+                    localSb.Append(ch);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            var parts = localSb.ToString().Split(new [] { ':', '.' });
+            if (parts != null && parts.Length == 3)
+            {
+                parts = ("00:" + localSb).Split(new [] { ':', '.' });
+            }
+            if (parts != null && parts.Length == 4)
+            {
+                subtractSeconds = DecodeTimeCodeMsFourParts(parts).TotalSeconds;
+            }
+
+            startIndex = s.IndexOf("MPEGTS:", StringComparison.OrdinalIgnoreCase);
+            var tsSb = new StringBuilder();
+            for (int i = startIndex + 7; i < s.Length; i++)
+            {
+                var ch = s[i];
+                if (char.IsNumber(ch))
+                {
+                    tsSb.Append(ch);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (tsSb.Length > 0)
+            {
+                long number;
+                if (long.TryParse(tsSb.ToString(), out number))
+                {
+                    var seconds = number / Configuration.Settings.SubtitleSettings.WebVttTimescale - subtractSeconds;
+                    if (seconds > 0 && seconds < 90000) // max 25 hours - or wrong timescale
+                    {
+                        return seconds;
+                    }
+                }
+            }
+
+            return 0;
         }
 
         internal static string GetPositionInfo(string s)
@@ -203,8 +318,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             if (!string.IsNullOrEmpty(pos) && pos.EndsWith('%'))
             {
-                double number;
-                if (double.TryParse(pos.TrimEnd('%'), out number))
+                if (double.TryParse(pos.TrimEnd('%'), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var number))
                 {
                     if (number < 25)
                     {
@@ -217,13 +331,12 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 }
             }
 
-            if (!string.IsNullOrEmpty(line) && line.EndsWith('%'))
+            if (!string.IsNullOrEmpty(line))
             {
-
+                line = line.Trim();
                 if (line.EndsWith('%'))
                 {
-                    double number;
-                    if (double.TryParse(line.TrimEnd('%'), out number))
+                    if (double.TryParse(line.TrimEnd('%'), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var number))
                     {
                         if (number < 25)
                         {
@@ -237,14 +350,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 }
                 else
                 {
-                    double number;
-                    if (double.TryParse(line.TrimEnd('%'), out number))
+                    if (double.TryParse(line, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var number))
                     {
-                        if (number < 7)
+                        if (number >= 0 && number <= 7)
                         {
-                            vAlignTop = true;
+                            vAlignTop = true; // Positive numbers indicate top down
                         }
-                        else if (number < 11)
+                        else if (number > 7 && number < 11)
                         {
                             vAlignMiddle = true;
                         }
@@ -264,7 +376,8 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 }
                 return "{\\an1}";
             }
-            else if (hAlignRight)
+
+            if (hAlignRight)
             {
                 if (vAlignTop)
                 {
@@ -276,11 +389,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 }
                 return "{\\an3}";
             }
-            else if (vAlignTop)
+
+            if (vAlignTop)
             {
                 return "{\\an8}";
             }
-            else if (vAlignMiddle)
+
+            if (vAlignMiddle)
             {
                 return "{\\an5}";
             }
@@ -311,66 +426,182 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
         public override void RemoveNativeFormatting(Subtitle subtitle, SubtitleFormat newFormat)
         {
+            var regexWebVttColorMulti = new Regex(@"<c.[a-z0-9_\.]*>", RegexOptions.Compiled);
+            var regexRemoveCTags = new Regex(@"\</?c([a-zA-Z\._\d]*)\>", RegexOptions.Compiled);
+            var regexRemoveTimeCodes = new Regex(@"\<\d+:\d+:\d+.\d+\>", RegexOptions.Compiled); // <00:00:10.049>
+            var regexTagsPlusWhiteSpace = new Regex(@"(\{\\an\d\})[\s\r\n]+", RegexOptions.Compiled); // <00:00:10.049>
+
             foreach (Paragraph p in subtitle.Paragraphs)
             {
                 if (p.Text.Contains('<'))
                 {
-                    string text = p.Text;
+                    var text = p.Text.Replace("&rlm;", "\u202B").Replace("&lrm;", "\u202A");
+                    foreach (var knownLanguage in KnownLanguages)
+                    {
+                        text = text.Replace("<c." + knownLanguage + ">", string.Empty).Replace("</c." + knownLanguage + ">", string.Empty);
+                    }
+                    text = System.Net.WebUtility.HtmlDecode(text);
+
+                    var match = regexWebVttColorMulti.Match(text);
+                    while (match.Success)
+                    {
+                        var tag = match.Value.Substring(3, match.Value.Length - 4);
+                        tag = FindBestColorTagOrDefault(tag);
+                        if (tag == null)
+                        {
+                            break;
+                        }
+                        var fontString = "<font color=\"" + tag + "\">";
+                        fontString = fontString.Trim('"').Trim('\'');
+                        text = text.Remove(match.Index, match.Length).Insert(match.Index, fontString);
+                        var endIndex = text.IndexOf("</c>", match.Index, StringComparison.OrdinalIgnoreCase);
+                        if (endIndex >= 0)
+                        {
+                            text = text.Remove(endIndex, 4).Insert(endIndex, "</font>");
+                        }
+                        match = RegexWebVttColor.Match(text);
+                    }
+
                     text = RemoveTag("v", text);
                     text = RemoveTag("rt", text);
                     text = RemoveTag("ruby", text);
                     text = RemoveTag("span", text);
-                    text = RemoveTag("c", text);
+                    text = regexRemoveCTags.Replace(text, string.Empty).Trim();
+                    text = regexRemoveTimeCodes.Replace(text, string.Empty).Trim();
+                    text = regexTagsPlusWhiteSpace.Replace(text, "$1");
                     p.Text = text;
                 }
             }
         }
 
-        private static readonly Regex RegexWebVttColor = new Regex(@"<c.[a-z]*>", RegexOptions.Compiled);
-
-        private static string ColorWebVttToHtml(string text)
+        private string FindBestColorTagOrDefault(string tag)
         {
-            text = text.Replace("</c>", "</font>");
-            var match = RegexWebVttColor.Match(text);
+            var tags = tag.Split('.').ToList();
+            tags.Reverse();
+            foreach (var s in tags)
+            {
+                var l = s.ToLowerInvariant();
+                if (DefaultColorClasses.Keys.Contains(l))
+                {
+                    return l;
+                }
+
+                if (l.StartsWith("color") && l.Length > 6 && Utilities.IsHex(l.Remove(0, 5))) // e.g. color008000
+                {
+                    return "#" + l.Remove(0, 5);
+                }
+            }
+            return null;
+        }
+
+        private static readonly Regex RegexWebVttColor = new Regex(@"<c.[a-z]*>", RegexOptions.Compiled);
+        private static readonly Regex RegexWebVttColorHex = new Regex(@"<c.[a-z]*\d+>", RegexOptions.Compiled);
+
+        internal static string ColorWebVttToHtml(string text)
+        {
+            var res = RunColorRegEx(text, RegexWebVttColor);
+            res = RunColorRegEx(res, RegexWebVttColorHex);
+            return res;
+        }
+
+        private static string RunColorRegEx(string input, Regex regex)
+        {
+            var res = input;
+            var match = regex.Match(res);
             while (match.Success)
             {
-                var fontString = "<font color=\"" + match.Value.Substring(3, match.Value.Length - 4) + "\">";
-                fontString = fontString.Trim('"').Trim('\'');
-                text = text.Remove(match.Index, match.Length).Insert(match.Index, fontString);
-                match = RegexWebVttColor.Match(text);
+                var value = match.Value.Substring(3, match.Value.Length - 4);
+                if (match.Value.StartsWith("<c.color", StringComparison.Ordinal))
+                {
+                    value = "#" + match.Value.Substring(3 + 5, match.Value.Length - 4 - 5);
+                }
+
+                if (!KnownLanguages.Contains(value))
+                {
+                    var fontString = "<font color=\"" + value + "\">";
+                    fontString = fontString.Trim('"').Trim('\'');
+                    res = res.Remove(match.Index, match.Length).Insert(match.Index, fontString);
+                    var endIndex = res.IndexOf("</c>", match.Index, StringComparison.OrdinalIgnoreCase);
+                    if (endIndex >= 0)
+                    {
+                        res = res.Remove(endIndex, 4).Insert(endIndex, "</font>");
+                    }
+                }
+
+                match = regex.Match(res, match.Index + 1);
             }
-            return text;
+            return res;
         }
 
         private static readonly Regex RegexHtmlColor = new Regex("<font color=\"[a-z]*\">", RegexOptions.Compiled);
         private static readonly Regex RegexHtmlColor2 = new Regex("<font color=[a-z]*>", RegexOptions.Compiled);
+        private static readonly Regex RegexHtmlColor3 = new Regex("<font color=\"#[ABCDEFabcdef\\d]*\">", RegexOptions.Compiled);
 
         private static string ColorHtmlToWebVtt(string text)
         {
-            text = text.Replace("</font>", "</c>");
-            var match = RegexHtmlColor.Match(text);
+            var res = text.Replace("</font>", "</c>");
+            var match = RegexHtmlColor.Match(res);
             while (match.Success)
             {
                 var fontString = "<c." + match.Value.Substring(13, match.Value.Length - 15) + ">";
                 fontString = fontString.Trim('"').Trim('\'');
-                text = text.Remove(match.Index, match.Length).Insert(match.Index, fontString);
-                match = RegexHtmlColor.Match(text);
+                res = res.Remove(match.Index, match.Length).Insert(match.Index, fontString);
+                match = RegexHtmlColor.Match(res);
             }
-            match = RegexHtmlColor2.Match(text);
+
+            match = RegexHtmlColor2.Match(res);
             while (match.Success)
             {
                 var fontString = "<c." + match.Value.Substring(12, match.Value.Length - 13) + ">";
                 fontString = fontString.Trim('"').Trim('\'');
-                text = text.Remove(match.Index, match.Length).Insert(match.Index, fontString);
-                match = RegexHtmlColor2.Match(text);
+                res = res.Remove(match.Index, match.Length).Insert(match.Index, fontString);
+                match = RegexHtmlColor2.Match(res);
             }
-            return text;
+
+            match = RegexHtmlColor3.Match(res);
+            while (match.Success)
+            {
+                var tag = match.Value.Substring(14, match.Value.Length - 16);
+                var fontString = "<c.color" + tag + ">";
+                var closeColor = GetCloseColor(tag);
+                if (closeColor != null)
+                {
+                    fontString = "<c." + closeColor + ">";
+                }
+                fontString = fontString.Trim('"').Trim('\'');
+                res = res.Remove(match.Index, match.Length).Insert(match.Index, fontString);
+                match = RegexHtmlColor3.Match(res);
+            }
+            return res;
+        }
+
+        private static string GetCloseColor(string tag)
+        {
+            try
+            {
+                var c = ColorTranslator.FromHtml("#" + tag.Trim('#'));
+                int maxDiff = 25;
+                foreach (var kvp in DefaultColorClasses)
+                {
+                    if (Math.Abs(kvp.Value.R - c.R) <= maxDiff &&
+                        Math.Abs(kvp.Value.G - c.G) <= maxDiff &&
+                        Math.Abs(kvp.Value.B - c.B) <= maxDiff)
+                    {
+                        return kvp.Key;
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            return null;
         }
 
         public static List<string> GetVoices(Subtitle subtitle)
         {
             var list = new List<string>();
-            if (subtitle != null && subtitle.Paragraphs != null)
+            if (subtitle?.Paragraphs != null)
             {
                 foreach (Paragraph p in subtitle.Paragraphs)
                 {
@@ -383,13 +614,19 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                         {
                             string voice = s.Substring(startIndex + 2, endIndex - startIndex - 2).Trim();
                             if (!list.Contains(voice))
+                            {
                                 list.Add(voice);
+                            }
                         }
 
                         if (startIndex == s.Length - 1)
+                        {
                             startIndex = -1;
+                        }
                         else
+                        {
                             startIndex = s.IndexOf("<v ", startIndex + 1, StringComparison.Ordinal);
+                        }
                     }
                 }
             }
@@ -398,28 +635,28 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
         public static string RemoveTag(string tag, string text)
         {
-            int indexOfTag = text.IndexOf("<" + tag + " ", StringComparison.Ordinal);
+            var res = text;
+            int indexOfTag = res.IndexOf("<" + tag + " ", StringComparison.Ordinal);
             if (indexOfTag >= 0)
             {
-                int indexOfEnd = text.IndexOf('>', indexOfTag);
+                int indexOfEnd = res.IndexOf('>', indexOfTag);
                 if (indexOfEnd > 0)
                 {
-                    text = text.Remove(indexOfTag, indexOfEnd - indexOfTag + 1);
-                    text = text.Replace("</" + tag + ">", string.Empty);
+                    res = res.Remove(indexOfTag, indexOfEnd - indexOfTag + 1);
+                    res = res.Replace("</" + tag + ">", string.Empty);
                 }
             }
-            return text;
+            return res;
         }
 
         internal static TimeCode GetTimeCodeFromString(string time)
         {
             // hh:mm:ss.mmm
-            string[] timeCode = time.Trim().Split(':', '.', ' ');
+            var timeCode = time.Trim().Split(':', '.', ' ');
             return new TimeCode(int.Parse(timeCode[0]),
                                 int.Parse(timeCode[1]),
                                 int.Parse(timeCode[2]),
                                 int.Parse(timeCode[3]));
         }
-
     }
 }

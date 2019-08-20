@@ -38,7 +38,9 @@ namespace Nikse.SubtitleEdit.Logic.SpellCheck
                 IntPtr addressCharArray = Marshal.ReadIntPtr(addressStringArray, i * IntPtr.Size);
                 string suggestion = Marshal.PtrToStringAuto(addressCharArray);
                 if (!string.IsNullOrEmpty(suggestion))
+                {
                     results.Add(suggestion);
+                }
             }
             NativeMethods.Hunspell_free_list(_hunspellHandle, pointerToAddressStringArray, resultCount);
             Marshal.FreeHGlobal(pointerToAddressStringArray);
@@ -51,7 +53,7 @@ namespace Nikse.SubtitleEdit.Logic.SpellCheck
             Dispose(false);
         }
 
-        private void ReleaseUnmangedResources()
+        private void ReleaseUnmanagedResources()
         {
             if (_hunspellHandle != IntPtr.Zero)
             {
@@ -72,7 +74,7 @@ namespace Nikse.SubtitleEdit.Logic.SpellCheck
             {
                 //ReleaseManagedResources();
             }
-            ReleaseUnmangedResources();
+            ReleaseUnmanagedResources();
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Nikse.SubtitleEdit.Core.Interfaces;
 
 namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
 {
@@ -25,7 +26,9 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                     {
                         var st = new StrippableText(p.Text);
                         if (st.StrippedText.Length > 0 && st.StrippedText[0] != char.ToUpper(st.StrippedText[0]))
+                        {
                             p.Text = st.Pre + char.ToUpper(st.StrippedText[0]) + st.StrippedText.Substring(1) + st.Post;
+                        }
                     }
                 }
 
@@ -68,10 +71,15 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                                 if (s == 'i' && p.Text.Length > j + 1)
                                 {
                                     if (p.Text[j + 1] == char.ToUpper(p.Text[j + 1]))
+                                    {
                                         change = false;
+                                    }
                                 }
                                 if (change)
+                                {
                                     p.Text = p.Text.Remove(j, 1).Insert(j, char.ToUpper(s).ToString(CultureInfo.InvariantCulture));
+                                }
+
                                 lastWasColon = false;
                             }
                             else if (!(" " + Environment.NewLine).Contains(s))
@@ -93,7 +101,7 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                 {
                     noOfFixes++;
                     subtitle.Paragraphs[i].Text = p.Text;
-                    callbacks.AddFixToListView(p, fixAction, oldText, p.Text);
+                    callbacks.AddFixToListView(subtitle.Paragraphs[i], fixAction, oldText, p.Text);
                 }
             }
             callbacks.UpdateFixStatus(noOfFixes, language.StartWithUppercaseLetterAfterColon, noOfFixes.ToString(CultureInfo.InvariantCulture));

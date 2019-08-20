@@ -14,6 +14,7 @@ namespace Nikse.SubtitleEdit.Forms.Ocr
             Abort,
             AddToUserDictionary,
             AddToNames,
+            AddToNamesOnly,
             AllwaysUseSuggestion,
             ChangeAndSave,
             ChangeOnce,
@@ -28,14 +29,8 @@ namespace Nikse.SubtitleEdit.Forms.Ocr
 
         public bool IsBinaryImageCompare
         {
-            get
-            {
-                return buttonEditImageDb.Visible;
-            }
-            set
-            {
-                buttonEditImageDb.Visible = value;
-            }
+            get => buttonEditImageDb.Visible;
+            set => buttonEditImageDb.Visible = value;
         }
         public Action ActionResult { get; private set; }
         public string Word { get; private set; }
@@ -79,19 +74,32 @@ namespace Nikse.SubtitleEdit.Forms.Ocr
             DialogResult = DialogResult.Abort;
         }
 
-        internal void Initialize(string word, List<string> suggestions, string line, Bitmap bitmap)
+        internal void Initialize(string word, List<string> suggestions, string line, Bitmap bitmap, bool isBinaryImageCompare)
         {
+            IsBinaryImageCompare = isBinaryImageCompare;
             _originalWord = word;
             OriginalWholeText = line;
+            pictureBoxText.SizeMode = PictureBoxSizeMode.Zoom;
+            if (isBinaryImageCompare)
+            {
+                groupBoxTextAsImage.BackColor = Color.DimGray;
+                groupBoxTextAsImage.ForeColor = Color.White;
+                pictureBoxText.BackColor = Color.Transparent;
+            }
             pictureBoxText.Image = bitmap;
             textBoxWord.Text = word;
             richTextBoxParagraph.Text = line;
             textBoxWholeText.Text = line;
             listBoxSuggestions.Items.Clear();
             foreach (string suggestion in suggestions)
+            {
                 listBoxSuggestions.Items.Add(suggestion);
+            }
+
             if (listBoxSuggestions.Items.Count > 0)
+            {
                 listBoxSuggestions.SelectedIndex = 0;
+            }
 
             HighLightWord(richTextBoxParagraph, word);
             ButtonEditWordClick(null, null);
@@ -108,12 +116,18 @@ namespace Nikse.SubtitleEdit.Forms.Ocr
                     {
                         bool startOk = i == 0;
                         if (!startOk)
+                        {
                             startOk = expectedWordBoundaryChars.Contains(richTextBoxParagraph.Text[i - 1]);
+                        }
+
                         if (startOk)
                         {
                             bool endOk = (i + word.Length == richTextBoxParagraph.Text.Length);
                             if (!endOk)
+                            {
                                 endOk = expectedWordBoundaryChars.Contains(richTextBoxParagraph.Text[i + word.Length]);
+                            }
+
                             if (endOk)
                             {
                                 richTextBoxParagraph.SelectionStart = i + 1;
@@ -279,7 +293,9 @@ namespace Nikse.SubtitleEdit.Forms.Ocr
         {
             string text = textBoxWord.Text;
             if (!string.IsNullOrWhiteSpace(text))
+            {
                 System.Diagnostics.Process.Start("https://www.google.com/search?q=" + Utilities.UrlEncode(text));
+            }
         }
 
         private void OcrSpellCheck_KeyDown(object sender, KeyEventArgs e)
@@ -295,6 +311,47 @@ namespace Nikse.SubtitleEdit.Forms.Ocr
         {
             ActionResult = Action.InspectCompareMatches;
             DialogResult = DialogResult.OK;
+        }
+
+        private void addXToNamesnoiseListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(richTextBoxParagraph.SelectedText))
+            {
+                Word = richTextBoxParagraph.SelectedText.Trim();
+                ActionResult = Action.AddToNamesOnly;
+                DialogResult = DialogResult.OK;
+            }
+        }
+
+        private void addXToUserDictionaryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(richTextBoxParagraph.SelectedText))
+            {
+                string s = richTextBoxParagraph.SelectedText.Trim();
+                Word = s;
+                if (s.Length == 0 || s.Contains(' '))
+                {
+                    MessageBox.Show(Configuration.Settings.Language.SpellCheck.SpacesNotAllowed);
+                    ActionResult = Action.SkipOnce;
+                    return;
+                }
+                ActionResult = Action.AddToUserDictionary;
+                DialogResult = DialogResult.OK;
+            }
+        }
+
+        private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            bool showAddItems = false;
+            if (!string.IsNullOrWhiteSpace(richTextBoxParagraph.SelectedText))
+            {
+                string word = richTextBoxParagraph.SelectedText.Trim();
+                addXToNamesnoiseListToolStripMenuItem.Text = string.Format(Configuration.Settings.Language.SpellCheck.AddXToNames, word);
+                addXToUserDictionaryToolStripMenuItem.Text = string.Format(Configuration.Settings.Language.SpellCheck.AddXToUserDictionary, word);
+                showAddItems = true;
+            }
+            addXToNamesnoiseListToolStripMenuItem.Visible = showAddItems;
+            addXToUserDictionaryToolStripMenuItem.Visible = showAddItems;
         }
     }
 }

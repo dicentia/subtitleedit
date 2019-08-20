@@ -16,7 +16,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             string xmlStructure =
                 "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" + Environment.NewLine +
                 "<tmx version=\"1.4\">" + Environment.NewLine +
-                "  <header creationtool=\"Subtitle Edit\" creationtoolversion=\"3.4\" datatype=\"html\" segtype=\"sentence\" adminlang=\"en-us\" srclang=\"EN\" o-encoding=\"utf-8\">" + Environment.NewLine +
+                "  <header creationtool=\"Subtitle Edit\" creationtoolversion=\"3.5\" datatype=\"html\" segtype=\"sentence\" adminlang=\"en-us\" srclang=\"EN\" o-encoding=\"utf-8\">" + Environment.NewLine +
                 "    <note>This is a subtitle</note>" + Environment.NewLine +
                 "  </header>" + Environment.NewLine +
                 "  <body />" + Environment.NewLine +
@@ -24,9 +24,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             string lang = LanguageAutoDetect.AutoDetectLanguageName("en_US", subtitle);
             if (lang.StartsWith("en_", StringComparison.Ordinal))
+            {
                 lang = "EN";
+            }
             else if (lang.Length == 5)
+            {
                 lang = lang.Substring(3);
+            }
 
             string paragraphInnerXml =
                 "  <prop type=\"start\">[START]</prop>" + Environment.NewLine +
@@ -77,7 +81,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             string xmlString = sb.ToString();
             if (!xmlString.Contains("<tmx") || !xmlString.Contains("<seg>"))
+            {
                 return;
+            }
 
             var xml = new XmlDocument();
             try

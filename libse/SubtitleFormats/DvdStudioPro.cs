@@ -17,21 +17,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         {
             const string paragraphWriteFormat = "{0}\t,\t{1}\t,\t{2}\r\n";
             const string timeFormat = "{0:00}:{1:00}:{2:00}:{3:00}";
-            const string header = @"$VertAlign          =   Bottom
-$Bold               =   FALSE
-$Underlined         =   FALSE
-$Italic             =   FALSE
-$XOffset                =   0
-$YOffset                =   -5
-$TextContrast           =   15
-$Outline1Contrast           =   15
-$Outline2Contrast           =   13
-$BackgroundContrast     =   0
-$ForceDisplay           =   FALSE
-$FadeIn             =   0
-$FadeOut                =   0
-$HorzAlign          =   Center
-";
+            var header = Configuration.Settings.SubtitleSettings.DvdStudioProHeader.TrimEnd() + Environment.NewLine;
 
             var lastVerticalAlign = "$VertAlign = Bottom";
             var lastHorizontalcalAlign = "$HorzAlign = Center";
@@ -58,13 +44,22 @@ $HorzAlign          =   Center
                                        p.Text.StartsWith("{\\an5}", StringComparison.Ordinal) ||
                                        p.Text.StartsWith("{\\an6}", StringComparison.Ordinal);
             if (verticalTopAlign)
+            {
                 verticalAlign = "$VertAlign = Top";
+            }
             else if (verticalCenterAlign)
+            {
                 verticalAlign = "$VertAlign = Center";
+            }
             else
+            {
                 verticalAlign = "$VertAlign = Bottom";
+            }
+
             if (lastVerticalAlign != verticalAlign)
+            {
                 sb.AppendLine(verticalAlign);
+            }
 
             bool horizontalLeftAlign = p.Text.StartsWith("{\\an1}", StringComparison.Ordinal) ||
                                        p.Text.StartsWith("{\\an4}", StringComparison.Ordinal) ||
@@ -73,13 +68,22 @@ $HorzAlign          =   Center
                                         p.Text.StartsWith("{\\an6}", StringComparison.Ordinal) ||
                                         p.Text.StartsWith("{\\an9}", StringComparison.Ordinal);
             if (horizontalLeftAlign)
+            {
                 horizontalAlign = "$HorzAlign = Left";
+            }
             else if (horizontalRightAlign)
+            {
                 horizontalAlign = "$HorzAlign = Right";
+            }
             else
+            {
                 horizontalAlign = "$HorzAlign = Center";
+            }
+
             if (lastHorizontalAlign != horizontalAlign)
+            {
                 sb.AppendLine(horizontalAlign);
+            }
 
             lastVerticalAlign = verticalAlign;
             lastHorizontalAlign = horizontalAlign;
@@ -92,6 +96,10 @@ $HorzAlign          =   Center
             int number = 0;
             var verticalAlign = "$VertAlign=Bottom";
             var horizontalAlign = "$HorzAlign=Center";
+            bool italicOn = false;
+            bool boldOn = false;
+            bool underlineOn = false;
+
             foreach (string line in lines)
             {
                 if (!string.IsNullOrWhiteSpace(line) && line[0] != '$')
@@ -108,6 +116,18 @@ $HorzAlign          =   Center
                             p.Number = number;
                             p.Text = threePart[2].TrimEnd().Replace(" | ", Environment.NewLine).Replace("|", Environment.NewLine);
                             p.Text = DecodeStyles(p.Text);
+                            if (italicOn && !p.Text.Contains("<i>"))
+                            {
+                                p.Text = "<i>" + p.Text + "</i>";
+                            }
+                            if (boldOn && !p.Text.Contains("<b>"))
+                            {
+                                p.Text = "<b>" + p.Text + "</b>";
+                            }
+                            if (underlineOn && !p.Text.Contains("<u>"))
+                            {
+                                p.Text = "<u>" + p.Text + "</u>";
+                            }
                             p.Text = GetAlignment(verticalAlign, horizontalAlign) + p.Text;
                             subtitle.Paragraphs.Add(p);
                         }
@@ -125,6 +145,30 @@ $HorzAlign          =   Center
                 {
                     horizontalAlign = line.RemoveChar(' ').RemoveChar('\t');
                 }
+                else if (line.Replace(" ", string.Empty).Equals("$Italic=True", StringComparison.OrdinalIgnoreCase))
+                {
+                    italicOn = true;
+                }
+                else if (line.Replace(" ", string.Empty).Trim().Equals("$Italic=False", StringComparison.OrdinalIgnoreCase))
+                {
+                    italicOn = false;
+                }
+                else if (line.Replace(" ", string.Empty).Equals("$Bold=True", StringComparison.OrdinalIgnoreCase))
+                {
+                    boldOn = true;
+                }
+                else if (line.Replace(" ", string.Empty).Trim().Equals("$Bold=False", StringComparison.OrdinalIgnoreCase))
+                {
+                    boldOn = false;
+                }
+                else if (line.Replace(" ", string.Empty).Equals("$Underlined=True", StringComparison.OrdinalIgnoreCase))
+                {
+                    underlineOn = true;
+                }
+                else if (line.Replace(" ", string.Empty).Trim().Equals("$Underlined=False", StringComparison.OrdinalIgnoreCase))
+                {
+                    underlineOn = false;
+                }
             }
         }
 
@@ -133,25 +177,43 @@ $HorzAlign          =   Center
             if (verticalAlign.Equals("$VertAlign=Top", StringComparison.OrdinalIgnoreCase))
             {
                 if (horizontalAlign.Equals("$HorzAlign=Left", StringComparison.OrdinalIgnoreCase))
+                {
                     return "{\\an7}";
+                }
+
                 if (horizontalAlign.Equals("$HorzAlign=Right", StringComparison.OrdinalIgnoreCase))
+                {
                     return "{\\an9}";
+                }
+
                 return "{\\an8}";
             }
 
             if (verticalAlign.Equals("$VertAlign=Center", StringComparison.OrdinalIgnoreCase))
             {
                 if (horizontalAlign.Equals("$HorzAlign=Left", StringComparison.OrdinalIgnoreCase))
+                {
                     return "{\\an4}";
+                }
+
                 if (horizontalAlign.Equals("$HorzAlign=Right", StringComparison.OrdinalIgnoreCase))
+                {
                     return "{\\an6}";
+                }
+
                 return "{\\an5}";
             }
 
             if (horizontalAlign.Equals("$HorzAlign=Left", StringComparison.OrdinalIgnoreCase))
+            {
                 return "{\\an1}";
+            }
+
             if (horizontalAlign.Equals("$HorzAlign=Right", StringComparison.OrdinalIgnoreCase))
+            {
                 return "{\\an3}";
+            }
+
             return string.Empty;
         }
 
@@ -171,19 +233,13 @@ $HorzAlign          =   Center
                 {
                     if (text.Substring(i).StartsWith("^I", StringComparison.Ordinal))
                     {
-                        if (!italicOn)
-                            sb.Append("<i>");
-                        else
-                            sb.Append("</i>");
+                        sb.Append(!italicOn ? "<i>" : "</i>");
                         italicOn = !italicOn;
                         skipNext = true;
                     }
                     else if (text.Substring(i).StartsWith("^B", StringComparison.Ordinal))
                     {
-                        if (!boldOn)
-                            sb.Append("<b>");
-                        else
-                            sb.Append("</b>");
+                        sb.Append(!boldOn ? "<b>" : "</b>");
                         boldOn = !boldOn;
                         skipNext = true;
                     }
@@ -196,11 +252,15 @@ $HorzAlign          =   Center
             return sb.ToString();
         }
 
-        internal static string EncodeStyles(string text)
+        internal static string EncodeStyles(string input)
         {
-            text = Utilities.RemoveSsaTags(text);
+            var text = Utilities.RemoveSsaTags(input);
             text = text.Replace("<I>", "<i>").Replace("</I>", "</i>");
             bool allItalic = text.StartsWith("<i>", StringComparison.Ordinal) && text.EndsWith("</i>", StringComparison.Ordinal) && Utilities.CountTagInText(text, "<i>") == 1;
+            bool allBold = text.StartsWith("<b>", StringComparison.Ordinal) && text.EndsWith("</b>", StringComparison.Ordinal) && Utilities.CountTagInText(text, "<b>") == 1;
+            bool allUnderline = text.StartsWith("<u>", StringComparison.Ordinal) && text.EndsWith("</u>", StringComparison.Ordinal) && Utilities.CountTagInText(text, "<u>") == 1;
+            bool allUnderlineBoldItalic = text.StartsWith("<u><b><i>", StringComparison.Ordinal) && text.EndsWith("</i></b></u>", StringComparison.Ordinal) && Utilities.CountTagInText(text, "<u>") == 1;
+            bool allBoldItalic = text.StartsWith("<b><i>", StringComparison.Ordinal) && text.EndsWith("</i></b>", StringComparison.Ordinal) && Utilities.CountTagInText(text, "<i>") == 1 && Utilities.CountTagInText(text, "<b>") == 1;
 
             text = text.Replace("<i>", "^I");
             text = text.Replace("<I>", "^I");
@@ -212,8 +272,36 @@ $HorzAlign          =   Center
             text = text.Replace("</b>", "^B");
             text = text.Replace("</B>", "^B");
 
+            text = text.Replace("<u>", "^U");
+            text = text.Replace("<U>", "^U");
+            text = text.Replace("</u>", "^U");
+            text = text.Replace("</U>", "^U");
+
+            if (allUnderlineBoldItalic)
+            {
+                return text.Replace(Environment.NewLine, "^U^B^I|^I^B^U");
+            }
+
+            if (allBoldItalic)
+            {
+                return text.Replace(Environment.NewLine, "^U^B^I|^I^B^U");
+            }
+
             if (allItalic)
+            {
                 return text.Replace(Environment.NewLine, "^I|^I");
+            }
+
+            if (allBold)
+            {
+                return text.Replace(Environment.NewLine, "^B|^B");
+            }
+
+            if (allUnderline)
+            {
+                return text.Replace(Environment.NewLine, "^U|^U");
+            }
+
             return text.Replace(Environment.NewLine, "|");
         }
 
@@ -221,7 +309,7 @@ $HorzAlign          =   Center
         {
             try
             {
-                string[] timeParts = timeString.Split(':', ';');
+                var timeParts = timeString.Split(':', ';');
                 timeCode.Hours = int.Parse(timeParts[0]);
                 timeCode.Minutes = int.Parse(timeParts[1]);
                 timeCode.Seconds = int.Parse(timeParts[2]);

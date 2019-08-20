@@ -9,13 +9,14 @@ namespace Nikse.SubtitleEdit.Controls
     /// <summary>
     /// TextBox where double click selects current word
     /// </summary>
-    public class SETextBox : TextBox
+    public sealed class SETextBox : TextBox
     {
         private string _dragText = string.Empty;
         private int _dragStartFrom;
         private long _dragStartTicks;
         private bool _dragRemoveOld;
         private bool _dragFromThis;
+        private long _gotFocusTicks;
 
         public SETextBox()
         {
@@ -26,6 +27,9 @@ namespace Nikse.SubtitleEdit.Controls
             MouseDown += SETextBox_MouseDown;
             MouseUp += SETextBox_MouseUp;
             KeyDown += SETextBox_KeyDown;
+
+            // To fix issue where WM_LBUTTONDOWN got wrong "SelectedText" (only in undocked mode)
+            GotFocus += (sender, args) => { _gotFocusTicks = DateTime.UtcNow.Ticks; };
         }
 
         private void SETextBox_KeyDown(object sender, KeyEventArgs e)
@@ -52,7 +56,7 @@ namespace Nikse.SubtitleEdit.Controls
         {
             if (MouseButtons == MouseButtons.Left && !string.IsNullOrEmpty(_dragText))
             {
-                Point pt = new Point(e.X, e.Y);
+                var pt = new Point(e.X, e.Y);
                 int index = GetCharIndexFromPosition(pt);
                 if (index >= _dragStartFrom && index <= _dragStartFrom + _dragText.Length)
                 {
@@ -60,20 +64,27 @@ namespace Nikse.SubtitleEdit.Controls
                     SelectionStart = _dragStartFrom;
                     SelectionLength = _dragText.Length;
 
-                    var dataObject = new DataObject();
-                    dataObject.SetText(_dragText, TextDataFormat.UnicodeText);
-                    dataObject.SetText(_dragText, TextDataFormat.Text);
+                    try
+                    {
+                        var dataObject = new DataObject();
+                        dataObject.SetText(_dragText, TextDataFormat.UnicodeText);
+                        dataObject.SetText(_dragText, TextDataFormat.Text);
 
-                    _dragFromThis = true;
-                    if (ModifierKeys == Keys.Control)
-                    {
-                        _dragRemoveOld = false;
-                        DoDragDrop(dataObject, DragDropEffects.Copy);
+                        _dragFromThis = true;
+                        if (ModifierKeys == Keys.Control)
+                        {
+                            _dragRemoveOld = false;
+                            DoDragDrop(dataObject, DragDropEffects.Copy);
+                        }
+                        else if (ModifierKeys == Keys.None)
+                        {
+                            _dragRemoveOld = true;
+                            DoDragDrop(dataObject, DragDropEffects.Move);
+                        }
                     }
-                    else if (ModifierKeys == Keys.None)
+                    catch
                     {
-                        _dragRemoveOld = true;
-                        DoDragDrop(dataObject, DragDropEffects.Move);
+                        // ignored
                     }
                 }
             }
@@ -86,9 +97,13 @@ namespace Nikse.SubtitleEdit.Controls
 
             string newText;
             if (e.Data.GetDataPresent(DataFormats.UnicodeText))
+            {
                 newText = (string)e.Data.GetData(DataFormats.UnicodeText);
+            }
             else
+            {
                 newText = (string)e.Data.GetData(DataFormats.Text);
+            }
 
             if (string.IsNullOrWhiteSpace(Text))
             {
@@ -106,13 +121,18 @@ namespace Nikse.SubtitleEdit.Controls
                     {
                         SelectionLength = 0;
                         if (justAppend)
+                        {
                             index++;
+                        }
+
                         SelectionStart = index;
                         return; // too fast - nobody can drag'n'drop this fast
                     }
 
                     if (index >= _dragStartFrom && index <= _dragStartFrom + _dragText.Length)
+                    {
                         return; // don't drop same text at same position
+                    }
 
                     if (_dragRemoveOld)
                     {
@@ -129,20 +149,29 @@ namespace Nikse.SubtitleEdit.Controls
                         {
                             Text = Text.Remove(_dragStartFrom, 1);
                             if (_dragStartFrom < index)
+                            {
                                 index--;
+                            }
                         }
                         else if (_dragStartFrom > 0 && Text.Length > _dragStartFrom + 1 && Text[_dragStartFrom] == ' ' && expectedChars.Contains(Text[_dragStartFrom + 1]))
                         {
                             Text = Text.Remove(_dragStartFrom, 1);
                             if (_dragStartFrom < index)
+                            {
                                 index--;
+                            }
                         }
 
                         // fix index
                         if (index > _dragStartFrom)
+                        {
                             index -= _dragText.Length;
+                        }
+
                         if (index < 0)
+                        {
                             index = 0;
+                        }
                     }
                 }
                 if (justAppend)
@@ -173,7 +202,9 @@ namespace Nikse.SubtitleEdit.Controls
                 {
                     bool lastWord = expectedChars.Contains(Text[endIndex]);
                     if (!lastWord)
+                    {
                         Text = Text.Insert(endIndex, " ");
+                    }
                 }
                 else if (endIndex < Text.Length && newText.EndsWith(' ') && Text[endIndex] == ' ')
                 {
@@ -212,9 +243,13 @@ namespace Nikse.SubtitleEdit.Controls
             }
             if (m.Msg == WM_LBUTTONDOWN)
             {
-                _dragText = SelectedText;
-                _dragStartFrom = SelectionStart;
-                _dragStartTicks = DateTime.UtcNow.Ticks;
+                long milliseconds = (DateTime.UtcNow.Ticks - _gotFocusTicks) / 10000;
+                if (milliseconds > 10)
+                {
+                    _dragText = SelectedText;
+                    _dragStartFrom = SelectionStart;
+                    _dragStartTicks = DateTime.UtcNow.Ticks;
+                }
             }
             base.WndProc(ref m);
         }

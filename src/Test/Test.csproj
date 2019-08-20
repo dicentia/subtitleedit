@@ -45,11 +45,14 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\FixCasingTest.cs" />
     <Compile Include="Core\LanguageAutoDetectTest.cs" />
+    <Compile Include="Core\PlainTextImporterTest.cs" />
     <Compile Include="Core\StringExtensionsTest.cs" />
     <Compile Include="Core\NikseBitmapTest.cs" />
     <Compile Include="Core\SubtitleTest.cs" />
     <Compile Include="Core\RichTextToPlainTextTest.cs" />
+    <Compile Include="Logic\BridgeGapsTest.cs" />
     <Compile Include="Logic\NetflixQualityCheckTest.cs" />
     <Compile Include="Logic\Ocr\BinaryOcrTest.cs" />
     <Compile Include="Core\HtmlUtilTest.cs" />
@@ -60,6 +63,8 @@
     <Compile Include="Logic\Dictionaries\NamesListTest.cs" />
     <Compile Include="Logic\Dictionaries\OcrFixReplaceListTest.cs" />
     <Compile Include="Logic\Mp4\Mp4Test.cs" />
+    <Compile Include="Logic\Ocr\MatchesToItalicStringConverterTest.cs" />
+    <Compile Include="Logic\SplitLongLinesHelperTest.cs" />
     <Compile Include="Logic\TarFileTest.cs" />
     <Compile Include="Logic\TransportStream\TransportStreamTest.cs" />
     <Compile Include="Logic\ParagraphTest.cs" />
@@ -128,6 +133,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Files\auto_detect_Russian.srt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Files\auto_detect_windows-1250.srt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\auto_detect_windows-1251.srt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

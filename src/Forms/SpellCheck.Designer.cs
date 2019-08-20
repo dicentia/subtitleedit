@@ -23,6 +23,9 @@
             this.richTextBoxParagraph = new System.Windows.Forms.RichTextBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addXToNamesnoiseListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addXToUserDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listBoxSuggestions = new System.Windows.Forms.ListBox();
             this.labelFullText = new System.Windows.Forms.Label();
             this.textBoxWord = new System.Windows.Forms.TextBox();
@@ -45,7 +48,6 @@
             this.textBoxWholeText = new System.Windows.Forms.TextBox();
             this.labelActionInfo = new System.Windows.Forms.Label();
             this.buttonSpellCheckDownload = new System.Windows.Forms.Button();
-            this.addXToUserDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBoxWordNotFound.SuspendLayout();
             this.groupBoxSuggestions.SuspendLayout();
@@ -110,9 +112,11 @@
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addXToNamesnoiseListToolStripMenuItem,
-            this.addXToUserDictionaryToolStripMenuItem});
+            this.addXToUserDictionaryToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(208, 70);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(208, 76);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip1Opening);
             // 
             // addXToNamesnoiseListToolStripMenuItem
@@ -121,6 +125,25 @@
             this.addXToNamesnoiseListToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.addXToNamesnoiseListToolStripMenuItem.Text = "Add x to names/noise list";
             this.addXToNamesnoiseListToolStripMenuItem.Click += new System.EventHandler(this.AddXToNamesnoiseListToolStripMenuItemClick);
+            // 
+            // addXToUserDictionaryToolStripMenuItem
+            // 
+            this.addXToUserDictionaryToolStripMenuItem.Name = "addXToUserDictionaryToolStripMenuItem";
+            this.addXToUserDictionaryToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.addXToUserDictionaryToolStripMenuItem.Text = "Add x to user dictionary";
+            this.addXToUserDictionaryToolStripMenuItem.Click += new System.EventHandler(this.AddXToUserDictionaryToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(204, 6);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.deleteToolStripMenuItem.Text = "Delete...";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // listBoxSuggestions
             // 
@@ -187,7 +210,7 @@
             // 
             // buttonUseSuggestion
             // 
-            this.buttonUseSuggestion.Location = new System.Drawing.Point(93, 17);
+            this.buttonUseSuggestion.Location = new System.Drawing.Point(68, 17);
             this.buttonUseSuggestion.Name = "buttonUseSuggestion";
             this.buttonUseSuggestion.Size = new System.Drawing.Size(90, 21);
             this.buttonUseSuggestion.TabIndex = 0;
@@ -209,9 +232,9 @@
             // 
             // buttonUseSuggestionAlways
             // 
-            this.buttonUseSuggestionAlways.Location = new System.Drawing.Point(189, 17);
+            this.buttonUseSuggestionAlways.Location = new System.Drawing.Point(164, 17);
             this.buttonUseSuggestionAlways.Name = "buttonUseSuggestionAlways";
-            this.buttonUseSuggestionAlways.Size = new System.Drawing.Size(90, 21);
+            this.buttonUseSuggestionAlways.Size = new System.Drawing.Size(115, 21);
             this.buttonUseSuggestionAlways.TabIndex = 1;
             this.buttonUseSuggestionAlways.Text = "Use always";
             this.buttonUseSuggestionAlways.UseVisualStyleBackColor = true;
@@ -369,13 +392,6 @@
             this.buttonSpellCheckDownload.UseVisualStyleBackColor = true;
             this.buttonSpellCheckDownload.Click += new System.EventHandler(this.buttonSpellCheckDownload_Click);
             // 
-            // addXToUserDictionaryToolStripMenuItem
-            // 
-            this.addXToUserDictionaryToolStripMenuItem.Name = "addXToUserDictionaryToolStripMenuItem";
-            this.addXToUserDictionaryToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.addXToUserDictionaryToolStripMenuItem.Text = "Add x to user dictionary";
-            this.addXToUserDictionaryToolStripMenuItem.Click += new System.EventHandler(this.AddXToUserDictionaryToolStripMenuItem_Click);
-            // 
             // SpellCheck
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -447,5 +463,7 @@
         private System.Windows.Forms.Button buttonUndo;
         private System.Windows.Forms.Button buttonGoogleIt;
         private System.Windows.Forms.ToolStripMenuItem addXToUserDictionaryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
     }
 }

@@ -33,9 +33,16 @@
             this.tabControlSettings = new System.Windows.Forms.TabControl();
             this.tabPageGeneral = new System.Windows.Forms.TabPage();
             this.groupBoxMiscellaneous = new System.Windows.Forms.GroupBox();
+            this.checkBoxAutoSave = new System.Windows.Forms.CheckBox();
             this.comboBoxSaveAsFileNameFrom = new System.Windows.Forms.ComboBox();
             this.labelSaveAsFileNameFrom = new System.Windows.Forms.Label();
             this.groupBoxGeneralRules = new System.Windows.Forms.GroupBox();
+            this.checkBoxCpsIncludeWhiteSpace = new System.Windows.Forms.CheckBox();
+            this.buttonEditProfile = new System.Windows.Forms.Button();
+            this.comboBoxRulesProfileName = new System.Windows.Forms.ComboBox();
+            this.labelRulesProfileName = new System.Windows.Forms.Label();
+            this.labelOptimalCharsPerSecond = new System.Windows.Forms.Label();
+            this.numericUpDownOptimalCharsSec = new System.Windows.Forms.NumericUpDown();
             this.labelSubMaxLen = new System.Windows.Forms.Label();
             this.numericUpDownMaxWordsMin = new System.Windows.Forms.NumericUpDown();
             this.labelMergeShortLines = new System.Windows.Forms.Label();
@@ -82,6 +89,9 @@
             this.labelDefaultFrameRate = new System.Windows.Forms.Label();
             this.tabPageShortcuts = new System.Windows.Forms.TabPage();
             this.groupBoxShortcuts = new System.Windows.Forms.GroupBox();
+            this.buttonShortcutsClear = new System.Windows.Forms.Button();
+            this.labelShortcutsSearch = new System.Windows.Forms.Label();
+            this.textBoxShortcutSearch = new System.Windows.Forms.TextBox();
             this.buttonClearShortcut = new System.Windows.Forms.Button();
             this.comboBoxShortcutKey = new System.Windows.Forms.ComboBox();
             this.labelShortcutKey = new System.Windows.Forms.Label();
@@ -183,19 +193,22 @@
             this.buttonWaveformSelectedColor = new System.Windows.Forms.Button();
             this.checkBoxWaveformShowGrid = new System.Windows.Forms.CheckBox();
             this.tabPageTools = new System.Windows.Forms.TabPage();
+            this.groupBoxGoogleTranslate = new System.Windows.Forms.GroupBox();
+            this.labelGoogleTranslateApiKey = new System.Windows.Forms.Label();
+            this.textBoxGoogleTransleApiKey = new System.Windows.Forms.TextBox();
+            this.linkLabelGoogleTranslateSignUp = new System.Windows.Forms.LinkLabel();
+            this.label3 = new System.Windows.Forms.Label();
             this.groupBoxBing = new System.Windows.Forms.GroupBox();
             this.labelClientSecret = new System.Windows.Forms.Label();
             this.textBoxBingClientSecret = new System.Windows.Forms.TextBox();
             this.linkLabelBingSubscribe = new System.Windows.Forms.LinkLabel();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBoxToolsMisc = new System.Windows.Forms.GroupBox();
-            this.comboBoxGoogleTranslateUrl = new System.Windows.Forms.ComboBox();
-            this.labelGoogleTranslateUrl = new System.Windows.Forms.Label();
-            this.checkBoxCpsIncludeWhiteSpace = new System.Windows.Forms.CheckBox();
             this.labelUserBingApiId = new System.Windows.Forms.Label();
             this.buttonEditDoNotBreakAfterList = new System.Windows.Forms.Button();
             this.checkBoxUseDoNotBreakAfterList = new System.Windows.Forms.CheckBox();
             this.groupBoxSpellCheck = new System.Windows.Forms.GroupBox();
+            this.checkBoxUseAlwaysToFile = new System.Windows.Forms.CheckBox();
             this.checkBoxTreatINQuoteAsING = new System.Windows.Forms.CheckBox();
             this.checkBoxSpellCheckOneLetterWords = new System.Windows.Forms.CheckBox();
             this.checkBoxSpellCheckAutoChangeNames = new System.Windows.Forms.CheckBox();
@@ -347,6 +360,7 @@
             this.tabPageGeneral.SuspendLayout();
             this.groupBoxMiscellaneous.SuspendLayout();
             this.groupBoxGeneralRules.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOptimalCharsSec)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxWordsMin)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxNumberOfLines)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDurationMin)).BeginInit();
@@ -369,6 +383,7 @@
             this.groupBoxWaveformAppearence.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWaveformBorderHitMs)).BeginInit();
             this.tabPageTools.SuspendLayout();
+            this.groupBoxGoogleTranslate.SuspendLayout();
             this.groupBoxBing.SuspendLayout();
             this.groupBoxToolsMisc.SuspendLayout();
             this.groupBoxSpellCheck.SuspendLayout();
@@ -483,6 +498,7 @@
             this.groupBoxMiscellaneous.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxMiscellaneous.Controls.Add(this.checkBoxAutoSave);
             this.groupBoxMiscellaneous.Controls.Add(this.comboBoxSaveAsFileNameFrom);
             this.groupBoxMiscellaneous.Controls.Add(this.labelSaveAsFileNameFrom);
             this.groupBoxMiscellaneous.Controls.Add(this.groupBoxGeneralRules);
@@ -521,6 +537,16 @@
             this.groupBoxMiscellaneous.TabStop = false;
             this.groupBoxMiscellaneous.Text = "Miscellaneous";
             // 
+            // checkBoxAutoSave
+            // 
+            this.checkBoxAutoSave.AutoSize = true;
+            this.checkBoxAutoSave.Location = new System.Drawing.Point(441, 438);
+            this.checkBoxAutoSave.Name = "checkBoxAutoSave";
+            this.checkBoxAutoSave.Size = new System.Drawing.Size(75, 17);
+            this.checkBoxAutoSave.TabIndex = 28;
+            this.checkBoxAutoSave.Text = "Auto save";
+            this.checkBoxAutoSave.UseVisualStyleBackColor = true;
+            // 
             // comboBoxSaveAsFileNameFrom
             // 
             this.comboBoxSaveAsFileNameFrom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -541,6 +567,12 @@
             // 
             // groupBoxGeneralRules
             // 
+            this.groupBoxGeneralRules.Controls.Add(this.checkBoxCpsIncludeWhiteSpace);
+            this.groupBoxGeneralRules.Controls.Add(this.buttonEditProfile);
+            this.groupBoxGeneralRules.Controls.Add(this.comboBoxRulesProfileName);
+            this.groupBoxGeneralRules.Controls.Add(this.labelRulesProfileName);
+            this.groupBoxGeneralRules.Controls.Add(this.labelOptimalCharsPerSecond);
+            this.groupBoxGeneralRules.Controls.Add(this.numericUpDownOptimalCharsSec);
             this.groupBoxGeneralRules.Controls.Add(this.labelSubMaxLen);
             this.groupBoxGeneralRules.Controls.Add(this.numericUpDownMaxWordsMin);
             this.groupBoxGeneralRules.Controls.Add(this.labelMergeShortLines);
@@ -559,15 +591,88 @@
             this.groupBoxGeneralRules.Controls.Add(this.numericUpDownSubtitleLineMaximumLength);
             this.groupBoxGeneralRules.Location = new System.Drawing.Point(6, 24);
             this.groupBoxGeneralRules.Name = "groupBoxGeneralRules";
-            this.groupBoxGeneralRules.Size = new System.Drawing.Size(387, 243);
+            this.groupBoxGeneralRules.Size = new System.Drawing.Size(387, 337);
             this.groupBoxGeneralRules.TabIndex = 0;
             this.groupBoxGeneralRules.TabStop = false;
             this.groupBoxGeneralRules.Text = "Rules";
             // 
+            // checkBoxCpsIncludeWhiteSpace
+            // 
+            this.checkBoxCpsIncludeWhiteSpace.AutoSize = true;
+            this.checkBoxCpsIncludeWhiteSpace.Location = new System.Drawing.Point(9, 299);
+            this.checkBoxCpsIncludeWhiteSpace.Name = "checkBoxCpsIncludeWhiteSpace";
+            this.checkBoxCpsIncludeWhiteSpace.Size = new System.Drawing.Size(271, 17);
+            this.checkBoxCpsIncludeWhiteSpace.TabIndex = 60;
+            this.checkBoxCpsIncludeWhiteSpace.Text = "Characters per second (CPS) includes white spaces";
+            this.checkBoxCpsIncludeWhiteSpace.UseVisualStyleBackColor = true;
+            this.checkBoxCpsIncludeWhiteSpace.CheckedChanged += new System.EventHandler(this.ProfileUiValueChanged);
+            // 
+            // buttonEditProfile
+            // 
+            this.buttonEditProfile.Location = new System.Drawing.Point(282, 19);
+            this.buttonEditProfile.Name = "buttonEditProfile";
+            this.buttonEditProfile.Size = new System.Drawing.Size(28, 23);
+            this.buttonEditProfile.TabIndex = 10;
+            this.buttonEditProfile.Text = "...";
+            this.buttonEditProfile.UseVisualStyleBackColor = true;
+            this.buttonEditProfile.Click += new System.EventHandler(this.buttonEditProfile_Click);
+            // 
+            // comboBoxRulesProfileName
+            // 
+            this.comboBoxRulesProfileName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxRulesProfileName.FormattingEnabled = true;
+            this.comboBoxRulesProfileName.Location = new System.Drawing.Point(78, 20);
+            this.comboBoxRulesProfileName.Name = "comboBoxRulesProfileName";
+            this.comboBoxRulesProfileName.Size = new System.Drawing.Size(198, 21);
+            this.comboBoxRulesProfileName.TabIndex = 5;
+            this.comboBoxRulesProfileName.SelectedIndexChanged += new System.EventHandler(this.comboBoxRulesProfileName_SelectedIndexChanged);
+            // 
+            // labelRulesProfileName
+            // 
+            this.labelRulesProfileName.AutoSize = true;
+            this.labelRulesProfileName.Location = new System.Drawing.Point(6, 24);
+            this.labelRulesProfileName.Name = "labelRulesProfileName";
+            this.labelRulesProfileName.Size = new System.Drawing.Size(37, 13);
+            this.labelRulesProfileName.TabIndex = 50;
+            this.labelRulesProfileName.Text = "Profile";
+            // 
+            // labelOptimalCharsPerSecond
+            // 
+            this.labelOptimalCharsPerSecond.AutoSize = true;
+            this.labelOptimalCharsPerSecond.Location = new System.Drawing.Point(6, 84);
+            this.labelOptimalCharsPerSecond.Name = "labelOptimalCharsPerSecond";
+            this.labelOptimalCharsPerSecond.Size = new System.Drawing.Size(92, 13);
+            this.labelOptimalCharsPerSecond.TabIndex = 8;
+            this.labelOptimalCharsPerSecond.Text = "Optimal chars/sec";
+            // 
+            // numericUpDownOptimalCharsSec
+            // 
+            this.numericUpDownOptimalCharsSec.DecimalPlaces = 1;
+            this.numericUpDownOptimalCharsSec.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numericUpDownOptimalCharsSec.Location = new System.Drawing.Point(203, 82);
+            this.numericUpDownOptimalCharsSec.Minimum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.numericUpDownOptimalCharsSec.Name = "numericUpDownOptimalCharsSec";
+            this.numericUpDownOptimalCharsSec.Size = new System.Drawing.Size(56, 21);
+            this.numericUpDownOptimalCharsSec.TabIndex = 20;
+            this.numericUpDownOptimalCharsSec.Value = new decimal(new int[] {
+            11,
+            0,
+            0,
+            0});
+            this.numericUpDownOptimalCharsSec.ValueChanged += new System.EventHandler(this.ProfileUiValueChanged);
+            // 
             // labelSubMaxLen
             // 
             this.labelSubMaxLen.AutoSize = true;
-            this.labelSubMaxLen.Location = new System.Drawing.Point(6, 21);
+            this.labelSubMaxLen.Location = new System.Drawing.Point(6, 57);
             this.labelSubMaxLen.Name = "labelSubMaxLen";
             this.labelSubMaxLen.Size = new System.Drawing.Size(103, 13);
             this.labelSubMaxLen.TabIndex = 6;
@@ -575,7 +680,7 @@
             // 
             // numericUpDownMaxWordsMin
             // 
-            this.numericUpDownMaxWordsMin.Location = new System.Drawing.Point(203, 72);
+            this.numericUpDownMaxWordsMin.Location = new System.Drawing.Point(203, 136);
             this.numericUpDownMaxWordsMin.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -588,17 +693,18 @@
             0});
             this.numericUpDownMaxWordsMin.Name = "numericUpDownMaxWordsMin";
             this.numericUpDownMaxWordsMin.Size = new System.Drawing.Size(56, 21);
-            this.numericUpDownMaxWordsMin.TabIndex = 10;
+            this.numericUpDownMaxWordsMin.TabIndex = 30;
             this.numericUpDownMaxWordsMin.Value = new decimal(new int[] {
             300,
             0,
             0,
             0});
+            this.numericUpDownMaxWordsMin.ValueChanged += new System.EventHandler(this.ProfileUiValueChanged);
             // 
             // labelMergeShortLines
             // 
             this.labelMergeShortLines.AutoSize = true;
-            this.labelMergeShortLines.Location = new System.Drawing.Point(6, 209);
+            this.labelMergeShortLines.Location = new System.Drawing.Point(6, 273);
             this.labelMergeShortLines.Name = "labelMergeShortLines";
             this.labelMergeShortLines.Size = new System.Drawing.Size(124, 13);
             this.labelMergeShortLines.TabIndex = 16;
@@ -607,7 +713,7 @@
             // labelMaxWordsPerMin
             // 
             this.labelMaxWordsPerMin.AutoSize = true;
-            this.labelMaxWordsPerMin.Location = new System.Drawing.Point(6, 74);
+            this.labelMaxWordsPerMin.Location = new System.Drawing.Point(6, 138);
             this.labelMaxWordsPerMin.Name = "labelMaxWordsPerMin";
             this.labelMaxWordsPerMin.Size = new System.Drawing.Size(83, 13);
             this.labelMaxWordsPerMin.TabIndex = 49;
@@ -616,7 +722,7 @@
             // labelMinDuration
             // 
             this.labelMinDuration.AutoSize = true;
-            this.labelMinDuration.Location = new System.Drawing.Point(6, 101);
+            this.labelMinDuration.Location = new System.Drawing.Point(6, 165);
             this.labelMinDuration.Name = "labelMinDuration";
             this.labelMinDuration.Size = new System.Drawing.Size(132, 13);
             this.labelMinDuration.TabIndex = 10;
@@ -624,7 +730,7 @@
             // 
             // numericUpDownMaxNumberOfLines
             // 
-            this.numericUpDownMaxNumberOfLines.Location = new System.Drawing.Point(203, 178);
+            this.numericUpDownMaxNumberOfLines.Location = new System.Drawing.Point(203, 242);
             this.numericUpDownMaxNumberOfLines.Maximum = new decimal(new int[] {
             25,
             0,
@@ -637,7 +743,7 @@
             0});
             this.numericUpDownMaxNumberOfLines.Name = "numericUpDownMaxNumberOfLines";
             this.numericUpDownMaxNumberOfLines.Size = new System.Drawing.Size(56, 21);
-            this.numericUpDownMaxNumberOfLines.TabIndex = 15;
+            this.numericUpDownMaxNumberOfLines.TabIndex = 50;
             this.numericUpDownMaxNumberOfLines.Value = new decimal(new int[] {
             2,
             0,
@@ -648,7 +754,7 @@
             // labelMaxDuration
             // 
             this.labelMaxDuration.AutoSize = true;
-            this.labelMaxDuration.Location = new System.Drawing.Point(6, 127);
+            this.labelMaxDuration.Location = new System.Drawing.Point(6, 191);
             this.labelMaxDuration.Name = "labelMaxDuration";
             this.labelMaxDuration.Size = new System.Drawing.Size(136, 13);
             this.labelMaxDuration.TabIndex = 12;
@@ -657,7 +763,7 @@
             // labelMaxLines
             // 
             this.labelMaxLines.AutoSize = true;
-            this.labelMaxLines.Location = new System.Drawing.Point(6, 180);
+            this.labelMaxLines.Location = new System.Drawing.Point(6, 244);
             this.labelMaxLines.Name = "labelMaxLines";
             this.labelMaxLines.Size = new System.Drawing.Size(107, 13);
             this.labelMaxLines.TabIndex = 47;
@@ -665,7 +771,7 @@
             // 
             // numericUpDownDurationMin
             // 
-            this.numericUpDownDurationMin.Location = new System.Drawing.Point(203, 99);
+            this.numericUpDownDurationMin.Location = new System.Drawing.Point(203, 163);
             this.numericUpDownDurationMin.Maximum = new decimal(new int[] {
             2000,
             0,
@@ -678,16 +784,17 @@
             0});
             this.numericUpDownDurationMin.Name = "numericUpDownDurationMin";
             this.numericUpDownDurationMin.Size = new System.Drawing.Size(56, 21);
-            this.numericUpDownDurationMin.TabIndex = 11;
+            this.numericUpDownDurationMin.TabIndex = 35;
             this.numericUpDownDurationMin.Value = new decimal(new int[] {
             100,
             0,
             0,
             0});
+            this.numericUpDownDurationMin.ValueChanged += new System.EventHandler(this.ProfileUiValueChanged);
             // 
             // numericUpDownDurationMax
             // 
-            this.numericUpDownDurationMax.Location = new System.Drawing.Point(203, 125);
+            this.numericUpDownDurationMax.Location = new System.Drawing.Point(203, 189);
             this.numericUpDownDurationMax.Maximum = new decimal(new int[] {
             50000,
             0,
@@ -700,34 +807,36 @@
             0});
             this.numericUpDownDurationMax.Name = "numericUpDownDurationMax";
             this.numericUpDownDurationMax.Size = new System.Drawing.Size(56, 21);
-            this.numericUpDownDurationMax.TabIndex = 13;
+            this.numericUpDownDurationMax.TabIndex = 40;
             this.numericUpDownDurationMax.Value = new decimal(new int[] {
             50000,
             0,
             0,
             0});
+            this.numericUpDownDurationMax.ValueChanged += new System.EventHandler(this.ProfileUiValueChanged);
             // 
             // comboBoxMergeShortLineLength
             // 
             this.comboBoxMergeShortLineLength.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxMergeShortLineLength.FormattingEnabled = true;
-            this.comboBoxMergeShortLineLength.Location = new System.Drawing.Point(203, 206);
+            this.comboBoxMergeShortLineLength.Location = new System.Drawing.Point(203, 270);
             this.comboBoxMergeShortLineLength.Name = "comboBoxMergeShortLineLength";
             this.comboBoxMergeShortLineLength.Size = new System.Drawing.Size(73, 21);
-            this.comboBoxMergeShortLineLength.TabIndex = 16;
+            this.comboBoxMergeShortLineLength.TabIndex = 55;
+            this.comboBoxMergeShortLineLength.SelectedIndexChanged += new System.EventHandler(this.ProfileUiValueChanged);
             // 
             // labelMaxCharsPerSecond
             // 
             this.labelMaxCharsPerSecond.AutoSize = true;
-            this.labelMaxCharsPerSecond.Location = new System.Drawing.Point(6, 47);
+            this.labelMaxCharsPerSecond.Location = new System.Drawing.Point(6, 111);
             this.labelMaxCharsPerSecond.Name = "labelMaxCharsPerSecond";
             this.labelMaxCharsPerSecond.Size = new System.Drawing.Size(80, 13);
-            this.labelMaxCharsPerSecond.TabIndex = 8;
+            this.labelMaxCharsPerSecond.TabIndex = 9;
             this.labelMaxCharsPerSecond.Text = "Max. chars/sec";
             // 
             // numericUpDownMinGapMs
             // 
-            this.numericUpDownMinGapMs.Location = new System.Drawing.Point(203, 151);
+            this.numericUpDownMinGapMs.Location = new System.Drawing.Point(203, 215);
             this.numericUpDownMinGapMs.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -735,12 +844,13 @@
             0});
             this.numericUpDownMinGapMs.Name = "numericUpDownMinGapMs";
             this.numericUpDownMinGapMs.Size = new System.Drawing.Size(56, 21);
-            this.numericUpDownMinGapMs.TabIndex = 14;
+            this.numericUpDownMinGapMs.TabIndex = 45;
             this.numericUpDownMinGapMs.Value = new decimal(new int[] {
             25,
             0,
             0,
             0});
+            this.numericUpDownMinGapMs.ValueChanged += new System.EventHandler(this.ProfileUiValueChanged);
             // 
             // numericUpDownMaxCharsSec
             // 
@@ -750,7 +860,7 @@
             0,
             0,
             65536});
-            this.numericUpDownMaxCharsSec.Location = new System.Drawing.Point(203, 45);
+            this.numericUpDownMaxCharsSec.Location = new System.Drawing.Point(203, 109);
             this.numericUpDownMaxCharsSec.Minimum = new decimal(new int[] {
             4,
             0,
@@ -758,17 +868,18 @@
             0});
             this.numericUpDownMaxCharsSec.Name = "numericUpDownMaxCharsSec";
             this.numericUpDownMaxCharsSec.Size = new System.Drawing.Size(56, 21);
-            this.numericUpDownMaxCharsSec.TabIndex = 9;
+            this.numericUpDownMaxCharsSec.TabIndex = 25;
             this.numericUpDownMaxCharsSec.Value = new decimal(new int[] {
             24,
             0,
             0,
             0});
+            this.numericUpDownMaxCharsSec.ValueChanged += new System.EventHandler(this.ProfileUiValueChanged);
             // 
             // labelMinGapMs
             // 
             this.labelMinGapMs.AutoSize = true;
-            this.labelMinGapMs.Location = new System.Drawing.Point(6, 153);
+            this.labelMinGapMs.Location = new System.Drawing.Point(6, 217);
             this.labelMinGapMs.Name = "labelMinGapMs";
             this.labelMinGapMs.Size = new System.Drawing.Size(136, 13);
             this.labelMinGapMs.TabIndex = 14;
@@ -776,7 +887,7 @@
             // 
             // numericUpDownSubtitleLineMaximumLength
             // 
-            this.numericUpDownSubtitleLineMaximumLength.Location = new System.Drawing.Point(203, 19);
+            this.numericUpDownSubtitleLineMaximumLength.Location = new System.Drawing.Point(203, 55);
             this.numericUpDownSubtitleLineMaximumLength.Maximum = new decimal(new int[] {
             999,
             0,
@@ -789,12 +900,13 @@
             0});
             this.numericUpDownSubtitleLineMaximumLength.Name = "numericUpDownSubtitleLineMaximumLength";
             this.numericUpDownSubtitleLineMaximumLength.Size = new System.Drawing.Size(56, 21);
-            this.numericUpDownSubtitleLineMaximumLength.TabIndex = 7;
+            this.numericUpDownSubtitleLineMaximumLength.TabIndex = 15;
             this.numericUpDownSubtitleLineMaximumLength.Value = new decimal(new int[] {
             100,
             0,
             0,
             0});
+            this.numericUpDownSubtitleLineMaximumLength.ValueChanged += new System.EventHandler(this.ProfileUiValueChanged);
             // 
             // comboBoxAutoBackupDeleteAfter
             // 
@@ -821,10 +933,10 @@
             // checkBoxCheckForUpdates
             // 
             this.checkBoxCheckForUpdates.AutoSize = true;
-            this.checkBoxCheckForUpdates.Location = new System.Drawing.Point(441, 435);
+            this.checkBoxCheckForUpdates.Location = new System.Drawing.Point(522, 438);
             this.checkBoxCheckForUpdates.Name = "checkBoxCheckForUpdates";
             this.checkBoxCheckForUpdates.Size = new System.Drawing.Size(114, 17);
-            this.checkBoxCheckForUpdates.TabIndex = 28;
+            this.checkBoxCheckForUpdates.TabIndex = 29;
             this.checkBoxCheckForUpdates.Text = "Check for updates";
             this.checkBoxCheckForUpdates.UseVisualStyleBackColor = true;
             // 
@@ -868,7 +980,7 @@
             "UTF-7",
             "UTF-8",
             "Unicode"});
-            this.comboBoxEncoding.Location = new System.Drawing.Point(205, 314);
+            this.comboBoxEncoding.Location = new System.Drawing.Point(205, 409);
             this.comboBoxEncoding.Name = "comboBoxEncoding";
             this.comboBoxEncoding.Size = new System.Drawing.Size(188, 21);
             this.comboBoxEncoding.TabIndex = 4;
@@ -876,7 +988,7 @@
             // checkBoxAutoDetectAnsiEncoding
             // 
             this.checkBoxAutoDetectAnsiEncoding.AutoSize = true;
-            this.checkBoxAutoDetectAnsiEncoding.Location = new System.Drawing.Point(205, 343);
+            this.checkBoxAutoDetectAnsiEncoding.Location = new System.Drawing.Point(205, 438);
             this.checkBoxAutoDetectAnsiEncoding.Name = "checkBoxAutoDetectAnsiEncoding";
             this.checkBoxAutoDetectAnsiEncoding.Size = new System.Drawing.Size(15, 14);
             this.checkBoxAutoDetectAnsiEncoding.TabIndex = 6;
@@ -979,7 +1091,7 @@
             // labelAutoDetectAnsiEncoding
             // 
             this.labelAutoDetectAnsiEncoding.AutoSize = true;
-            this.labelAutoDetectAnsiEncoding.Location = new System.Drawing.Point(8, 342);
+            this.labelAutoDetectAnsiEncoding.Location = new System.Drawing.Point(8, 437);
             this.labelAutoDetectAnsiEncoding.Name = "labelAutoDetectAnsiEncoding";
             this.labelAutoDetectAnsiEncoding.Size = new System.Drawing.Size(137, 13);
             this.labelAutoDetectAnsiEncoding.TabIndex = 5;
@@ -1061,7 +1173,7 @@
             // labelDefaultFileEncoding
             // 
             this.labelDefaultFileEncoding.AutoSize = true;
-            this.labelDefaultFileEncoding.Location = new System.Drawing.Point(8, 318);
+            this.labelDefaultFileEncoding.Location = new System.Drawing.Point(8, 413);
             this.labelDefaultFileEncoding.Name = "labelDefaultFileEncoding";
             this.labelDefaultFileEncoding.Size = new System.Drawing.Size(105, 13);
             this.labelDefaultFileEncoding.TabIndex = 3;
@@ -1070,7 +1182,7 @@
             // comboBoxFrameRate
             // 
             this.comboBoxFrameRate.FormattingEnabled = true;
-            this.comboBoxFrameRate.Location = new System.Drawing.Point(205, 286);
+            this.comboBoxFrameRate.Location = new System.Drawing.Point(205, 381);
             this.comboBoxFrameRate.Name = "comboBoxFrameRate";
             this.comboBoxFrameRate.Size = new System.Drawing.Size(121, 21);
             this.comboBoxFrameRate.TabIndex = 2;
@@ -1078,7 +1190,7 @@
             // labelDefaultFrameRate
             // 
             this.labelDefaultFrameRate.AutoSize = true;
-            this.labelDefaultFrameRate.Location = new System.Drawing.Point(8, 291);
+            this.labelDefaultFrameRate.Location = new System.Drawing.Point(8, 386);
             this.labelDefaultFrameRate.Name = "labelDefaultFrameRate";
             this.labelDefaultFrameRate.Size = new System.Drawing.Size(96, 13);
             this.labelDefaultFrameRate.TabIndex = 1;
@@ -1100,6 +1212,9 @@
             this.groupBoxShortcuts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxShortcuts.Controls.Add(this.buttonShortcutsClear);
+            this.groupBoxShortcuts.Controls.Add(this.labelShortcutsSearch);
+            this.groupBoxShortcuts.Controls.Add(this.textBoxShortcutSearch);
             this.groupBoxShortcuts.Controls.Add(this.buttonClearShortcut);
             this.groupBoxShortcuts.Controls.Add(this.comboBoxShortcutKey);
             this.groupBoxShortcuts.Controls.Add(this.labelShortcutKey);
@@ -1115,6 +1230,34 @@
             this.groupBoxShortcuts.TabIndex = 2;
             this.groupBoxShortcuts.TabStop = false;
             this.groupBoxShortcuts.Text = "Shortcuts";
+            // 
+            // buttonShortcutsClear
+            // 
+            this.buttonShortcutsClear.Enabled = false;
+            this.buttonShortcutsClear.Location = new System.Drawing.Point(221, 18);
+            this.buttonShortcutsClear.Name = "buttonShortcutsClear";
+            this.buttonShortcutsClear.Size = new System.Drawing.Size(111, 23);
+            this.buttonShortcutsClear.TabIndex = 38;
+            this.buttonShortcutsClear.Text = "Clear";
+            this.buttonShortcutsClear.UseVisualStyleBackColor = true;
+            this.buttonShortcutsClear.Click += new System.EventHandler(this.buttonShortcutsClear_Click);
+            // 
+            // labelShortcutsSearch
+            // 
+            this.labelShortcutsSearch.AutoSize = true;
+            this.labelShortcutsSearch.Location = new System.Drawing.Point(18, 23);
+            this.labelShortcutsSearch.Name = "labelShortcutsSearch";
+            this.labelShortcutsSearch.Size = new System.Drawing.Size(40, 13);
+            this.labelShortcutsSearch.TabIndex = 37;
+            this.labelShortcutsSearch.Text = "Search";
+            // 
+            // textBoxShortcutSearch
+            // 
+            this.textBoxShortcutSearch.Location = new System.Drawing.Point(64, 20);
+            this.textBoxShortcutSearch.Name = "textBoxShortcutSearch";
+            this.textBoxShortcutSearch.Size = new System.Drawing.Size(151, 21);
+            this.textBoxShortcutSearch.TabIndex = 36;
+            this.textBoxShortcutSearch.TextChanged += new System.EventHandler(this.textBoxShortcutSearch_TextChanged);
             // 
             // buttonClearShortcut
             // 
@@ -1343,9 +1486,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.treeViewShortcuts.HideSelection = false;
-            this.treeViewShortcuts.Location = new System.Drawing.Point(16, 21);
+            this.treeViewShortcuts.Location = new System.Drawing.Point(16, 47);
             this.treeViewShortcuts.Name = "treeViewShortcuts";
-            this.treeViewShortcuts.Size = new System.Drawing.Size(797, 419);
+            this.treeViewShortcuts.Size = new System.Drawing.Size(797, 393);
             this.treeViewShortcuts.TabIndex = 0;
             this.treeViewShortcuts.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewShortcuts_AfterSelect);
             // 
@@ -2422,6 +2565,7 @@
             // 
             // tabPageTools
             // 
+            this.tabPageTools.Controls.Add(this.groupBoxGoogleTranslate);
             this.tabPageTools.Controls.Add(this.groupBoxBing);
             this.tabPageTools.Controls.Add(this.groupBoxToolsMisc);
             this.tabPageTools.Controls.Add(this.groupBoxSpellCheck);
@@ -2435,6 +2579,56 @@
             this.tabPageTools.Text = "Tools";
             this.tabPageTools.UseVisualStyleBackColor = true;
             // 
+            // groupBoxGoogleTranslate
+            // 
+            this.groupBoxGoogleTranslate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxGoogleTranslate.Controls.Add(this.labelGoogleTranslateApiKey);
+            this.groupBoxGoogleTranslate.Controls.Add(this.textBoxGoogleTransleApiKey);
+            this.groupBoxGoogleTranslate.Controls.Add(this.linkLabelGoogleTranslateSignUp);
+            this.groupBoxGoogleTranslate.Controls.Add(this.label3);
+            this.groupBoxGoogleTranslate.Location = new System.Drawing.Point(422, 290);
+            this.groupBoxGoogleTranslate.Name = "groupBoxGoogleTranslate";
+            this.groupBoxGoogleTranslate.Size = new System.Drawing.Size(404, 78);
+            this.groupBoxGoogleTranslate.TabIndex = 31;
+            this.groupBoxGoogleTranslate.TabStop = false;
+            this.groupBoxGoogleTranslate.Text = "Google translate";
+            // 
+            // labelGoogleTranslateApiKey
+            // 
+            this.labelGoogleTranslateApiKey.AutoSize = true;
+            this.labelGoogleTranslateApiKey.Location = new System.Drawing.Point(13, 47);
+            this.labelGoogleTranslateApiKey.Name = "labelGoogleTranslateApiKey";
+            this.labelGoogleTranslateApiKey.Size = new System.Drawing.Size(44, 13);
+            this.labelGoogleTranslateApiKey.TabIndex = 30;
+            this.labelGoogleTranslateApiKey.Text = "API key";
+            // 
+            // textBoxGoogleTransleApiKey
+            // 
+            this.textBoxGoogleTransleApiKey.Location = new System.Drawing.Point(94, 47);
+            this.textBoxGoogleTransleApiKey.Name = "textBoxGoogleTransleApiKey";
+            this.textBoxGoogleTransleApiKey.Size = new System.Drawing.Size(304, 21);
+            this.textBoxGoogleTransleApiKey.TabIndex = 26;
+            // 
+            // linkLabelGoogleTranslateSignUp
+            // 
+            this.linkLabelGoogleTranslateSignUp.Location = new System.Drawing.Point(201, 15);
+            this.linkLabelGoogleTranslateSignUp.Name = "linkLabelGoogleTranslateSignUp";
+            this.linkLabelGoogleTranslateSignUp.Size = new System.Drawing.Size(183, 27);
+            this.linkLabelGoogleTranslateSignUp.TabIndex = 24;
+            this.linkLabelGoogleTranslateSignUp.TabStop = true;
+            this.linkLabelGoogleTranslateSignUp.Text = "How to sign up";
+            this.linkLabelGoogleTranslateSignUp.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.linkLabelGoogleTranslateSignUp.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelGoogleTranslateSignUp_LinkClicked);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(16, 106);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(0, 13);
+            this.label3.TabIndex = 25;
+            // 
             // groupBoxBing
             // 
             this.groupBoxBing.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -2443,9 +2637,9 @@
             this.groupBoxBing.Controls.Add(this.textBoxBingClientSecret);
             this.groupBoxBing.Controls.Add(this.linkLabelBingSubscribe);
             this.groupBoxBing.Controls.Add(this.label1);
-            this.groupBoxBing.Location = new System.Drawing.Point(421, 331);
+            this.groupBoxBing.Location = new System.Drawing.Point(421, 374);
             this.groupBoxBing.Name = "groupBoxBing";
-            this.groupBoxBing.Size = new System.Drawing.Size(404, 131);
+            this.groupBoxBing.Size = new System.Drawing.Size(404, 88);
             this.groupBoxBing.TabIndex = 6;
             this.groupBoxBing.TabStop = false;
             this.groupBoxBing.Text = "Bing translator";
@@ -2487,48 +2681,15 @@
             // 
             // groupBoxToolsMisc
             // 
-            this.groupBoxToolsMisc.Controls.Add(this.comboBoxGoogleTranslateUrl);
-            this.groupBoxToolsMisc.Controls.Add(this.labelGoogleTranslateUrl);
-            this.groupBoxToolsMisc.Controls.Add(this.checkBoxCpsIncludeWhiteSpace);
             this.groupBoxToolsMisc.Controls.Add(this.labelUserBingApiId);
             this.groupBoxToolsMisc.Controls.Add(this.buttonEditDoNotBreakAfterList);
             this.groupBoxToolsMisc.Controls.Add(this.checkBoxUseDoNotBreakAfterList);
             this.groupBoxToolsMisc.Location = new System.Drawing.Point(421, 130);
             this.groupBoxToolsMisc.Name = "groupBoxToolsMisc";
-            this.groupBoxToolsMisc.Size = new System.Drawing.Size(404, 195);
+            this.groupBoxToolsMisc.Size = new System.Drawing.Size(404, 154);
             this.groupBoxToolsMisc.TabIndex = 5;
             this.groupBoxToolsMisc.TabStop = false;
             this.groupBoxToolsMisc.Text = "Misc";
-            // 
-            // comboBoxGoogleTranslateUrl
-            // 
-            this.comboBoxGoogleTranslateUrl.FormattingEnabled = true;
-            this.comboBoxGoogleTranslateUrl.Items.AddRange(new object[] {
-            "translate.google.com",
-            "translate.google.cn"});
-            this.comboBoxGoogleTranslateUrl.Location = new System.Drawing.Point(15, 155);
-            this.comboBoxGoogleTranslateUrl.Name = "comboBoxGoogleTranslateUrl";
-            this.comboBoxGoogleTranslateUrl.Size = new System.Drawing.Size(369, 21);
-            this.comboBoxGoogleTranslateUrl.TabIndex = 34;
-            // 
-            // labelGoogleTranslateUrl
-            // 
-            this.labelGoogleTranslateUrl.AutoSize = true;
-            this.labelGoogleTranslateUrl.Location = new System.Drawing.Point(12, 138);
-            this.labelGoogleTranslateUrl.Name = "labelGoogleTranslateUrl";
-            this.labelGoogleTranslateUrl.Size = new System.Drawing.Size(101, 13);
-            this.labelGoogleTranslateUrl.TabIndex = 33;
-            this.labelGoogleTranslateUrl.Text = "Google translate url";
-            // 
-            // checkBoxCpsIncludeWhiteSpace
-            // 
-            this.checkBoxCpsIncludeWhiteSpace.AutoSize = true;
-            this.checkBoxCpsIncludeWhiteSpace.Location = new System.Drawing.Point(15, 21);
-            this.checkBoxCpsIncludeWhiteSpace.Name = "checkBoxCpsIncludeWhiteSpace";
-            this.checkBoxCpsIncludeWhiteSpace.Size = new System.Drawing.Size(274, 17);
-            this.checkBoxCpsIncludeWhiteSpace.TabIndex = 0;
-            this.checkBoxCpsIncludeWhiteSpace.Text = "Characters per second (CPS) includes  white spaces";
-            this.checkBoxCpsIncludeWhiteSpace.UseVisualStyleBackColor = true;
             // 
             // labelUserBingApiId
             // 
@@ -2540,7 +2701,7 @@
             // 
             // buttonEditDoNotBreakAfterList
             // 
-            this.buttonEditDoNotBreakAfterList.Location = new System.Drawing.Point(34, 76);
+            this.buttonEditDoNotBreakAfterList.Location = new System.Drawing.Point(239, 22);
             this.buttonEditDoNotBreakAfterList.Name = "buttonEditDoNotBreakAfterList";
             this.buttonEditDoNotBreakAfterList.Size = new System.Drawing.Size(75, 23);
             this.buttonEditDoNotBreakAfterList.TabIndex = 23;
@@ -2551,7 +2712,7 @@
             // checkBoxUseDoNotBreakAfterList
             // 
             this.checkBoxUseDoNotBreakAfterList.AutoSize = true;
-            this.checkBoxUseDoNotBreakAfterList.Location = new System.Drawing.Point(15, 53);
+            this.checkBoxUseDoNotBreakAfterList.Location = new System.Drawing.Point(15, 26);
             this.checkBoxUseDoNotBreakAfterList.Name = "checkBoxUseDoNotBreakAfterList";
             this.checkBoxUseDoNotBreakAfterList.Size = new System.Drawing.Size(218, 17);
             this.checkBoxUseDoNotBreakAfterList.TabIndex = 1;
@@ -2562,6 +2723,7 @@
             // 
             this.groupBoxSpellCheck.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxSpellCheck.Controls.Add(this.checkBoxUseAlwaysToFile);
             this.groupBoxSpellCheck.Controls.Add(this.checkBoxTreatINQuoteAsING);
             this.groupBoxSpellCheck.Controls.Add(this.checkBoxSpellCheckOneLetterWords);
             this.groupBoxSpellCheck.Controls.Add(this.checkBoxSpellCheckAutoChangeNames);
@@ -2571,6 +2733,16 @@
             this.groupBoxSpellCheck.TabIndex = 4;
             this.groupBoxSpellCheck.TabStop = false;
             this.groupBoxSpellCheck.Text = "Spell check";
+            // 
+            // checkBoxUseAlwaysToFile
+            // 
+            this.checkBoxUseAlwaysToFile.AutoSize = true;
+            this.checkBoxUseAlwaysToFile.Location = new System.Drawing.Point(16, 86);
+            this.checkBoxUseAlwaysToFile.Name = "checkBoxUseAlwaysToFile";
+            this.checkBoxUseAlwaysToFile.Size = new System.Drawing.Size(192, 17);
+            this.checkBoxUseAlwaysToFile.TabIndex = 3;
+            this.checkBoxUseAlwaysToFile.Text = "Remember \"Use always\" / \"Skip all\"";
+            this.checkBoxUseAlwaysToFile.UseVisualStyleBackColor = true;
             // 
             // checkBoxTreatINQuoteAsING
             // 
@@ -3964,9 +4136,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBoxPreview.Controls.Add(this.pictureBoxPreview);
-            this.groupBoxPreview.Location = new System.Drawing.Point(6, 114);
+            this.groupBoxPreview.Location = new System.Drawing.Point(6, 118);
             this.groupBoxPreview.Name = "groupBoxPreview";
-            this.groupBoxPreview.Size = new System.Drawing.Size(807, 336);
+            this.groupBoxPreview.Size = new System.Drawing.Size(807, 332);
             this.groupBoxPreview.TabIndex = 10;
             this.groupBoxPreview.TabStop = false;
             this.groupBoxPreview.Text = "Preview";
@@ -3976,7 +4148,7 @@
             this.pictureBoxPreview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBoxPreview.Location = new System.Drawing.Point(3, 17);
             this.pictureBoxPreview.Name = "pictureBoxPreview";
-            this.pictureBoxPreview.Size = new System.Drawing.Size(801, 316);
+            this.pictureBoxPreview.Size = new System.Drawing.Size(801, 312);
             this.pictureBoxPreview.TabIndex = 0;
             this.pictureBoxPreview.TabStop = false;
             // 
@@ -4165,6 +4337,7 @@
             this.groupBoxMiscellaneous.PerformLayout();
             this.groupBoxGeneralRules.ResumeLayout(false);
             this.groupBoxGeneralRules.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOptimalCharsSec)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxWordsMin)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxNumberOfLines)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDurationMin)).EndInit();
@@ -4196,6 +4369,8 @@
             this.groupBoxWaveformAppearence.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWaveformBorderHitMs)).EndInit();
             this.tabPageTools.ResumeLayout(false);
+            this.groupBoxGoogleTranslate.ResumeLayout(false);
+            this.groupBoxGoogleTranslate.PerformLayout();
             this.groupBoxBing.ResumeLayout(false);
             this.groupBoxBing.PerformLayout();
             this.groupBoxToolsMisc.ResumeLayout(false);
@@ -4561,10 +4736,7 @@
         private System.Windows.Forms.Label labelMaxWordsPerMin;
         private System.Windows.Forms.CheckBox checkBoxMpvHandlesPreviewText;
         private System.Windows.Forms.CheckBox checkBoxVideoAutoOpen;
-        private System.Windows.Forms.CheckBox checkBoxCpsIncludeWhiteSpace;
         private System.Windows.Forms.Button buttonClearShortcut;
-        private System.Windows.Forms.ComboBox comboBoxGoogleTranslateUrl;
-        private System.Windows.Forms.Label labelGoogleTranslateUrl;
         private System.Windows.Forms.CheckBox checkBoxAllowVolumeBoost;
         private System.Windows.Forms.TabPage tabPageFont;
         private System.Windows.Forms.GroupBox groupBoxFont;
@@ -4589,5 +4761,21 @@
         private System.Windows.Forms.GroupBox groupBoxFontGeneral;
         private System.Windows.Forms.Label labelFontNote;
         private System.Windows.Forms.Button buttonDownloadFfmpeg;
+        private System.Windows.Forms.Button buttonShortcutsClear;
+        private System.Windows.Forms.Label labelShortcutsSearch;
+        private System.Windows.Forms.TextBox textBoxShortcutSearch;
+        private System.Windows.Forms.GroupBox groupBoxGoogleTranslate;
+        private System.Windows.Forms.Label labelGoogleTranslateApiKey;
+        private System.Windows.Forms.TextBox textBoxGoogleTransleApiKey;
+        private System.Windows.Forms.LinkLabel linkLabelGoogleTranslateSignUp;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox checkBoxAutoSave;
+        private System.Windows.Forms.CheckBox checkBoxUseAlwaysToFile;
+        private System.Windows.Forms.Label labelOptimalCharsPerSecond;
+        private System.Windows.Forms.NumericUpDown numericUpDownOptimalCharsSec;
+        private System.Windows.Forms.Button buttonEditProfile;
+        private System.Windows.Forms.ComboBox comboBoxRulesProfileName;
+        private System.Windows.Forms.Label labelRulesProfileName;
+        private System.Windows.Forms.CheckBox checkBoxCpsIncludeWhiteSpace;
     }
 }

@@ -43,7 +43,10 @@ namespace Nikse.SubtitleEdit.Controls
             get
             {
                 if (_forceHHMMSSFF || Configuration.Settings?.General.UseTimeFormatHHMMSSFF == true)
+                {
                     return TimeMode.HHMMSSFF;
+                }
+
                 return TimeMode.HHMMSSMS;
             }
         }
@@ -51,7 +54,7 @@ namespace Nikse.SubtitleEdit.Controls
         public TimeUpDown()
         {
             AutoScaleMode = AutoScaleMode.Dpi;
-            Font = SystemFonts.MessageBoxFont;
+            Font = UiUtil.GetDefaultFont();
             InitializeComponent();
             UiUtil.FixFonts(this);
             numericUpDown1.ValueChanged += NumericUpDownValueChanged;
@@ -81,7 +84,9 @@ namespace Nikse.SubtitleEdit.Controls
             if (milliseconds.HasValue)
             {
                 if (milliseconds.Value >= TimeCode.MaxTimeTotalMilliseconds - 0.1)
+                {
                     milliseconds = 0;
+                }
 
                 if (Mode == TimeMode.HHMMSSMS)
                 {
@@ -137,7 +142,9 @@ namespace Nikse.SubtitleEdit.Controls
         public double? GetTotalMilliseconds()
         {
             if (!_dirty)
+            {
                 return _initialTotalMilliseconds;
+            }
 
             return TimeCode?.TotalMilliseconds;
         }
@@ -147,13 +154,19 @@ namespace Nikse.SubtitleEdit.Controls
             get
             {
                 if (_designMode)
+                {
                     return new TimeCode();
+                }
 
                 if (string.IsNullOrWhiteSpace(maskedTextBox1.Text.RemoveChar('.').Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, string.Empty).RemoveChar(',').RemoveChar(':')))
+                {
                     return new TimeCode(TimeCode.MaxTimeTotalMilliseconds);
+                }
 
                 if (!_dirty)
+                {
                     return new TimeCode(_initialTotalMilliseconds);
+                }
 
                 string startTime = maskedTextBox1.Text;
                 bool isNegative = startTime.StartsWith('-');
@@ -161,27 +174,29 @@ namespace Nikse.SubtitleEdit.Controls
                 if (Mode == TimeMode.HHMMSSMS)
                 {
                     if (startTime.EndsWith(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, StringComparison.Ordinal))
+                    {
                         startTime += "000";
+                    }
 
                     string[] times = startTime.Split(_splitChars, StringSplitOptions.RemoveEmptyEntries);
 
                     if (times.Length == 4)
                     {
-                        int hours;
-                        int.TryParse(times[0], out hours);
+                        int.TryParse(times[0], out var hours);
 
-                        int minutes;
-                        int.TryParse(times[1], out minutes);
+                        int.TryParse(times[1], out var minutes);
                         if (minutes > 59)
+                        {
                             minutes = 59;
+                        }
 
-                        int seconds;
-                        int.TryParse(times[2], out seconds);
+                        int.TryParse(times[2], out var seconds);
                         if (seconds > 59)
+                        {
                             seconds = 59;
+                        }
 
-                        int milliSeconds;
-                        int.TryParse(times[3].PadRight(3, '0'), out milliSeconds);
+                        int.TryParse(times[3].PadRight(3, '0'), out var milliSeconds);
                         var tc = new TimeCode(hours, minutes, seconds, milliSeconds);
 
                         if (UseVideoOffset)
@@ -190,30 +205,31 @@ namespace Nikse.SubtitleEdit.Controls
                         }
 
                         if (isNegative)
+                        {
                             tc.TotalMilliseconds *= -1;
+                        }
+
                         return tc;
                     }
                 }
                 else
                 {
                     if (startTime.EndsWith(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, StringComparison.Ordinal) || startTime.EndsWith(':'))
+                    {
                         startTime += "00";
+                    }
 
                     string[] times = startTime.Split(_splitChars, StringSplitOptions.RemoveEmptyEntries);
 
                     if (times.Length == 4)
                     {
-                        int hours;
-                        int.TryParse(times[0], out hours);
+                        int.TryParse(times[0], out var hours);
 
-                        int minutes;
-                        int.TryParse(times[1], out minutes);
+                        int.TryParse(times[1], out var minutes);
 
-                        int seconds;
-                        int.TryParse(times[2], out seconds);
+                        int.TryParse(times[2], out var seconds);
 
-                        int milliSeconds;
-                        if (int.TryParse(times[3], out milliSeconds))
+                        if (int.TryParse(times[3], out var milliSeconds))
                         {
                             milliSeconds = Core.SubtitleFormats.SubtitleFormat.FramesToMillisecondsMax999(milliSeconds);
                         }
@@ -226,7 +242,10 @@ namespace Nikse.SubtitleEdit.Controls
                         }
 
                         if (isNegative)
+                        {
                             tc.TotalMilliseconds *= -1;
+                        }
+
                         return tc;
                     }
                 }
@@ -235,7 +254,9 @@ namespace Nikse.SubtitleEdit.Controls
             set
             {
                 if (_designMode)
+                {
                     return;
+                }
 
                 if (value != null)
                 {
@@ -294,14 +315,16 @@ namespace Nikse.SubtitleEdit.Controls
             }
         }
 
-        private string GetMask(double val) => val >= 0 ? "00:00:00.000" : "-00:00:00.000";
+        private static string GetMask(double val) => val >= 0 ? "00:00:00.000" : "-00:00:00.000";
 
-        private string GetMaskFrames(double val) => val >= 0 ? "00:00:00:00" : "-00:00:00:00";
+        private static string GetMaskFrames(double val) => val >= 0 ? "00:00:00:00" : "-00:00:00:00";
 
         private void maskedTextBox1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
+            {
                 _dirty = true;
+            }
         }
     }
 }

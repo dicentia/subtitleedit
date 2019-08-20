@@ -92,7 +92,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     keyNode = xml.CreateElement("key");
                     keyNode.InnerText = "text";
                     if (textNo > 1)
+                    {
                         keyNode.InnerText = keyNode.InnerText + textNo;
+                    }
+
                     paragraph.AppendChild(keyNode);
 
                     valueNode = xml.CreateElement("string");
@@ -122,24 +125,31 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     var pText = new StringBuilder();
                     foreach (XmlNode innerNode in node.ChildNodes)
                     {
-                        switch (innerNode.Name)
+                        if (innerNode.Name == "key")
                         {
-                            case "key":
-                                lastKey = innerNode.InnerText;
-                                break;
-                            default:
-                                if (lastKey == "in")
-                                    p.StartTime.TotalSeconds = double.Parse(innerNode.InnerText);
-                                else if (lastKey == "out")
-                                    p.EndTime.TotalSeconds = double.Parse(innerNode.InnerText);
-                                else if (lastKey.StartsWith("text"))
-                                    pText.AppendLine(innerNode.InnerText);
-                                break;
+                            lastKey = innerNode.InnerText;
+                        }
+                        else
+                        {
+                            if (lastKey == "in")
+                            {
+                                p.StartTime.TotalSeconds = double.Parse(innerNode.InnerText);
+                            }
+                            else if (lastKey == "out")
+                            {
+                                p.EndTime.TotalSeconds = double.Parse(innerNode.InnerText);
+                            }
+                            else if (lastKey.StartsWith("text"))
+                            {
+                                pText.AppendLine(innerNode.InnerText);
+                            }
                         }
                     }
                     p.Text = pText.ToString().Trim();
                     if (p.StartTime.TotalSeconds >= 0 && p.EndTime.TotalMilliseconds > 0 && !string.IsNullOrEmpty(p.Text))
+                    {
                         subtitle.Paragraphs.Add(p);
+                    }
                 }
                 catch (Exception ex)
                 {

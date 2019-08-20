@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Nikse.SubtitleEdit.Core
 {
@@ -28,14 +29,20 @@ namespace Nikse.SubtitleEdit.Core
                 var index = 0;
                 var fileLength = fs.Length;
                 if (fileLength > int.MaxValue)
+                {
                     throw new IOException("File too long");
+                }
+
                 var count = (int)fileLength;
                 var bytes = new byte[count];
                 while (count > 0)
                 {
                     var n = fs.Read(bytes, index, count);
                     if (n == 0)
+                    {
                         throw new InvalidOperationException("End of file reached before expected");
+                    }
+
                     index += n;
                     count -= n;
                 }
@@ -60,7 +67,10 @@ namespace Nikse.SubtitleEdit.Core
                 var buffer = new byte[4];
                 var count = fs.Read(buffer, 0, buffer.Length);
                 if (count != buffer.Length)
+                {
                     return false;
+                }
+
                 return buffer[0] == 0x50  // P
                     && buffer[1] == 0x4B  // K
                     && buffer[2] == 0x03  // (ETX)
@@ -74,7 +84,10 @@ namespace Nikse.SubtitleEdit.Core
                 var buffer = new byte[6];
                 var count = fs.Read(buffer, 0, buffer.Length);
                 if (count != buffer.Length)
+                {
                     return false;
+                }
+
                 return buffer[0] == 0x37     // 7
                        && buffer[1] == 0x7a  // z
                        && buffer[2] == 0xbc
@@ -91,7 +104,10 @@ namespace Nikse.SubtitleEdit.Core
                 var buffer = new byte[4];
                 var count = fs.Read(buffer, 0, buffer.Length);
                 if (count != buffer.Length)
+                {
                     return false;
+                }
+
                 return buffer[0] == 0x52  // R
                     && buffer[1] == 0x61  // a
                     && buffer[2] == 0x72  // r
@@ -106,7 +122,10 @@ namespace Nikse.SubtitleEdit.Core
                 var buffer = new byte[8];
                 var count = fs.Read(buffer, 0, buffer.Length);
                 if (count != buffer.Length)
+                {
                     return false;
+                }
+
                 return buffer[0] == 137
                     && buffer[1] == 80
                     && buffer[2] == 78
@@ -125,7 +144,10 @@ namespace Nikse.SubtitleEdit.Core
                 var buffer = new byte[3];
                 var count = fs.Read(buffer, 0, buffer.Length);
                 if (count != buffer.Length)
+                {
                     return false;
+                }
+
                 return buffer[0] == 0x69
                     && buffer[1] == 0x69
                     && buffer[2] == 0x69;
@@ -140,7 +162,9 @@ namespace Nikse.SubtitleEdit.Core
                 var buffer = new byte[3];
                 var count = fs.Read(buffer, 0, buffer.Length);
                 if (count != buffer.Length)
+                {
                     return false;
+                }
 
                 return buffer[0] == 0xFF
                     && buffer[1] == 0xD8
@@ -176,7 +200,9 @@ namespace Nikse.SubtitleEdit.Core
                 var buffer = new byte[3761];
                 var count = fs.Read(buffer, 0, buffer.Length);
                 if (count != buffer.Length)
+                {
                     return false;
+                }
 
                 // allow for some random bytes in the beginning
                 for (int i = 0; i < 255; i++)
@@ -267,7 +293,9 @@ namespace Nikse.SubtitleEdit.Core
                 var buffer = new byte[65536];
                 var count = fs.Read(buffer, 0, buffer.Length);
                 if (count < 100)
+                {
                     return false;
+                }
 
                 for (int i = 0; i < count - 11; i++)
                 {
@@ -291,6 +319,23 @@ namespace Nikse.SubtitleEdit.Core
             return false;
         }
 
+        public static bool IsRtf(string fileName)
+        {
+            using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                var buffer = new byte[10];
+                if (fs.Read(buffer, 0, buffer.Length) != buffer.Length)
+                {
+                    return false;
+                }
+
+                var text = Encoding.ASCII.GetString(buffer);
+                var textUtf8 = Encoding.ASCII.GetString(buffer, 3, 7);
+                return text.Trim().StartsWith("{\\rtf1\\", StringComparison.Ordinal) ||
+                       textUtf8.Trim().StartsWith("{\\rtf1\\", StringComparison.Ordinal);
+            }
+        }
+
         public static bool HasUtf8Bom(string fileName)
         {
             using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -306,7 +351,9 @@ namespace Nikse.SubtitleEdit.Core
             using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 if (fs.Length < 10)
+                {
                     return false; // too short to be a proper subtitle file
+                }
 
                 int numberOfBytes = 1;
                 var buffer = new byte[1024];
@@ -328,27 +375,38 @@ namespace Nikse.SubtitleEdit.Core
         public static bool IsFile(string path)
         {
             if (!Path.IsPathRooted(path))
+            {
                 return false;
-            return ((File.GetAttributes(path) & FileAttributes.Directory) != FileAttributes.Directory);
+            }
+
+            return (File.GetAttributes(path) & FileAttributes.Directory) != FileAttributes.Directory;
         }
 
         public static bool IsDirectory(string path)
         {
             if (!Path.IsPathRooted(path))
+            {
                 return false;
-            return ((File.GetAttributes(path) & FileAttributes.Directory) == FileAttributes.Directory);
+            }
+
+            return (File.GetAttributes(path) & FileAttributes.Directory) == FileAttributes.Directory;
         }
 
         public static bool IsPlainText(string fileName)
         {
             var fileInfo = new FileInfo(fileName);
             if (fileInfo.Length < 20)
+            {
                 return false; // too short to be plain text
+            }
+
             if (fileInfo.Length > 5000000)
+            {
                 return false; // too large to be plain text
+            }
 
             var enc = LanguageAutoDetect.GetEncodingFromFile(fileName);
-            var s = File.ReadAllText(fileName, enc);
+            var s = ReadAllTextShared(fileName, enc);
 
             int numberCount = 0;
             int letterCount = 0;
@@ -356,7 +414,7 @@ namespace Nikse.SubtitleEdit.Core
 
             for (int i = 0; i < len; i++)
             {
-                char ch = s[i];
+                var ch = s[i];
                 if (char.IsLetter(ch) || " -,.!?[]()\r\n".Contains(ch))
                 {
                     letterCount++;
@@ -374,7 +432,31 @@ namespace Nikse.SubtitleEdit.Core
             {
                 return numberCount < 5 && letterCount > 20;
             }
-            var numberThreshold = len * 0.002 + 2;
+
+            var numberPatternMatches = new Regex(@"\d+[.:,; -]\d+").Matches(s);
+            if (numberPatternMatches.Count > 30)
+            {
+                return false; // looks like time codes
+            }
+
+            var largeBlocksOfLargeNumbers = new Regex(@"\d{3,8}").Matches(s);
+            if (largeBlocksOfLargeNumbers.Count > 30)
+            {
+                return false; // looks like time codes
+            }
+
+            if (len < 1000 && largeBlocksOfLargeNumbers.Count > 10)
+            {
+                return false; // looks like time codes
+            }
+
+            var partsWithMoreThan100CharsOfNonNumbers = new Regex(@"[^\d]{150,100000}").Matches(s);
+            if (partsWithMoreThan100CharsOfNonNumbers.Count > 10)
+            {
+                return true; // looks like text
+            }
+
+            var numberThreshold = len * 0.015 + 25;
             var letterThreshold = len * 0.8;
             return numberCount < numberThreshold && letterCount > letterThreshold;
         }
@@ -457,5 +539,11 @@ namespace Nikse.SubtitleEdit.Core
 
             return info;
         }
+
+        public static string GetTempFileName (string extension)
+        {
+            return Path.GetTempPath() + Guid.NewGuid() + extension;
+        }
+
     }
 }

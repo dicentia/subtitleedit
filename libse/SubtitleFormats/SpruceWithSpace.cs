@@ -67,13 +67,22 @@ $TapeOffset         =   FALSE
                                        p.Text.StartsWith("{\\an5}", StringComparison.Ordinal) ||
                                        p.Text.StartsWith("{\\an6}", StringComparison.Ordinal);
             if (verticalTopAlign)
+            {
                 verticalAlign = "$VertAlign     = Top";
+            }
             else if (verticalCenterAlign)
+            {
                 verticalAlign = "$VertAlign     = Center";
+            }
             else
+            {
                 verticalAlign = "$VertAlign     = Bottom";
+            }
+
             if (lastVerticalAlign != verticalAlign)
+            {
                 sb.AppendLine(verticalAlign);
+            }
 
             bool horizontalLeftAlign = p.Text.StartsWith("{\\an1}", StringComparison.Ordinal) ||
                                        p.Text.StartsWith("{\\an4}", StringComparison.Ordinal) ||
@@ -82,11 +91,18 @@ $TapeOffset         =   FALSE
                                         p.Text.StartsWith("{\\an6}", StringComparison.Ordinal) ||
                                         p.Text.StartsWith("{\\an9}", StringComparison.Ordinal);
             if (horizontalLeftAlign)
+            {
                 horizontalAlign = "$HorzAlign     = Left";
+            }
             else if (horizontalRightAlign)
+            {
                 horizontalAlign = "$HorzAlign     = Right";
+            }
             else
+            {
                 horizontalAlign = "$HorzAlign     = Center";
+            }
+
             sb.AppendLine(horizontalAlign);
 
             lastVerticalAlign = verticalAlign;
@@ -94,16 +110,15 @@ $TapeOffset         =   FALSE
             return sb;
         }
 
-        private static string EncodeText(string text)
+        private static string EncodeText(string input)
         {
-            text = text.Replace("<b>", "^B");
-            text = text.Replace("</b>", string.Empty);
-            text = text.Replace("<i>", "^I");
-            text = text.Replace("</i>", string.Empty);
-            text = text.Replace("<u>", "^U");
-            text = text.Replace("</u>", string.Empty);
-            text = HtmlUtil.RemoveHtmlTags(text, true);
-            return text.Replace(Environment.NewLine, "|");
+            var text = input.Replace("<b>", "^B")
+                            .Replace("</b>", string.Empty)
+                            .Replace("<i>", "^I")
+                            .Replace("</i>", string.Empty)
+                            .Replace("<u>", "^U")
+                            .Replace("</u>", string.Empty);
+            return HtmlUtil.RemoveHtmlTags(text, true).Replace(Environment.NewLine, "|");
         }
 
         private static string EncodeTimeCode(TimeCode time)
@@ -160,11 +175,20 @@ $TapeOffset         =   FALSE
         { // TODO: Improve end tags
             text = text.Replace("|", Environment.NewLine);
             if (text.Contains("^B"))
+            {
                 text = text.Replace("^B", "<b>") + "</b>";
+            }
+
             if (text.Contains("^I"))
+            {
                 text = text.Replace("^I", "<i>") + "</i>";
+            }
+
             if (text.Contains("^U"))
+            {
                 text = text.Replace("^U", "<u>") + "</u>";
+            }
+
             return text;
         }
     }

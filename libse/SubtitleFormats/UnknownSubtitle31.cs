@@ -50,7 +50,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         public override void LoadSubtitle(Subtitle subtitle, List<string> lines, string fileName)
         {
             Paragraph paragraph = null;
-            ExpectingLine expecting = ExpectingLine.Number;
+            var expecting = ExpectingLine.Number;
             _errorCount = 0;
 
             subtitle.Paragraphs.Clear();
@@ -59,8 +59,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 if (line.EndsWith('.') && Utilities.IsInteger(line.TrimEnd('.')))
                 {
-                    if (paragraph != null && !string.IsNullOrEmpty(paragraph.Text))
+                    if (!string.IsNullOrEmpty(paragraph?.Text))
+                    {
                         subtitle.Paragraphs.Add(paragraph);
+                    }
+
                     paragraph = new Paragraph();
                     expecting = ExpectingLine.TimeStart;
                 }
@@ -71,7 +74,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     {
                         try
                         {
-                            var tc = DecodeTimeCodeFramesTwoParts(parts);
+                            var tc = DecodeTimeCode(parts);
                             paragraph.StartTime = tc;
                             expecting = ExpectingLine.TimeEnd;
                         }
@@ -89,7 +92,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     {
                         try
                         {
-                            var tc = DecodeTimeCodeFramesTwoParts(parts);
+                            var tc = DecodeTimeCode(parts);
                             paragraph.EndTime = tc;
                             expecting = ExpectingLine.Text;
                         }
@@ -121,15 +124,27 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     }
                 }
             }
-            if (paragraph != null && !string.IsNullOrEmpty(paragraph.Text))
+            if (!string.IsNullOrEmpty(paragraph?.Text))
+            {
                 subtitle.Paragraphs.Add(paragraph);
+            }
 
             subtitle.Renumber();
         }
 
         private static string EncodeTimeCode(TimeCode time)
         {
-            return $"{(int)time.TotalSeconds:00}.{MillisecondsToFramesMaxFrameRate(time.Milliseconds):00}";
+            int frames = MillisecondsToFrames(time.TotalMilliseconds);
+            int footage = frames / 16;
+            int rest = (int)Math.Round(frames % 16.0 / 16.0 * Configuration.Settings.General.CurrentFrameRate);
+            return $"{footage}.{rest:00}";
+        }
+
+        private static TimeCode DecodeTimeCode(string[] parts)
+        {
+            var frames16 = int.Parse(parts[0]);
+            var frames = int.Parse(parts[1]);
+            return new TimeCode(0, 0, 0, FramesToMilliseconds(16 * frames16 + frames));
         }
 
     }

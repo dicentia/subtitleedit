@@ -54,7 +54,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void ChangeCasingNames_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
         private void AddToListViewNames(string name)
@@ -70,7 +72,9 @@ namespace Nikse.SubtitleEdit.Forms
 
             _language = LanguageAutoDetect.AutoDetectGoogleLanguage(_subtitle);
             if (string.IsNullOrEmpty(_language))
+            {
                 _language = "en_US";
+            }
 
             _nameList = new NameList(Configuration.DictionariesDirectory, _language, Configuration.Settings.WordLists.UseOnlineNames, Configuration.Settings.WordLists.NamesUrl);
             _nameListInclMulti = _nameList.GetAllNames(); // Will contains both one word names and multi names
@@ -92,9 +96,9 @@ namespace Nikse.SubtitleEdit.Forms
                     string name = item.SubItems[1].Text;
 
                     string textNoTags = HtmlUtil.RemoveHtmlTags(text, true);
-                    if (textNoTags != textNoTags.ToUpper())
+                    if (textNoTags != textNoTags.ToUpperInvariant())
                     {
-                        if (item.Checked && text != null && text.Contains(name, StringComparison.OrdinalIgnoreCase) && name.Length > 1 && name != name.ToLower())
+                        if (item.Checked && text != null && text.Contains(name, StringComparison.OrdinalIgnoreCase) && name.Length > 1 && name != name.ToLowerInvariant())
                         {
                             var st = new StrippableText(text);
                             st.FixCasing(new List<string> { name }, true, false, false, string.Empty);
@@ -103,7 +107,9 @@ namespace Nikse.SubtitleEdit.Forms
                     }
                 }
                 if (text != p.Text)
+                {
                     AddToPreviewListView(p, text);
+                }
             }
             listViewFixes.EndUpdate();
             groupBoxLinesFound.Text = string.Format(Configuration.Settings.Language.ChangeCasingNames.LinesFoundX, listViewFixes.Items.Count);
@@ -134,15 +140,15 @@ namespace Nikse.SubtitleEdit.Forms
         private void FindAllNames()
         {
             string text = HtmlUtil.RemoveHtmlTags(_subtitle.GetAllTexts());
-            string textToLower = text.ToLower();
+            string textToLower = text.ToLowerInvariant();
             listViewNames.BeginUpdate();
             foreach (string name in _nameListInclMulti)
             {
-                int startIndex = textToLower.IndexOf(name.ToLower(), StringComparison.Ordinal);
+                int startIndex = textToLower.IndexOf(name.ToLowerInvariant(), StringComparison.Ordinal);
                 if (startIndex >= 0)
                 {
                     while (startIndex >= 0 && startIndex < text.Length &&
-                           textToLower.Substring(startIndex).Contains(name.ToLower()) && name.Length > 1 && name != name.ToLower())
+                           textToLower.Substring(startIndex).Contains(name.ToLowerInvariant()) && name.Length > 1 && name != name.ToLowerInvariant())
                     {
                         bool startOk = startIndex == 0 || "([ --'>\r\n¿¡\"”“„".Contains(text[startIndex - 1]);
                         if (startOk)
@@ -150,7 +156,9 @@ namespace Nikse.SubtitleEdit.Forms
                             int end = startIndex + name.Length;
                             bool endOk = end <= text.Length;
                             if (endOk)
+                            {
                                 endOk = end == text.Length || ExpectedEndChars.Contains(text[end]);
+                            }
 
                             if (endOk && text.Substring(startIndex, name.Length) != name) // do not add names where casing already is correct
                             {
@@ -167,7 +175,7 @@ namespace Nikse.SubtitleEdit.Forms
                             }
                         }
 
-                        startIndex = textToLower.IndexOf(name.ToLower(), startIndex + 2, StringComparison.Ordinal);
+                        startIndex = textToLower.IndexOf(name.ToLowerInvariant(), startIndex + 2, StringComparison.Ordinal);
                     }
                 }
             }
@@ -179,7 +187,9 @@ namespace Nikse.SubtitleEdit.Forms
         {
             labelXLinesSelected.Text = string.Empty;
             if (listViewNames.SelectedItems.Count != 1)
+            {
                 return;
+            }
 
             string name = listViewNames.SelectedItems[0].SubItems[1].Text;
             listViewFixes.BeginUpdate();
@@ -190,10 +200,10 @@ namespace Nikse.SubtitleEdit.Forms
 
                 string text = UiUtil.GetStringFromListViewText(item.SubItems[2].Text);
 
-                string lower = text.ToLower();
-                if (lower.Contains(name.ToLower()) && name.Length > 1 && name != name.ToLower())
+                string lower = text.ToLowerInvariant();
+                if (lower.Contains(name.ToLowerInvariant()) && name.Length > 1 && name != name.ToLowerInvariant())
                 {
-                    int start = lower.IndexOf(name.ToLower(), StringComparison.Ordinal);
+                    int start = lower.IndexOf(name.ToLowerInvariant(), StringComparison.Ordinal);
                     if (start >= 0)
                     {
                         bool startOk = start == 0 || lower[start - 1] == ' ' || lower[start - 1] == '-' || lower[start - 1] == '"' ||
@@ -204,7 +214,9 @@ namespace Nikse.SubtitleEdit.Forms
                             int end = start + name.Length;
                             bool endOk = end <= lower.Length;
                             if (endOk)
+                            {
                                 endOk = end == lower.Length || ExpectedEndChars.Contains(lower[end]);
+                            }
 
                             item.Selected = endOk;
                         }
@@ -215,7 +227,9 @@ namespace Nikse.SubtitleEdit.Forms
             listViewFixes.EndUpdate();
 
             if (listViewFixes.SelectedItems.Count > 0)
+            {
                 listViewFixes.EnsureVisible(listViewFixes.SelectedItems[0].Index);
+            }
         }
 
         private void ListViewNamesItemChecked(object sender, ItemCheckedEventArgs e)
@@ -237,7 +251,9 @@ namespace Nikse.SubtitleEdit.Forms
                     LinesChanged++;
                     var p = item.Tag as Paragraph;
                     if (p != null)
+                    {
                         p.Text = UiUtil.GetStringFromListViewText(item.SubItems[3].Text);
+                    }
                 }
             }
         }
@@ -250,9 +266,13 @@ namespace Nikse.SubtitleEdit.Forms
         private void listViewFixes_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listViewFixes.SelectedItems.Count > 1)
+            {
                 labelXLinesSelected.Text = string.Format(Configuration.Settings.Language.Main.XLinesSelected, listViewFixes.SelectedItems.Count);
+            }
             else
+            {
                 labelXLinesSelected.Text = string.Empty;
+            }
         }
 
         private void buttonSelectAll_Click(object sender, EventArgs e)
@@ -272,9 +292,13 @@ namespace Nikse.SubtitleEdit.Forms
             foreach (ListViewItem item in listViewNames.Items)
             {
                 if (selectAll)
+                {
                     item.Checked = true;
+                }
                 else
+                {
                     item.Checked = !item.Checked;
+                }
             }
             listViewNames.EndUpdate();
             listViewNames.ItemChecked += ListViewNamesItemChecked;

@@ -214,6 +214,39 @@ namespace Test.Logic.Forms
             Assert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void RemoveColonTest10()
+        {
+            var target = GetRemoveTextForHiLib();
+            target.Settings.RemoveIfAllUppercase = false;
+            target.Settings.RemoveTextBeforeColon = true;
+            target.Settings.OnlyIfInSeparateLine = false;
+            target.Settings.OnlyIfInSeparateLine = false;
+            target.Settings.ColonSeparateLine = false;
+            target.Settings.RemoveTextBeforeColonOnlyUppercase = false;
+            string text = "- Rich: Hm-mm." + Environment.NewLine + "- Sam: Yes, and it was,";
+            string expected = "- Hm-mm." + Environment.NewLine + "- Yes, and it was,";
+            string actual = target.RemoveColon(text);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void RemoveColonTest11()
+        {
+            var target = GetRemoveTextForHiLib();
+            target.Settings.RemoveIfAllUppercase = true;
+            target.Settings.RemoveTextBeforeColon = true;
+            target.Settings.OnlyIfInSeparateLine = false;
+            target.Settings.OnlyIfInSeparateLine = false;
+            target.Settings.ColonSeparateLine = false;
+            target.Settings.RemoveTextBetweenParentheses = true;
+            target.Settings.RemoveTextBeforeColonOnlyUppercase = false;
+            string text = "- He's got the clap." + Environment.NewLine + "- SAM: (gasps) What?";
+            string expected = "- He's got the clap." + Environment.NewLine + "- What?";
+            string actual = target.RemoveTextFromHearImpaired(text);
+            Assert.AreEqual(expected, actual);
+        }
+
         /// <summary>
         /// A test for RemoveHIInsideLine
         /// </summary>
@@ -229,7 +262,7 @@ namespace Test.Logic.Forms
             target.Settings.ColonSeparateLine = false;
             const string text = "Be quiet. (SHUSHING) It's okay.";
             const string expected = "Be quiet. It's okay.";
-            string actual = target.RemoveHearImpairedtagsInsideLine(text);
+            string actual = target.RemoveHearingImpairedTagsInsideLine(text);
             Assert.AreEqual(expected, actual);
         }
 
@@ -1314,6 +1347,36 @@ namespace Test.Logic.Forms
         }
 
         [TestMethod]
+        public void RemoveTextForHiDialogMusicSymbolsFirstLine()
+        {
+            var target = GetRemoveTextForHiLib();
+            target.Settings.RemoveTextBeforeColonOnlyUppercase = false;
+            string actual = target.RemoveColon("- ♪ To defeat ♪" + Environment.NewLine + "- Referee: Salute.");
+            Assert.AreEqual("- ♪ To defeat ♪" + Environment.NewLine + "- Salute.", actual);
+        }
+
+        [TestMethod]
+        public void RemoveTextForHiDialogMusicSymbolsFirstLine2()
+        {
+            var target = GetRemoveTextForHiLib();
+            target.Settings.RemoveTextBeforeColonOnlyUppercase = true;
+            string actual = target.RemoveColon("- ♪ To defeat ♪" + Environment.NewLine + "- Referee: Salute.");
+            Assert.AreEqual("- ♪ To defeat ♪" + Environment.NewLine + "- Referee: Salute.", actual);
+        }
+
+        [TestMethod]
+        public void RemoveTextForHiDialogMusicSymbolsFirstLine3()
+        {
+            var target = GetRemoveTextForHiLib();
+            target.Settings.RemoveTextBeforeColonOnlyUppercase = false;
+            target.Settings.RemoveTextBetweenCustomTags = true;
+            target.Settings.CustomStart = "♪";
+            target.Settings.CustomEnd = "♪";
+            string actual = target.RemoveTextFromHearImpaired("- ♪ To defeat ♪" + Environment.NewLine + "- Referee: Salute.");
+            Assert.AreEqual("Salute.", actual);
+        }
+
+        [TestMethod]
         public void RemoveInterjectionKeepDotDotDot()
         {
             string text = "She uh..." + Environment.NewLine + "she disappeared.";
@@ -1615,7 +1678,7 @@ namespace Test.Logic.Forms
         }
 
         [TestMethod]
-        public void RemoveColonNameAfterElipseInsideLine()
+        public void RemoveColonNameAfterEllipsisInsideLine()
         {
             var target = GetRemoveTextForHiLib();
             target.Settings.RemoveTextBeforeColon = true;
@@ -1685,7 +1748,7 @@ namespace Test.Logic.Forms
             target.Settings.RemoveTextBeforeColon = true;
             target.Settings.RemoveTextBetweenParentheses = true;
             var source = "{\\an8}But I know of something" + Environment.NewLine +
-                         "<i>that could:</i>"; 
+                         "<i>that could:</i>";
             string actual = target.RemoveColon(source);
             Assert.AreEqual(source, actual);
         }

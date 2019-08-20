@@ -47,7 +47,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             //TODO: check max
             var firstByte = (byte)(value / 256);
             if (firstBitValue == 1)
+            {
                 firstByte = (byte)(firstByte | Helper.B10000000);
+            }
+
             stream.WriteByte(firstByte);
             stream.WriteByte((byte)(value % 256));
         }
@@ -57,14 +60,16 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             //TODO: check max
             var firstByte = (byte)(value);
             if (firstBitValue == 1)
+            {
                 firstByte = (byte)(firstByte | Helper.B10000000);
+            }
+
             stream.WriteByte(firstByte);
         }
     }
 
     public class TextST : SubtitleFormat
     {
-
         public class Palette
         {
             public int PaletteEntryId { get; set; }
@@ -277,9 +282,14 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 using (var ms = new MemoryStream())
                 {
                     if (PlayerStyleFlag)
+                    {
                         ms.WriteByte(Helper.B10000000);
+                    }
                     else
+                    {
                         ms.WriteByte(0);
+                    }
+
                     ms.WriteByte(0); // reserved?
                     ms.WriteByte((byte)NumberOfRegionStyles);
                     ms.WriteByte((byte)NumberOfUserStyles);
@@ -321,7 +331,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 stream.WriteByte(userStyle.LineSpaceDelta, userStyle.LineSpaceIncDec);
             }
 
-            private void AddRegionStyle(Stream stream, RegionStyle regionStyle)
+            private static void AddRegionStyle(Stream stream, RegionStyle regionStyle)
             {
                 stream.WriteByte((byte)regionStyle.RegionStyleId);
                 stream.WriteWord(regionStyle.RegionHorizontalPosition);
@@ -721,8 +731,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 }
             }
 
-            public DialogPresentationSegment(byte[] buffer, int idx)
+            public DialogPresentationSegment(byte[] buffer, int index)
             {
+                int idx = index;
                 StartPts = buffer[idx + 13];
                 StartPts += (ulong)buffer[idx + 12] << 8;
                 StartPts += (ulong)buffer[idx + 11] << 16;
@@ -908,15 +919,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 }
             }
 
-            public ulong StartPtsMilliseconds
-            {
-                get { return (ulong)Math.Round((StartPts) / 90.0); }
-            }
+            public ulong StartPtsMilliseconds => (ulong)Math.Round((StartPts) / 90.0);
 
-            public ulong EndPtsMilliseconds
-            {
-                get { return (ulong)Math.Round((EndPts) / 90.0); }
-            }
+            public ulong EndPtsMilliseconds => (ulong)Math.Round((EndPts) / 90.0);
 
             public void WriteToStream(Stream stream)
             {
@@ -957,9 +962,15 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     {
                         byte flags = 0;
                         if (subtitleRegion.ContinuousPresentation)
+                        {
                             flags = (byte)(flags | Helper.B10000000);
+                        }
+
                         if (subtitleRegion.Forced)
+                        {
                             flags = (byte)(flags | Helper.B01000000);
+                        }
+
                         ms.WriteByte(flags); // first byte=continuous_present_flag, second byte=force, next 6 bits reserved
 
                         ms.WriteByte((byte)subtitleRegion.RegionStyleId);
@@ -1001,7 +1012,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         public override bool IsMine(List<string> lines, string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
+            {
                 return false;
+            }
 
             if (fileName.EndsWith(".m2ts", StringComparison.OrdinalIgnoreCase) && FileUtil.IsM2TransportStream(fileName) ||
                 fileName.EndsWith(".textst", StringComparison.OrdinalIgnoreCase) && FileUtil.IsMpeg2PrivateStream2(fileName))
@@ -1048,7 +1061,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 stream.Seek(position, SeekOrigin.Begin);
                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 if (bytesRead < 20)
+                {
                     break;
+                }
 
                 int size = (buffer[4] << 8) + buffer[5] + 6;
                 position += size;
@@ -1083,7 +1098,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             ms.Seek(position, SeekOrigin.Begin);
             ms.Read(m2TsTimeCodeBuffer, 0, 3);
             if (m2TsTimeCodeBuffer[0] == 0x54 && m2TsTimeCodeBuffer[1] == 0x46 && m2TsTimeCodeBuffer[2] == 0x72)
+            {
                 position = 3760;
+            }
 
             long transportStreamLength = ms.Length;
             while (position < transportStreamLength)
@@ -1140,7 +1157,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             subtitle.Renumber();
         }
 
-        private bool DetectFormat(Stream ms)
+        private static bool DetectFormat(Stream ms)
         {
             if (ms.Length > 192 + 192 + 5)
             {
@@ -1148,7 +1165,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 var buffer = new byte[192 + 192 + 5];
                 ms.Read(buffer, 0, buffer.Length);
                 if (buffer[0] == Packet.SynchronizationByte && buffer[188] == Packet.SynchronizationByte)
+                {
                     return false;
+                }
+
                 if (buffer[4] == Packet.SynchronizationByte && buffer[192 + 4] == Packet.SynchronizationByte && buffer[192 + 192 + 4] == Packet.SynchronizationByte)
                 {
                     return true;

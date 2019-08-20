@@ -58,23 +58,31 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             foreach (var kp in LoadReplaceList(userDoc, "RemovedWholeWords"))
             {
                 if (WordReplaceList.ContainsKey(kp.Key))
+                {
                     WordReplaceList.Remove(kp.Key);
+                }
             }
             foreach (var kp in LoadReplaceList(userDoc, "WholeWords"))
             {
                 if (!WordReplaceList.ContainsKey(kp.Key))
+                {
                     WordReplaceList.Add(kp.Key, kp.Value);
+                }
             }
 
             foreach (var kp in LoadReplaceList(userDoc, "RemovedPartialLines"))
             {
                 if (PartialLineWordBoundaryReplaceList.ContainsKey(kp.Key))
+                {
                     PartialLineWordBoundaryReplaceList.Remove(kp.Key);
+                }
             }
             foreach (var kp in LoadReplaceList(userDoc, "PartialLines"))
             {
                 if (!PartialLineWordBoundaryReplaceList.ContainsKey(kp.Key))
+                {
                     PartialLineWordBoundaryReplaceList.Add(kp.Key, kp.Value);
+                }
             }
         }
 
@@ -87,18 +95,23 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
         {
             var list = new Dictionary<string, string>();
             if (!IsValidXmlDocument(doc, name))
+            {
                 return list;
+            }
+
             var node = doc.DocumentElement?.SelectSingleNode(name);
             if (node != null)
             {
                 foreach (XmlNode item in node.ChildNodes)
                 {
-                    if (item.Attributes != null && HasValidAttributes(item, false))
+                    if (HasValidAttributes(item, false))
                     {
                         string to = item.Attributes["to"].Value;
                         string from = item.Attributes["from"].Value;
                         if (!list.ContainsKey(from))
+                        {
                             list.Add(from, to);
+                        }
                     }
                 }
             }
@@ -110,18 +123,23 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
         {
             var list = new Dictionary<string, string>();
             if (!IsValidXmlDocument(doc, name))
+            {
                 return list;
+            }
+
             var node = doc.DocumentElement?.SelectSingleNode(name);
             if (node != null)
             {
                 foreach (XmlNode item in node.ChildNodes)
                 {
-                    if (item.Attributes != null && HasValidAttributes(item, true))
+                    if (HasValidAttributes(item, true))
                     {
                         string to = item.Attributes["replaceWith"].Value;
                         string from = item.Attributes["find"].Value;
                         if (!list.ContainsKey(from))
+                        {
                             list.Add(from, to);
+                        }
                     }
                 }
             }
@@ -131,15 +149,16 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
 
         private static bool IsValidXmlDocument(XmlDocument doc, string elementName)
         {
-            if (doc.DocumentElement?.SelectSingleNode(elementName) == null)
-                return false;
-            return true;
+            return doc.DocumentElement?.SelectSingleNode(elementName) != null;
         }
 
         private static bool HasValidAttributes(XmlNode node, bool isRegex)
         {
             if (node?.Attributes == null)
+            {
                 return false;
+            }
+
             if (isRegex)
             {
                 if (node.Attributes["find"] != null && node.Attributes["replaceWith"] != null)
@@ -163,7 +182,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             foreach (string from in _wholeLineReplaceList.Keys)
             {
                 if (input == from)
+                {
                     return _wholeLineReplaceList[from];
+                }
             }
 
             string newText = input;
@@ -192,16 +213,20 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                 string s = l;
                 foreach (string from in _beginLineReplaceList.Keys)
                 {
-                    if (s.Contains(from))
+                    if (s.FastIndexOf(from) >= 0)
                     {
                         string with = _beginLineReplaceList[from];
                         if (s.StartsWith(from, StringComparison.Ordinal))
+                        {
                             s = s.Remove(0, from.Length).Insert(0, with);
+                        }
                         s = s.Replace(". " + from, ". " + with);
                         s = s.Replace("! " + from, "! " + with);
                         s = s.Replace("? " + from, "? " + with);
                         if (s.StartsWith("\"" + from, StringComparison.Ordinal) && !from.StartsWith('"'))
+                        {
                             s = s.Replace("\"" + from, "\"" + with);
+                        }
                     }
                 }
                 sb.AppendLine(s);
@@ -228,13 +253,17 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             foreach (string from in PartialLineWordBoundaryReplaceList.Keys)
             {
                 if (newText.FastIndexOf(from) >= 0)
+                {
                     newText = ReplaceWord(newText, from, PartialLineWordBoundaryReplaceList[from]);
+                }
             }
 
             foreach (string from in _partialLineAlwaysReplaceList.Keys)
             {
                 if (newText.FastIndexOf(from) >= 0)
+                {
                     newText = newText.Replace(from, _partialLineAlwaysReplaceList[from]);
+                }
             }
 
             foreach (string findWhat in _regExList.Keys)
@@ -248,16 +277,24 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
         private static string AddToGuessList(List<string> list, string word, int index, string letter, string replaceLetters)
         {
             if (string.IsNullOrEmpty(word) || index < 0 || index + letter.Length - 1 >= word.Length)
+            {
                 return word;
+            }
 
             string s = word.Remove(index, letter.Length);
             if (index >= s.Length)
+            {
                 s += replaceLetters;
+            }
             else
+            {
                 s = s.Insert(index, replaceLetters);
+            }
 
             if (!list.Contains(s))
+            {
                 list.Add(s);
+            }
 
             return s;
         }
@@ -289,8 +326,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             return list;
         }
 
-        public string FixCommonWordErrors(string word)
+        public string FixCommonWordErrors(string input)
         {
+            var word = input;
             if (Configuration.Settings.Tools.OcrFixUseHardcodedRules)
             {
                 // common Latin ligatures from legacy encodings;
@@ -301,26 +339,34 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                 word = word.Replace("ﬃ", "ffi");
                 word = word.Replace("ﬄ", "ffl");
                 if (!_replaceListXmlFileName.Contains("\\ell" + ReplaceListFileNamePostFix))
+                {
                     word = word.Replace('ν', 'v'); // first 'v' is U+03BD GREEK SMALL LETTER NU
+                }
                 word = word.Replace('’', '\'');
                 word = word.Replace('`', '\'');
                 word = word.Replace('´', '\'');
                 word = word.Replace('‘', '\'');
                 word = word.Replace('—', '-');
                 while (word.Contains("--"))
+                {
                     word = word.Replace("--", "-");
+                }
                 word = word.Replace('|', 'l');
                 word = word.Replace("vx/", "w");
                 if (word.Contains('¤'))
                 {
                     if (Regex.IsMatch(word, "[A-ZÆØÅÄÖÉÈÀÙÂÊÎÔÛËÏa-zæøåäöéèàùâêîôûëï]¤"))
+                    {
                         word = word.Replace('¤', 'o');
+                    }
                 }
             }
 
             //always replace list
             foreach (string letter in _partialWordReplaceListAlways.Keys)
+            {
                 word = word.Replace(letter, _partialWordReplaceListAlways[letter]);
+            }
 
             string pre = string.Empty;
             string post = string.Empty;
@@ -403,13 +449,17 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             }
             string preWordPost = pre + word + post;
             if (word.Length == 0)
+            {
                 return preWordPost;
+            }
 
             if (word.Contains('?'))
             {
                 var match = RegExQuestion.Match(word);
                 if (match.Success)
+                {
                     word = word.Insert(match.Index + 2, " ");
+                }
             }
 
             if (!string.IsNullOrEmpty(pre) || !string.IsNullOrEmpty(post))
@@ -420,12 +470,16 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                     if (word.Length == from.Length)
                     {
                         if (word == from)
+                        {
                             return pre + WordReplaceList[from] + post;
+                        }
                     }
                     else if (wordPlusPost.Length == from.Length)
                     {
                         if (string.CompareOrdinal(wordPlusPost, from) == 0)
+                        {
                             return pre + WordReplaceList[from];
+                        }
                     }
                     if (preWordPost.Length == from.Length && string.CompareOrdinal(preWordPost, from) == 0)
                     {
@@ -438,7 +492,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                 foreach (string from in WordReplaceList.Keys)
                 {
                     if (word.Length == from.Length && word == from)
+                    {
                         return pre + WordReplaceList[from] + post;
+                    }
                 }
             }
 
@@ -469,12 +525,16 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                         if (word.Length == from.Length)
                         {
                             if (string.CompareOrdinal(word, from) == 0)
+                            {
                                 return pre + WordReplaceList[from] + post;
+                            }
                         }
                         else if (wordPlusPost.Length == from.Length)
                         {
                             if (string.CompareOrdinal(wordPlusPost, from) == 0)
+                            {
                                 return pre + WordReplaceList[from];
+                            }
                         }
                         if (preWordPost.Length == from.Length && string.CompareOrdinal(preWordPost, from) == 0)
                         {
@@ -487,7 +547,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                     foreach (string from in WordReplaceList.Keys)
                     {
                         if (word.Length == from.Length && string.CompareOrdinal(word, from) == 0)
+                        {
                             return pre + WordReplaceList[from] + post;
+                        }
                     }
                 }
             }
@@ -495,9 +557,10 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             return preWordPost;
         }
 
-        public static string FixLowerCaseLInsideUpperCaseWord(string word)
+        public static string FixLowerCaseLInsideUpperCaseWord(string input)
         {
-            if (word.Length > 3 && word.RemoveChar('l').ToUpper() == word.RemoveChar('l'))
+            var word = input;
+            if (word.Length > 3 && word.RemoveChar('l').ToUpperInvariant() == word.RemoveChar('l'))
             {
                 if (!word.Contains('<') && !word.Contains('>') && !word.Contains('\''))
                 {
@@ -507,16 +570,23 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             return word;
         }
 
-        public static string FixIor1InsideLowerCaseWord(string word)
+        public static string FixIor1InsideLowerCaseWord(string input)
         {
+            var word = input;
             if (StartsAndEndsWithNumber.IsMatch(word))
+            {
                 return word;
+            }
 
             if (word.Contains(new[] { '2', '3', '4', '5', '6', '7', '8', '9' }))
+            {
                 return word;
+            }
 
             if (HexNumber.IsMatch(word))
+            {
                 return word;
+            }
 
             if (word.LastIndexOf('I') > 0 || word.LastIndexOf('1') > 0)
             {
@@ -527,14 +597,18 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                     {
                         bool doFix = word[match.Index + 1] != 'I' && match.Index >= 1 && word.Substring(match.Index - 1).StartsWith("Mc", StringComparison.Ordinal);
                         if (word[match.Index + 1] == 'I' && match.Index >= 2 && word.Substring(match.Index - 2).StartsWith("Mac", StringComparison.Ordinal))
+                        {
                             doFix = false;
+                        }
 
                         if (doFix)
                         {
                             string oldText = word;
                             word = word.Substring(0, match.Index + 1) + "l";
                             if (match.Index + 2 < oldText.Length)
+                            {
                                 word += oldText.Substring(match.Index + 2);
+                            }
                         }
                     }
                     match = RegExIandZero.Match(word, match.Index + 1);
@@ -543,20 +617,27 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             return word;
         }
 
-        public static string Fix0InsideLowerCaseWord(string word)
+        public static string Fix0InsideLowerCaseWord(string input)
         {
+            var word = input;
             if (StartsAndEndsWithNumber.IsMatch(word))
+            {
                 return word;
+            }
 
             if (word.Contains(new[] { '1', '2', '3', '4', '5', '6', '7', '8', '9' }) ||
                 word.EndsWith("a.m", StringComparison.Ordinal) ||
                 word.EndsWith("p.m", StringComparison.Ordinal) ||
                 word.EndsWith("am", StringComparison.Ordinal) ||
                 word.EndsWith("pm", StringComparison.Ordinal))
+            {
                 return word;
+            }
 
             if (HexNumber.IsMatch(word))
+            {
                 return word;
+            }
 
             if (word.LastIndexOf('0') > 0)
             {
@@ -568,7 +649,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                         string oldText = word;
                         word = word.Substring(0, match.Index + 1) + "o";
                         if (match.Index + 2 < oldText.Length)
+                        {
                             word += oldText.Substring(match.Index + 2);
+                        }
                     }
                     match = RegExTime1.Match(word);
                 }
@@ -584,7 +667,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                             string oldText = word;
                             word = word.Substring(0, match.Index) + "o";
                             if (match.Index + 1 < oldText.Length)
+                            {
                                 word += oldText.Substring(match.Index + 1);
+                            }
                         }
                     }
                     match = RegExTime2.Match(word, match.Index + 1);
@@ -593,11 +678,15 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             return word;
         }
 
-        public string FixCommonWordErrorsQuick(string word)
+        public string FixCommonWordErrorsQuick(string input)
         {
+            var word = input;
+
             //always replace list
             foreach (string letter in _partialWordReplaceListAlways.Keys)
+            {
                 word = word.Replace(letter, _partialWordReplaceListAlways[letter]);
+            }
 
             string pre = string.Empty;
             string post = string.Empty;
@@ -681,7 +770,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
 
             string preWordPost = pre + word + post;
             if (word.Length == 0)
+            {
                 return preWordPost;
+            }
 
             if (!string.IsNullOrEmpty(pre) || !string.IsNullOrEmpty(post))
             {
@@ -691,12 +782,16 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                     if (word.Length == from.Length)
                     {
                         if (string.CompareOrdinal(word, from) == 0)
+                        {
                             return pre + WordReplaceList[from] + post;
+                        }
                     }
                     else if (wordPlusPost.Length == from.Length)
                     {
                         if (string.CompareOrdinal(wordPlusPost, from) == 0)
+                        {
                             return pre + WordReplaceList[from];
+                        }
                     }
                     if (pre.Length + word.Length + post.Length == from.Length && string.CompareOrdinal(preWordPost, from) == 0)
                     {
@@ -709,7 +804,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                 foreach (string from in WordReplaceList.Keys)
                 {
                     if (word.Length == from.Length && word == from)
+                    {
                         return pre + WordReplaceList[from] + post;
+                    }
                 }
             }
             return preWordPost;
@@ -722,7 +819,10 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                 if (DeletePartialLineFromWordList(word))
                 {
                     if (PartialLineWordBoundaryReplaceList.ContainsKey(word))
+                    {
                         PartialLineWordBoundaryReplaceList.Remove(word);
+                    }
+
                     return true;
                 }
                 return false;
@@ -730,7 +830,10 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             if (DeleteWordFromWordList(word))
             {
                 if (WordReplaceList.ContainsKey(word))
+                {
                     WordReplaceList.Remove(word);
+                }
+
                 return true;
             }
             return false;
@@ -765,9 +868,13 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
         private bool DeleteFromList(string word, XmlDocument userDoc, string replaceListName, string elementName, Dictionary<string, string> dictionary, Dictionary<string, string> userDictionary)
         {
             if (dictionary == null)
+            {
                 throw new ArgumentNullException(nameof(dictionary));
+            }
             if (userDictionary == null)
+            {
                 throw new ArgumentNullException(nameof(userDictionary));
+            }
 
             bool removed = false;
             if (userDictionary.ContainsKey((word)))
@@ -871,7 +978,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                 if (SavePartialLineToWordList(fromWord, toWord))
                 {
                     if (!PartialLineWordBoundaryReplaceList.ContainsKey(fromWord))
+                    {
                         PartialLineWordBoundaryReplaceList.Add(fromWord, toWord);
+                    }
                     return true;
                 }
                 return false;
@@ -879,7 +988,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             if (SaveWordToWordList(fromWord, toWord))
             {
                 if (!WordReplaceList.ContainsKey(fromWord))
+                {
                     WordReplaceList.Add(fromWord, toWord);
+                }
                 return true;
             }
             return false;
@@ -914,11 +1025,19 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
         private bool SaveToList(string fromWord, string toWord, XmlDocument userDoc, string replaceListName, string elementName, Dictionary<string, string> dictionary, Dictionary<string, string> userDictionary)
         {
             if (dictionary == null)
+            {
                 throw new ArgumentNullException(nameof(dictionary));
+            }
+
             if (userDictionary == null)
+            {
                 throw new ArgumentNullException(nameof(userDictionary));
+            }
+
             if (userDictionary.ContainsKey(fromWord))
+            {
                 return false;
+            }
 
             userDictionary.Add(fromWord, toWord);
             XmlNode wholeWordsNode = userDoc.DocumentElement?.SelectSingleNode(replaceListName);
@@ -945,7 +1064,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
         {
             var userDocument = LoadXmlReplaceListUserDocument();
             if (!_wholeLineReplaceList.ContainsKey(fromLine))
+            {
                 _wholeLineReplaceList.Add(fromLine, toLine);
+            }
             XmlNode wholeWordsNode = userDocument.DocumentElement?.SelectSingleNode("WholeLines");
             if (wholeWordsNode != null)
             {
@@ -959,7 +1080,7 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                     newNode.Attributes.Append(aFrom);
                     newNode.Attributes.Append(aTo);
                     wholeWordsNode.AppendChild(newNode);
-                    userDocument.Save(_replaceListXmlFileName);
+                    userDocument.Save(ReplaceListXmlFileNameUser);
                 }
             }
         }
@@ -967,7 +1088,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
         public static string ReplaceWord(string text, string word, string newWord)
         {
             if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(word))
+            {
                 return text;
+            }
 
             var sb = new StringBuilder(text.Length);
             if (text.Contains(word))
@@ -980,16 +1103,24 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                     {
                         bool startOk = i == 0;
                         if (!startOk)
+                        {
                             startOk = (startChars + Environment.NewLine).Contains(text[i - 1]);
+                        }
                         if (!startOk && word.StartsWith(' '))
+                        {
                             startOk = true;
+                        }
                         if (startOk)
                         {
                             bool endOk = (i + word.Length == text.Length);
                             if (!endOk)
+                            {
                                 endOk = (startChars + Environment.NewLine).Contains(text[i + word.Length]);
+                            }
                             if (!endOk)
+                            {
                                 endOk = newWord.EndsWith(' ');
+                            }
                             if (endOk)
                             {
                                 sb.Append(newWord);
@@ -998,7 +1129,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                         }
                     }
                     if (i >= appendFrom)
+                    {
                         sb.Append(text[i]);
+                    }
                 }
             }
             return sb.ToString();

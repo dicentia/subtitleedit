@@ -46,7 +46,9 @@ namespace Nikse.SubtitleEdit.Forms
                 encoderName = "FFmpeg";
                 string audioParameter = string.Empty;
                 if (audioTrackNumber > 0)
+                {
                     audioParameter = $"-map 0:a:{audioTrackNumber}";
+                }
 
                 const string fFmpegWaveTranscodeSettings = "-i \"{0}\" -acodec pcm_s16le -ac 1 -ar 16000 {2} \"{1}\"";
                 //-i indicates the input
@@ -61,12 +63,12 @@ namespace Nikse.SubtitleEdit.Forms
                 encoderName = "VLC";
                 string parameters = "\"" + inputVideoFile + "\" -I dummy -vvv --no-random --no-repeat --no-loop --no-sout-video --audio-track=" + audioTrackNumber + " --sout=\"#transcode{acodec=s16l,channels=1,ab=128,samplerate=16000}:std{access=file,mux=wav,dst=" + outWaveFile + "}\" vlc://quit";
                 string exeFilePath;
-                if (Configuration.IsRunningOnLinux())
+                if (Configuration.IsRunningOnLinux)
                 {
                     exeFilePath = "cvlc";
                     parameters = "-vvv --no-random --no-repeat --no-loop --no-sout-video --audio-track=" + audioTrackNumber + " --sout '#transcode{" + encodeParamters + "}:std{mux=wav,access=file,dst=" + outWaveFile + "}' \"" + inputVideoFile + "\" vlc://quit";
                 }
-                else if (Configuration.IsRunningOnMac())
+                else if (Configuration.IsRunningOnMac)
                 {
                     exeFilePath = "VLC.app/Contents/MacOS/VLC";
                 }
@@ -116,7 +118,7 @@ namespace Nikse.SubtitleEdit.Forms
 
                 // check for delay in matroska files
                 var mkvAudioTrackNumbers = new Dictionary<int, int>();
-                if (_videoFileName.ToLower().EndsWith(".mkv", StringComparison.OrdinalIgnoreCase))
+                if (_videoFileName.ToLowerInvariant().EndsWith(".mkv", StringComparison.OrdinalIgnoreCase))
                 {
                     MatroskaFile matroska = null;
                     try
@@ -131,9 +133,14 @@ namespace Nikse.SubtitleEdit.Forms
                                 {
                                     var audioTrackNames = new List<string>();
                                     if (track.CodecId != null && track.Language != null)
+                                    {
                                         audioTrackNames.Add("#" + track.TrackNumber + ": " + track.CodecId.Replace("\0", string.Empty) + " - " + track.Language.Replace("\0", string.Empty));
+                                    }
                                     else
+                                    {
                                         audioTrackNames.Add("#" + track.TrackNumber);
+                                    }
+
                                     mkvAudioTrackNumbers.Add(mkvAudioTrackNumbers.Count, track.TrackNumber);
                                 }
                             }
@@ -165,7 +172,6 @@ namespace Nikse.SubtitleEdit.Forms
             var output = new StringBuilder();
             var path = Path.Combine(Configuration.DataDirectory, "pocketsphinx");
             var fileName = Path.Combine(path, "bin", "Release", "Win32", "pocketsphinx_continuous.exe");
-            //            var fileName = Path.Combine(path, "bin", "Release", "x64", "pocketsphinx_continuous.exe");
             var hmm = Path.Combine(path, "model", "en-us", "en-us");
             var lm = Path.Combine(path, "model", "en-us", "en-us.lm.bin");
             var dict = Path.Combine(path, "model", "en-us", "cmudict-en-us.dict");
@@ -182,7 +188,9 @@ namespace Nikse.SubtitleEdit.Forms
                 process.OutputDataReceived += (sender, e) =>
                 {
                     if (_abort)
+                    {
                         return;
+                    }
 
                     if (e.Data == null)
                     {
@@ -202,7 +210,10 @@ namespace Nikse.SubtitleEdit.Forms
                 process.ErrorDataReceived += (sender, e) =>
                 {
                     if (_abort)
+                    {
                         return;
+                    }
+
                     if (e.Data == null)
                     {
                         errorWaitHandle.Set();
@@ -237,19 +248,24 @@ namespace Nikse.SubtitleEdit.Forms
         private static int GetLastTimeStampInSeconds(string text)
         {
             var lines = text.SplitToLines();
-            lines.Reverse();
-            foreach (var line in lines)
+
+            for (int i = lines.Count - 1; i >= 0; i--)
             {
-                if (!line.StartsWith('<') && !line.StartsWith('['))
+                string line = lines[i];
+                if (line.StartsWith('<') || line.StartsWith('['))
                 {
-                    var parts = line.Split();
-                    if (parts.Length == 4)
-                    {
-                        if (double.TryParse(parts[1], out _) && double.TryParse(parts[2], out var end))
-                        {
-                            return (int)Math.Round(end);
-                        }
-                    }
+                    continue;
+                }
+
+                var words = line.Split();
+                if (words.Length != 4)
+                {
+                    continue;
+                }
+
+                if (double.TryParse(words[1], out _) && double.TryParse(words[2], out var end))
+                {
+                    return (int)Math.Round(end);
                 }
             }
 
@@ -356,7 +372,10 @@ namespace Nikse.SubtitleEdit.Forms
             var positionInSeconds = e.ProgressPercentage;
             var percentage = (int)Math.Round(positionInSeconds * 100.0 / (_videoInfo.TotalMilliseconds / 1000.0));
             if (percentage > 100)
+            {
                 percentage = 100;
+            }
+
             if (progressBar1.Style == ProgressBarStyle.Marquee)
             {
                 progressBar1.Style = ProgressBarStyle.Blocks;

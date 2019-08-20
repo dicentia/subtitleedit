@@ -22,8 +22,8 @@
 
 
 ; preprocessor checks
-#if VER < EncodeVer(5,5,9)
-  #error Update your Inno Setup version (5.5.9 or newer)
+#if VER < EncodeVer(5,6,0)
+  #error Update your Inno Setup version (5.6.0 or newer)
 #endif
 
 #ifndef UNICODE
@@ -31,7 +31,7 @@
 #endif
 
 
-#define app_copyright "Copyright © 2001-2018, Nikse"
+#define app_copyright "Copyright © 2001-2019, Nikse"
 ; If you don't define "localize", i.e. comment out the following line then no translations
 ; for SubtitleEdit or the installer itself will be included in the installer
 #define localize
@@ -70,25 +70,26 @@
 #define keyApps "Software\Classes\Applications"
 #define keyRegApps "Software\RegisteredApplications"
 #define keyAppPaths "Software\Microsoft\Windows\CurrentVersion\App Paths"
+#define keyMuiCache "Software\Classes\Local Settings\MuiCache"
 
 
 [Setup]
 AppID=SubtitleEdit
 AppCopyright={#app_copyright}
-AppContact=http://www.nikse.dk/SubtitleEdit/
+AppContact=https://www.nikse.dk/SubtitleEdit/
 AppName=Subtitle Edit
 AppVerName=Subtitle Edit {#app_ver}
 AppVersion={#app_ver_full}
 AppPublisher=Nikse
-AppPublisherURL=http://www.nikse.dk/SubtitleEdit/
-AppSupportURL=http://www.nikse.dk/SubtitleEdit/
-AppUpdatesURL=http://www.nikse.dk/SubtitleEdit/
+AppPublisherURL=https://www.nikse.dk/SubtitleEdit/
+AppSupportURL=https://www.nikse.dk/SubtitleEdit/
+AppUpdatesURL=https://www.nikse.dk/SubtitleEdit/
 UninstallDisplayName=Subtitle Edit {#app_ver}
 UninstallDisplayIcon={app}\SubtitleEdit.exe
 DefaultDirName={pf}\Subtitle Edit
 DefaultGroupName=Subtitle Edit
 VersionInfoVersion={#app_ver_full}
-MinVersion=5.1
+MinVersion=5.6
 LicenseFile=..\LICENSE.txt
 InfoAfterFile=..\Changelog.txt
 SetupIconFile=..\src\Icons\SE.ico
@@ -145,8 +146,8 @@ Name: "sv"; MessagesFile: "Languages\Swedish.isl"
 Name: "th"; MessagesFile: "Languages\Thai.isl"
 Name: "tr"; MessagesFile: "compiler:Languages\Turkish.isl"
 Name: "uk"; MessagesFile: "compiler:Languages\Ukrainian.isl"
-Name: "vi"; MessagesFile: "Languages\Vietnamese.isl"
-Name: "zh"; MessagesFile: "Languages\ChineseSimplified.isl"
+Name: "vi"; MessagesFile: "Languages\Vietnamese.islu"
+Name: "zh"; MessagesFile: "Languages\ChineseSimplified.islu"
 Name: "zhTW"; MessagesFile: "Languages\ChineseTraditional.isl"
 #endif
 
@@ -181,34 +182,37 @@ Name: associate_srt;      Description: {cm:tsk_SetFileTypes};      GroupDescript
 
 
 [Files]
-Source: ..\Dictionaries\da_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\da_DK_user.xml;            DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\da_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\da_NoBreakAfterList.xml;   DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\dan_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
-Source: ..\Dictionaries\de_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\de_DE_user.xml;            DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\de_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\deu_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\en_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\en_NoBreakAfterList.xml;   DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\en_US.aff;                 DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\en_US.dic;                 DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
-Source: ..\Dictionaries\en_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\en_US_user.xml;            DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\eng_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
-Source: ..\Dictionaries\es_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\es_MX_user.xml;            DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\es_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\es_NoBreakAfterList.xml;   DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
-Source: ..\Dictionaries\fi_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\fi_FI_user.xml;            DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\fi_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\fin_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\fr_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\fra_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\hr_NoBreakAfterList.xml;   DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\hrb_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\hrv_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\hun_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\names.xml;                 DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\nl_NL_user.xml;            DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\nld_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
-Source: ..\Dictionaries\nor_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\no_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\nob_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\nor_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\por_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\pt_names.xml;              DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\pt_PT_user.xml;            DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
@@ -216,10 +220,11 @@ Source: ..\Dictionaries\ru_names.xml;              DestDir: {userappdata}\Subtit
 Source: ..\Dictionaries\ru_RU_user.xml;            DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\rus_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\spa_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Dictionaries\sr_NoBreakAfterList.xml;   DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\srp_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: ..\Dictionaries\swe_OCRFixReplaceList.xml; DestDir: {userappdata}\Subtitle Edit\Dictionaries; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
-Source: ..\Ocr\Latin.db; DestDir: {userappdata}\Subtitle Edit\Ocr; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
-Source: ..\Ocr\Latin.nocr; DestDir: {userappdata}\Subtitle Edit\Ocr; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Ocr\Latin.db;                           DestDir: {userappdata}\Subtitle Edit\Ocr;          Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
+Source: ..\Ocr\Latin.nocr;                         DestDir: {userappdata}\Subtitle Edit\Ocr;          Flags: ignoreversion onlyifdoesntexist uninsneveruninstall; Components: main
 Source: {#bindir}\Hunspellx64.dll;                 DestDir: {app};                                    Flags: ignoreversion; Components: main
 Source: {#bindir}\Hunspellx86.dll;                 DestDir: {app};                                    Flags: ignoreversion; Components: main
 
@@ -241,6 +246,7 @@ Source: {#bindir}\Languages\fi-FI.xml;             DestDir: {app}\Languages;    
 Source: {#bindir}\Languages\fr-FR.xml;             DestDir: {app}\Languages;                          Flags: ignoreversion; Components: translations
 Source: {#bindir}\Languages\hr-HR.xml;             DestDir: {app}\Languages;                          Flags: ignoreversion; Components: translations
 Source: {#bindir}\Languages\hu-HU.xml;             DestDir: {app}\Languages;                          Flags: ignoreversion; Components: translations
+Source: {#bindir}\Languages\id-ID.xml;             DestDir: {app}\Languages;                          Flags: ignoreversion; Components: translations
 Source: {#bindir}\Languages\it-IT.xml;             DestDir: {app}\Languages;                          Flags: ignoreversion; Components: translations
 Source: {#bindir}\Languages\ja-JP.xml;             DestDir: {app}\Languages;                          Flags: ignoreversion; Components: translations
 Source: {#bindir}\Languages\ko-KR.xml;             DestDir: {app}\Languages;                          Flags: ignoreversion; Components: translations
@@ -264,27 +270,24 @@ Source: {#bindir}\Languages\zh-TW.xml;             DestDir: {app}\Languages;    
 #endif
 
 Source: {#bindir}\SubtitleEdit.exe;                DestDir: {app};                                    Flags: ignoreversion; Components: main
-Source: {#bindir}\SubtitleEdit.resources.dll;      DestDir: {app};                                    Flags: ignoreversion; Components: main
+Source: {#bindir}\SubtitleEdit.resources.dll;      DestDir: {app};                                    Flags: ignoreversion; Components: main; AfterInstall: ClearMUICache
 Source: ..\Changelog.txt;                          DestDir: {app};                                    Flags: ignoreversion; Components: main
 Source: ..\LICENSE.txt;                            DestDir: {app};                                    Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\tessdata\configs\hocr;       DestDir: {app}\Tesseract4\tessdata\configs;        Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\tessdata\eng.traineddata;    DestDir: {app}\Tesseract4\tessdata;                Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\tesseract.exe;               DestDir: {app}\Tesseract4;                         Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\gif.dll;                     DestDir: {app}\Tesseract4;                         Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\jpeg62.dll;                  DestDir: {app}\Tesseract4;                         Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\leptonica-1.74.4.dll;        DestDir: {app}\Tesseract4;                         Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\libpng16.dll;                DestDir: {app}\Tesseract4;                         Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\lzma.dll;                    DestDir: {app}\Tesseract4;                         Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\tiff.dll;                    DestDir: {app}\Tesseract4;                         Flags: ignoreversion; Components: main
-Source: ..\Tesseract4\zlib1.dll;                   DestDir: {app}\Tesseract4;                         Flags: ignoreversion; Components: main
 Source: Icons\uninstall.ico;                       DestDir: {app}\Icons;                              Flags: ignoreversion; Components: main
+
+Source: ..\Tesseract302\tessdata\configs\hocr;       DestDir: {app}\Tesseract302\tessdata\configs;    Flags: ignoreversion; Components: main
+Source: ..\Tesseract302\tessdata\eng.traineddata;    DestDir: {app}\Tesseract302\tessdata;            Flags: ignoreversion; Components: main
+Source: ..\Tesseract302\tessdata\music.traineddata;  DestDir: {app}\Tesseract302\tessdata;            Flags: ignoreversion; Components: main
+Source: ..\Tesseract302\tesseract.exe;               DestDir: {app}\Tesseract302;                     Flags: ignoreversion; Components: main
+Source: ..\Tesseract302\msvcp90.dll;                 DestDir: {app}\Tesseract302;                     Flags: ignoreversion; Components: main
+Source: ..\Tesseract302\msvcr90.dll;                 DestDir: {app}\Tesseract302;                     Flags: ignoreversion; Components: main
 
 
 [Icons]
 Name: {group}\Subtitle Edit;                Filename: {app}\SubtitleEdit.exe; WorkingDir: {app}; Comment: Subtitle Edit {#app_ver}; AppUserModelID: Nikse.SubtitleEdit; IconFilename: {app}\SubtitleEdit.exe; IconIndex: 0
 Name: {group}\Help and Support\Changelog;   Filename: {app}\Changelog.txt;    WorkingDir: {app}; Comment: {cm:sm_com_Changelog}
-Name: {group}\Help and Support\Online Help; Filename: http://www.nikse.dk/SubtitleEdit/Help
-Name: {group}\Help and Support\{cm:ProgramOnTheWeb,Subtitle Edit}; Filename: http://www.nikse.dk/SubtitleEdit/;  Comment: {cm:ProgramOnTheWeb,Subtitle Edit}
+Name: {group}\Help and Support\Online Help; Filename: https://www.nikse.dk/SubtitleEdit/Help
+Name: {group}\Help and Support\{cm:ProgramOnTheWeb,Subtitle Edit}; Filename: https://www.nikse.dk/SubtitleEdit/;  Comment: {cm:ProgramOnTheWeb,Subtitle Edit}
 Name: {group}\{cm:UninstallProgram,Subtitle Edit};                 Filename: {uninstallexe};                     Comment: {cm:UninstallProgram,Subtitle Edit}; WorkingDir: {app}; IconFilename: {app}\Icons\uninstall.ico
 
 Name: {commondesktop}\Subtitle Edit;        Filename: {app}\SubtitleEdit.exe; WorkingDir: {app}; Comment: Subtitle Edit {#app_ver}; AppUserModelID: Nikse.SubtitleEdit; IconFilename: {app}\SubtitleEdit.exe; IconIndex: 0; Tasks: desktopicon\common
@@ -300,35 +303,42 @@ Type: files;      Name: {#quick_launch}\Subtitle Edit.lnk; Check: not IsTaskSele
 Type: files;      Name: {userappdata}\Subtitle Edit\Settings.xml; Tasks: reset_settings
 
 ; Remove files merged from now on with ILRepack
-Type: files;      Name: {app}\Interop.QuartzTypeLib.dll;              Check: IsUpgrade()
+Type: files;      Name: {app}\Interop.QuartzTypeLib.dll;               Check: IsUpgrade()
 
 ; Remove old files from the {app} dir
-Type: files;      Name: {app}\Dictionaries\da_names.xml;              Check: IsUpgrade()
-Type: files;      Name: {app}\Dictionaries\da_DK_user.xml;            Check: IsUpgrade()
-Type: files;      Name: {app}\Dictionaries\dan_OCRFixReplaceList.xml; Check: IsUpgrade()
-Type: files;      Name: {app}\Dictionaries\en_US.aff;                 Check: IsUpgrade()
-Type: files;      Name: {app}\Dictionaries\en_US.dic;                 Check: IsUpgrade()
-Type: files;      Name: {app}\Dictionaries\en_names.xml;              Check: IsUpgrade()
-Type: files;      Name: {app}\Dictionaries\en_US_user.xml;            Check: IsUpgrade()
-Type: files;      Name: {app}\Dictionaries\eng_OCRFixReplaceList.xml; Check: IsUpgrade()
-Type: files;      Name: {app}\Dictionaries\names.xml;                 Check: IsUpgrade()
-Type: dirifempty; Name: {app}\Dictionaries;                           Check: IsUpgrade()
-Type: files;      Name: {app}\TessData\eng.DangAmbigs;                Check: IsUpgrade()
-Type: files;      Name: {app}\TessData\eng.freq-dawg;                 Check: IsUpgrade()
-Type: files;      Name: {app}\TessData\eng.inttemp;                   Check: IsUpgrade()
-Type: files;      Name: {app}\TessData\eng.normproto;                 Check: IsUpgrade()
-Type: files;      Name: {app}\TessData\eng.pffmtable;                 Check: IsUpgrade()
-Type: files;      Name: {app}\TessData\eng.unicharset;                Check: IsUpgrade()
-Type: files;      Name: {app}\TessData\eng.user-words;                Check: IsUpgrade()
-Type: files;      Name: {app}\TessData\eng.word-dawg;                 Check: IsUpgrade()
-Type: dirifempty; Name: {app}\TessData;                               Check: IsUpgrade()
-Type: files;      Name: {app}\Tesseract\leptonlib.dll;                Check: IsUpgrade()
-Type: files;      Name: {app}\tessnet2_32.dll;                        Check: IsUpgrade()
-Type: files;      Name: {app}\Icons\SubtitleEdit.srt.ico;             Check: IsUpgrade()
-Type: files;      Name: {app}\DocumentIcons.dll;                      Check: IsUpgrade()
-Type: files;      Name: {app}\Settings.xml;                           Check: IsUpgrade()
-Type: files;      Name: {app}\gpl.txt;                                Check: IsUpgrade()
-Type: files;      Name: {app}\uninstall.ico;                          Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\da_names.xml;               Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\da_DK_user.xml;             Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\dan_OCRFixReplaceList.xml;  Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\en_US.aff;                  Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\en_US.dic;                  Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\en_names.xml;               Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\en_US_user.xml;             Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\eng_OCRFixReplaceList.xml;  Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\names.xml;                  Check: IsUpgrade()
+Type: files;      Name: {app}\Dictionaries\no_names.xml;               Check: IsUpgrade()
+Type: dirifempty; Name: {app}\Dictionaries;                            Check: IsUpgrade()
+Type: files;      Name: {app}\TessData\eng.DangAmbigs;                 Check: IsUpgrade()
+Type: files;      Name: {app}\TessData\eng.freq-dawg;                  Check: IsUpgrade()
+Type: files;      Name: {app}\TessData\eng.inttemp;                    Check: IsUpgrade()
+Type: files;      Name: {app}\TessData\eng.normproto;                  Check: IsUpgrade()
+Type: files;      Name: {app}\TessData\eng.pffmtable;                  Check: IsUpgrade()
+Type: files;      Name: {app}\TessData\eng.unicharset;                 Check: IsUpgrade()
+Type: files;      Name: {app}\TessData\eng.user-words;                 Check: IsUpgrade()
+Type: files;      Name: {app}\TessData\eng.word-dawg;                  Check: IsUpgrade()
+Type: dirifempty; Name: {app}\TessData;                                Check: IsUpgrade()
+Type: files;      Name: {app}\Tesseract\leptonlib.dll;                 Check: IsUpgrade()
+Type: files;      Name: {app}\tessnet2_32.dll;                         Check: IsUpgrade()
+Type: files;      Name: {app}\Tesseract302\tessdata\configs\hocr;      Check: IsUpgrade()
+Type: files;      Name: {app}\Tesseract302\tessdata\eng.traineddata;   Check: IsUpgrade()
+Type: files;      Name: {app}\Tesseract302\tessdata\music.traineddata; Check: IsUpgrade()
+Type: files;      Name: {app}\Tesseract302\tesseract.exe;              Check: IsUpgrade()
+Type: files;      Name: {app}\Tesseract302\msvcp90.dll;                Check: IsUpgrade()
+Type: files;      Name: {app}\Tesseract302\msvcr90.dll;                Check: IsUpgrade()
+Type: files;      Name: {app}\Icons\SubtitleEdit.srt.ico;              Check: IsUpgrade()
+Type: files;      Name: {app}\DocumentIcons.dll;                       Check: IsUpgrade()
+Type: files;      Name: {app}\Settings.xml;                            Check: IsUpgrade()
+Type: files;      Name: {app}\gpl.txt;                                 Check: IsUpgrade()
+Type: files;      Name: {app}\uninstall.ico;                           Check: IsUpgrade()
 
 #ifdef localize
 ; Language files not included anymore
@@ -354,6 +364,7 @@ Type: files;      Name: {app}\Languages\fi-FI.xml;      Check: not IsComponentSe
 Type: files;      Name: {app}\Languages\fr-FR.xml;      Check: not IsComponentSelected('translations') and IsUpgrade()
 Type: files;      Name: {app}\Languages\hr-HR.xml;      Check: not IsComponentSelected('translations') and IsUpgrade()
 Type: files;      Name: {app}\Languages\hu-HU.xml;      Check: not IsComponentSelected('translations') and IsUpgrade()
+Type: files;      Name: {app}\Languages\id-ID.xml;      Check: not IsComponentSelected('translations') and IsUpgrade()
 Type: files;      Name: {app}\Languages\it-IT.xml;      Check: not IsComponentSelected('translations') and IsUpgrade()
 Type: files;      Name: {app}\Languages\ja-JP.xml;      Check: not IsComponentSelected('translations') and IsUpgrade()
 Type: files;      Name: {app}\Languages\ko-KR.xml;      Check: not IsComponentSelected('translations') and IsUpgrade()
@@ -381,7 +392,7 @@ Type: dirifempty; Name: {app}\Languages;                Check: not IsComponentSe
 [Run]
 Filename: {win}\Microsoft.NET\Framework\v4.0.30319\ngen.exe; Parameters: "install ""{app}\SubtitleEdit.exe"""; StatusMsg: {cm:msg_OptimizingPerformance}; Flags: runhidden runascurrentuser skipifdoesntexist
 Filename: {app}\SubtitleEdit.exe;            Description: {cm:LaunchProgram,Subtitle Edit}; WorkingDir: {app}; Flags: nowait postinstall skipifsilent unchecked
-Filename: http://www.nikse.dk/SubtitleEdit/; Description: {cm:run_VisitWebsite};                               Flags: nowait postinstall skipifsilent unchecked shellexec
+Filename: https://www.nikse.dk/SubtitleEdit/; Description: {cm:run_VisitWebsite};                               Flags: nowait postinstall skipifsilent unchecked shellexec
 
 
 [UninstallRun]
@@ -438,6 +449,10 @@ Root: HKLM; Subkey: "{#keyCl}\.sub\OpenWithProgids"; ValueType: none; ValueName:
 Root: HKLM; Subkey: "{#keyCl}\.sub\OpenWithProgids"; ValueType: string; ValueName: "SubtitleEdit.sub"; ValueData: ""; Flags: uninsdeletevalue; OnlyBelowVersion: 6.0
 Root: HKLM; Subkey: "{#keyApps}\SubtitleEdit.exe\SupportedTypes"; ValueType: string; ValueName: ".sub"; ValueData: ""; Check: HklmKeyExists('{#keyApps}')
 Root: HKLM; Subkey: "{#keySE}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".sub"; ValueData: "SubtitleEdit.sub"
+; Add video files to the SE-supported file types
+Root: HKLM; Subkey: "{#keyApps}\SubtitleEdit.exe\SupportedTypes"; ValueType: string; ValueName: ".mkv"; ValueData: ""; Check: HklmKeyExists('{#keyApps}')
+Root: HKLM; Subkey: "{#keyApps}\SubtitleEdit.exe\SupportedTypes"; ValueType: string; ValueName: ".mp4"; ValueData: ""; Check: HklmKeyExists('{#keyApps}')
+Root: HKLM; Subkey: "{#keyApps}\SubtitleEdit.exe\SupportedTypes"; ValueType: string; ValueName: ".avi"; ValueData: ""; Check: HklmKeyExists('{#keyApps}')
 
 
 [Code]
@@ -476,7 +491,8 @@ var
   CurrentProgId, MyProgId, KeyName: String;
 begin
   KeyName := '{#keyCl}\.' + FileType;
-  if RegQueryStringValue(HKEY_LOCAL_MACHINE, KeyName, '', CurrentProgId) then begin
+  if RegQueryStringValue(HKEY_LOCAL_MACHINE, KeyName, '', CurrentProgId) then
+  begin
     MyProgId := 'SubtitleEdit.' + FileType;
     if CompareText(CurrentProgId, MyProgId) = 0 then
       RegWriteStringValue(HKEY_LOCAL_MACHINE, KeyName, '', '');
@@ -485,32 +501,73 @@ begin
 end;
 
 
+// Remove cached indirect strings from MUI cache
+procedure ClearMUICacheKey(const KeyName: String);
+var
+  Names: TArrayOfString;
+  Index: Integer;
+begin
+  if RegGetSubkeyNames(HKEY_USERS, KeyName, Names) then
+  begin
+    for Index := Low(Names) to High(Names) do
+      ClearMUICacheKey(KeyName + '\' + Names[Index]);
+  end;
+  if RegGetValueNames(HKEY_USERS, KeyName, Names) then
+  begin
+    for Index := Low(Names) to High(Names) do
+      if Pos('\SubtitleEdit.resources.dll,', Names[Index]) <> 0 then
+        RegDeleteValue(HKEY_USERS, KeyName, Names[Index]);
+  end;
+end;
+
+procedure ClearMUICache();
+var
+  Users: TArrayOfString;
+  Index: Integer;
+  Key: String;
+begin
+  if RegGetSubkeyNames(HKEY_USERS, '', Users) then
+  begin
+    for Index := Low(Users) to High(Users) do
+    begin
+      Key := Users[Index] + '\{#keyMuiCache}';
+      if RegKeyExists(HKEY_USERS, Key) then
+        ClearMUICacheKey(Key);
+    end;
+  end;
+end;
+
+
 procedure CleanUpDictionaries();
 begin
-  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\da_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\da_DK_user.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\da_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\da_NoBreakAfterList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\dan_OCRFixReplaceList.xml'));
-  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\de_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\de_DE_user.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\de_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\deu_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\en_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\en_NoBreakAfterList.xml'));
-  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\en_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\en_US_user.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\eng_OCRFixReplaceList.xml'));
-  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\es_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\es_MX_user.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\es_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\es_NoBreakAfterList.xml'));
-  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\fi_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\fi_FI_user.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\fi_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\fin_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\fr_names.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\fra_OCRFixReplaceList.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\hr_NoBreakAfterList.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\hrb_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\hrv_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\hun_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\names.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\nl_NL_user.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\nld_OCRFixReplaceList.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\no_names.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\nob_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\nor_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\por_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\pt_names.xml'));
@@ -519,6 +576,7 @@ begin
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\ru_RU_user.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\rus_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\spa_OCRFixReplaceList.xml'));
+  DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\sr_NoBreakAfterList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\srp_OCRFixReplaceList.xml'));
   DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\swe_OCRFixReplaceList.xml'));
   DelTree(ExpandConstant('{userappdata}\Subtitle Edit\Dictionaries\???_OCRFixReplaceList_User.xml'), False, True, False);
@@ -536,18 +594,17 @@ end;
 
 function IsUpgrade(): Boolean;
 var
-  sPrevPath: String;
+  PrevPath: String;
 begin
-  sPrevPath := WizardForm.PrevAppDir;
-  Result := (sPrevPath <> '');
+  PrevPath := WizardForm.PrevAppDir;
+  Result := (PrevPath <> '');
 end;
 
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   // Hide the license page
-  if IsUpgrade() and (PageID = wpLicense) then
-    Result := True;
+  Result := (IsUpgrade() and (PageID = wpLicense))
 end;
 
 
@@ -582,6 +639,24 @@ begin
         DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Settings.xml'));
       end;
 
+      // Remove tesseract
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract410\tesseract.exe'));
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract410\tessdata\configs\hocr'));
+      DelTree(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract410\tessdata\*.traineddata'), False, True, False);
+      
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract4\tesseract.exe'));
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract4\tessdata\configs\hocr'));
+      DelTree(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract4\tessdata\*.traineddata'), False, True, False);
+
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract302\msvcp90.dll'));
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract302\msvcr90.dll'));
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract302\tesseract.exe'));
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract302\tessdata\configs\hocr'));
+      DelTree(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract302\tessdata\*.traineddata'), False, True, False);
+
+      // Remove possible installed mpv
+      DeleteFile(ExpandConstant('{userappdata}\Subtitle Edit\mpv-1.dll'));
+
       // Remove the dirs if they are empty
       RemoveDir(ExpandConstant('{app}\Languages'));
       RemoveDir(ExpandConstant('{app}\Spectrograms'));
@@ -594,6 +669,12 @@ begin
       RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\VobSub'));
       RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\WaveForms'));
       RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\Plugins'));
+      RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract4\tessdata\configs'));
+      RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract4\tessdata'));
+      RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract4'));
+      RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract302\tessdata\configs'));
+      RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract302\tessdata'));
+      RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit\Tesseract302'));
       RemoveDir(ExpandConstant('{userappdata}\Subtitle Edit'));
 
     end;
@@ -603,7 +684,7 @@ end;
 
 function InitializeSetup(): Boolean;
 var
-  iErrorCode, iMsgBoxResult: Integer;
+  ErrorCode: Integer;
 begin
   Result := True;
 
@@ -614,7 +695,7 @@ begin
     begin
       if not WizardSilent() then begin
         if SuppressibleMsgBox(CustomMessage('msg_AskToDownNET'), mbCriticalError, MB_YESNO or MB_DEFBUTTON1, IDNO) = IDYES then
-          ShellExec('open','http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe','','',SW_SHOWNORMAL,ewNoWait,iErrorCode);
+          ShellExec('open','http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe','','',SW_SHOWNORMAL,ewNoWait,ErrorCode);
         Result := False;
       end;
     end;

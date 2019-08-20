@@ -1,4 +1,6 @@
-﻿namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
+﻿using Nikse.SubtitleEdit.Core.Interfaces;
+
+namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
 {
     public class FixShortDisplayTimes : IFixCommonError
     {
@@ -42,7 +44,10 @@
                         {
                             string oldCurrent = p.ToString();
                             if (next.StartTime.TotalMilliseconds - Configuration.Settings.General.MinimumMillisecondsBetweenLines > p.EndTime.TotalMilliseconds)
+                            {
                                 p.EndTime.TotalMilliseconds = next.StartTime.TotalMilliseconds - Configuration.Settings.General.MinimumMillisecondsBetweenLines;
+                            }
+
                             p.StartTime.TotalMilliseconds = p.EndTime.TotalMilliseconds - Configuration.Settings.General.SubtitleMinimumDisplayMilliseconds;
                             noOfShortDisplayTimes++;
                             callbacks.AddFixToListView(p, fixAction, oldCurrent, p.ToString());
@@ -60,7 +65,8 @@
                 if (!skip && charactersPerSecond > Configuration.Settings.General.SubtitleMaximumCharactersPerSeconds)
                 {
                     var temp = new Paragraph(p);
-                    while (Utilities.GetCharactersPerSecond(temp) > Configuration.Settings.General.SubtitleMaximumCharactersPerSeconds)
+                    var numberOfCharacters = temp.Text.CountCharacters(Configuration.Settings.General.CharactersPerSecondsIgnoreWhiteSpace);
+                    while (Utilities.GetCharactersPerSecond(temp, numberOfCharacters) > Configuration.Settings.General.SubtitleMaximumCharactersPerSeconds)
                     {
                         temp.EndTime.TotalMilliseconds++;
                     }
@@ -167,7 +173,10 @@
             {
                 string oldCurrent = p.ToString();
                 if (next != null && next.StartTime.TotalMilliseconds - Configuration.Settings.General.MinimumMillisecondsBetweenLines > p.EndTime.TotalMilliseconds)
+                {
                     p.EndTime.TotalMilliseconds = next.StartTime.TotalMilliseconds - Configuration.Settings.General.MinimumMillisecondsBetweenLines;
+                }
+
                 p.StartTime.TotalMilliseconds = p.EndTime.TotalMilliseconds - temp.Duration.TotalMilliseconds;
                 noOfShortDisplayTimes++;
                 _callbacks.AddFixToListView(p, fixAction, oldCurrent, p.ToString());

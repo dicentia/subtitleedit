@@ -26,20 +26,23 @@ namespace Nikse.SubtitleEdit.Forms
             string[] versionInfo = Utilities.AssemblyVersion.Split('.');
             string revisionNumber = "0";
             if (versionInfo.Length >= 4)
-                revisionNumber = versionInfo[3];
-            if (revisionNumber == "0")
             {
-                labelProduct.Text = String.Format("{0} {1}.{2}.{3}, ", _languageGeneral.Title, versionInfo[0], versionInfo[1], versionInfo[2]);
-                revisionNumber = Utilities.AssemblyDescription.Substring(0, 7);
+                revisionNumber = versionInfo[3];
+            }
+
+            if (revisionNumber == "0" || revisionNumber == "1") // don't append build number for rev 0 - and also 1 in case first build goes wrong
+            {
+                labelProduct.Text = $"{_languageGeneral.Title} {versionInfo[0]}.{versionInfo[1]}.{versionInfo[2]}";
+                linkLabelGitBuildHash.Hide();
             }
             else
             {
-                labelProduct.Text = String.Format("{0} {1}.{2}.{3}, build", _languageGeneral.Title, versionInfo[0], versionInfo[1], versionInfo[2]);
+                labelProduct.Text = $"{_languageGeneral.Title} {versionInfo[0]}.{versionInfo[1]}.{versionInfo[2]} NEXT, beta";
+                linkLabelGitBuildHash.Left = labelProduct.Left + labelProduct.Width - 5;
+                linkLabelGitBuildHash.Text = revisionNumber;
+                tooltip.SetToolTip(linkLabelGitBuildHash, GetGitHubHashLink());
+                linkLabelGitBuildHash.Font = labelProduct.Font;
             }
-            linkLabelGitBuildHash.Left = labelProduct.Left + labelProduct.Width - 5;
-            linkLabelGitBuildHash.Text = revisionNumber;
-            tooltip.SetToolTip(linkLabelGitBuildHash, GetGitHubHashLink());
-            linkLabelGitBuildHash.Font = labelProduct.Font;
 
             string aboutText = _language.AboutText1.TrimEnd() + Environment.NewLine +
                                Environment.NewLine +
@@ -72,7 +75,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void About_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
             else if (e.KeyCode == UiUtil.HelpKeys)
             {
                 Utilities.ShowHelp(null);
@@ -94,7 +99,7 @@ namespace Nikse.SubtitleEdit.Forms
 
         private void buttonDonate_Click(object sender, EventArgs e)
         {
-            Process.Start("http://www.nikse.dk/Donate");
+            Process.Start("https://www.nikse.dk/Donate");
         }
 
         private void linkLabelGitBuildHash_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

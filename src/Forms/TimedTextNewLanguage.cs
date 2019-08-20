@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Nikse.SubtitleEdit.Forms
 {
-    public partial class TimedTextNewLanguage : Form
+    public sealed partial class TimedTextNewLanguage : Form
     {
         public class LanguageComboBoxItem
         {
@@ -45,7 +45,7 @@ namespace Nikse.SubtitleEdit.Forms
             for (int i = 0; i < moreLanguages.Count; i++)
             {
                 var language = moreLanguages[i];
-                var code = language.TwoLetterISOLanguageName.ToLower();
+                var code = language.TwoLetterISOLanguageName.ToLowerInvariant();
                 comboBoxLanguage.Items.Add(new LanguageComboBoxItem(code, language.EnglishName + " / " + language.NativeName));
                 if (code == currentLanguage)
                 {

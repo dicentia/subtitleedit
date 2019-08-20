@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Nikse.SubtitleEdit.Core.Dictionaries;
 
 namespace Nikse.SubtitleEdit.Core
@@ -50,6 +51,11 @@ namespace Nikse.SubtitleEdit.Core
                     p.Text = FixCasingAfterTitles(p.Text);
                 }
 
+                if (FixNormal)
+                {
+                    p.Text = FixStutter(p.Text);
+                }
+
                 last = p;
             }
         }
@@ -66,15 +72,27 @@ namespace Nikse.SubtitleEdit.Core
             }
         }
 
-        private static string FixEnglishAloneILowerToUpper(string text)
+        private static string FixEnglishAloneILowerToUpper(string input)
         {
             const string pre = " >¡¿♪♫([";
             const string post = " <!?.:;,♪♫)]";
 
+            var text = input;
             if (text.StartsWith("I-i ", StringComparison.Ordinal))
+            {
                 text = text.Remove(0, 3).Insert(0, "I-I");
+            }
+            text = text.Replace(" i-i ", " I-I ");
+            if (text.StartsWith("I-i-i ", StringComparison.Ordinal))
+            {
+                text = text.Remove(0, 5).Insert(0, "I-I-I");
+            }
+            text = text.Replace(" i-i-i ", " I-I-I ");
+
             if (text.StartsWith("I-if ", StringComparison.Ordinal))
+            {
                 text = text.Remove(0, 4).Insert(0, "I-If ");
+            }
 
             for (var indexOfI = text.IndexOf('i'); indexOfI >= 0; indexOfI = text.IndexOf('i', indexOfI + 1))
             {
@@ -137,8 +155,9 @@ namespace Nikse.SubtitleEdit.Core
             return text;
         }
 
-        private string FixCasingAfterTitles(string text)
+        private string FixCasingAfterTitles(string input)
         {
+            var text = input;
             var titles = new[] { "Mrs.", "Miss.", "Mr.", "Ms.", "Dr." };
             var notChangeWords = new[] { "does", "has", "will", "is", "and", "for", "but", "or", "of" };
             for (int i = 0; i < text.Length - 4; i++)
@@ -155,7 +174,7 @@ namespace Nikse.SubtitleEdit.Core
                             var words = text.Substring(idx).Split(' ', '\r', '\n', ',', '"', '?', '!', '.', '\'');
                             if (words.Length > 0 && !notChangeWords.Contains(words[0]))
                             {
-                                var upper = text[idx].ToString().ToUpper();
+                                var upper = text[idx].ToString().ToUpperInvariant();
                                 text = text.Remove(idx, 1).Insert(idx, upper);
                             }
                         }
@@ -166,13 +185,71 @@ namespace Nikse.SubtitleEdit.Core
             return text;
         }
 
-        private string Fix(string text, string lastLine, List<string> nameList, CultureInfo subtitleCulture, double millisecondsFromLast)
+        public static string FixStutter(string text)
         {
-            string original = text;
+            if (!text.Contains("-"))
+            {
+                return text;
+            }
+
+            var sb = new StringBuilder(text.Length);
+            bool firstLetter = true;
+            bool tagOn = false;
+            var index = 0;
+            while (index < text.Length)
+            {
+                var ch = text[index];
+                if (ch == '<' || ch == '{')
+                {
+                    tagOn = true;
+                }
+                else if (ch == '<' || ch == '}')
+                {
+                    tagOn = false;
+                }
+                else if (ch == '.' || ch == '!' || ch == '?')
+                {
+                    firstLetter = true;
+                }
+                else if (!tagOn && char.IsLetter(ch))
+                {
+                    if (firstLetter && index < text.Length - 6 && char.IsUpper(text[index]) &&
+                        text[index + 1] == '-' && char.IsLower(text[index + 2]) && text[index] == char.ToUpperInvariant(text[index + 2]) &&
+                        text[index + 3] == '-' && char.IsLower(text[index + 4]) && text[index] == char.ToUpperInvariant(text[index + 4]) &&
+                        text[index + 5] != '-')
+                    {
+                        sb.Append(text[index]);
+                        sb.Append('-');
+                        sb.Append(text[index]);
+                        sb.Append('-');
+                        index += 4;
+                    }
+                    else if (firstLetter && index < text.Length - 4 && char.IsUpper(text[index]) &&
+                             text[index + 1] == '-' && char.IsLower(text[index + 2]) && text[index] == char.ToUpperInvariant(text[index + 2]) &&
+                             text[index + 3] != '-')
+                    {
+                        sb.Append(text[index]);
+                        sb.Append('-');
+                        index += 2;
+                    }
+                    firstLetter = false;
+                }
+                sb.Append(ch);
+                index++;
+            }
+
+            return sb.ToString();
+        }
+
+        private string Fix(string original, string lastLine, List<string> nameList, CultureInfo subtitleCulture, double millisecondsFromLast)
+        {
+            var text = original;
             if (FixNormal)
             {
                 if (FixNormalOnlyAllUppercase && text != text.ToUpper(subtitleCulture))
+                {
                     return text;
+                }
 
                 if (text.Length > 1)
                 {
@@ -195,7 +272,10 @@ namespace Nikse.SubtitleEdit.Core
                 text = text.ToLower(subtitleCulture);
             }
             if (original != text)
+            {
                 NoOfLinesChanged++;
+            }
+
             return text;
         }
 

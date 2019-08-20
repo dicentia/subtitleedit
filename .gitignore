@@ -21,6 +21,7 @@
 bin/
 obj/
 SubtitleEdit-*-setup.exe
+SubtitleEdit-*.zip
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -34,3 +35,4 @@ SubtitleEdit-*-setup.exe
 /src/SubtitleEdit.VC.VC.opendb
 /src/SubtitleEdit.VC.db
 /src/SubtitleEdit.userprefs
+SubtitleEditBeta

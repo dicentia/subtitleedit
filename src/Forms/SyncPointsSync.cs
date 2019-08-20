@@ -23,7 +23,6 @@ namespace Nikse.SubtitleEdit.Forms
         }
 
         private string _subtitleFileName;
-        private string _videoFileName;
         private int _audioTrackNumber;
         private Subtitle _subtitle;
         private Subtitle _originalSubtitle;
@@ -32,15 +31,9 @@ namespace Nikse.SubtitleEdit.Forms
         private readonly Keys _mainGeneralGoToNextSubtitle = UiUtil.GetKeys(Configuration.Settings.Shortcuts.GeneralGoToNextSubtitle);
         private readonly Keys _mainGeneralGoToPrevSubtitle = UiUtil.GetKeys(Configuration.Settings.Shortcuts.GeneralGoToPrevSubtitle);
 
-        public string VideoFileName
-        {
-            get { return _videoFileName; }
-        }
+        public string VideoFileName { get; private set; }
 
-        public Subtitle FixedSubtitle
-        {
-            get { return _subtitle; }
-        }
+        public Subtitle FixedSubtitle => _subtitle;
 
         public SyncPointsSync()
         {
@@ -76,11 +69,13 @@ namespace Nikse.SubtitleEdit.Forms
             _subtitle = new Subtitle(subtitle);
             _originalSubtitle = subtitle;
             _subtitleFileName = subtitleFileName;
-            _videoFileName = videoFileName;
+            VideoFileName = videoFileName;
             _audioTrackNumber = audioTrackNumber;
             SubtitleListview1.Fill(subtitle);
             if (SubtitleListview1.Items.Count > 0)
+            {
                 SubtitleListview1.Items[0].Selected = true;
+            }
 
             SubtitleListview1.Anchor = AnchorStyles.Left;
             buttonSetSyncPoint.Anchor = AnchorStyles.Left;
@@ -115,11 +110,14 @@ namespace Nikse.SubtitleEdit.Forms
             _otherSubtitle = otherSubtitle;
             _originalSubtitle = subtitle;
             _subtitleFileName = subtitleFileName;
-            _videoFileName = videoFileName;
+            VideoFileName = videoFileName;
             _audioTrackNumber = audioTrackNumber;
             SubtitleListview1.Fill(subtitle);
             if (SubtitleListview1.Items.Count > 0)
+            {
                 SubtitleListview1.Items[0].Selected = true;
+            }
+
             labelOtherSubtitleFileName.Text = otherSubtitleFileName;
             subtitleListView2.Fill(otherSubtitle);
 
@@ -137,7 +135,7 @@ namespace Nikse.SubtitleEdit.Forms
             MinimumSize = new Size(Width - 50, MinimumSize.Height);
         }
 
-        private void RefreshSynchronizationPointsUI()
+        private void RefreshSynchronizationPointsUi()
         {
             buttonApplySync.Enabled = _synchronizationPoints.Count > 0;
             labelNoOfSyncPoints.Text = string.Format(Configuration.Settings.Language.PointSync.SyncPointsX, _synchronizationPoints.Count);
@@ -148,8 +146,7 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 if (_synchronizationPoints.ContainsKey(i))
                 {
-                    var p = new Paragraph();
-                    p.StartTime.TotalMilliseconds = _synchronizationPoints[i].TotalMilliseconds;
+                    var p = new Paragraph { StartTime = { TotalMilliseconds = _synchronizationPoints[i].TotalMilliseconds } };
                     p.EndTime.TotalMilliseconds = p.StartTime.TotalMilliseconds + _subtitle.Paragraphs[i].Duration.TotalMilliseconds;
                     SubtitleListview1.SetStartTimeAndDuration(i, p, _subtitle.GetParagraphOrDefault(i + 1), _subtitle.GetParagraphOrDefault(i - 1));
 
@@ -180,18 +177,23 @@ namespace Nikse.SubtitleEdit.Forms
                     using (var getTime = new SetSyncPoint())
                     {
                         int index = SubtitleListview1.SelectedItems[0].Index;
-                        getTime.Initialize(_subtitle, _subtitleFileName, index, _videoFileName, _audioTrackNumber);
+                        getTime.Initialize(_subtitle, _subtitleFileName, index, VideoFileName, _audioTrackNumber);
                         if (getTime.ShowDialog(this) == DialogResult.OK)
                         {
                             if (_synchronizationPoints.ContainsKey(index))
+                            {
                                 _synchronizationPoints[index] = getTime.SynchronizationPoint;
+                            }
                             else
+                            {
                                 _synchronizationPoints.Add(index, getTime.SynchronizationPoint);
-                            RefreshSynchronizationPointsUI();
-                            _videoFileName = getTime.VideoFileName;
+                            }
+
+                            RefreshSynchronizationPointsUi();
+                            VideoFileName = getTime.VideoFileName;
                         }
                         Activate();
-                        _videoFileName = getTime.VideoFileName;
+                        VideoFileName = getTime.VideoFileName;
                     }
                 }
             }
@@ -206,10 +208,15 @@ namespace Nikse.SubtitleEdit.Forms
                 int indexOther = subtitleListView2.SelectedItems[0].Index;
 
                 if (_synchronizationPoints.ContainsKey(index))
+                {
                     _synchronizationPoints[index] = TimeSpan.FromMilliseconds(_otherSubtitle.Paragraphs[indexOther].StartTime.TotalMilliseconds);
+                }
                 else
+                {
                     _synchronizationPoints.Add(index, TimeSpan.FromMilliseconds(_otherSubtitle.Paragraphs[indexOther].StartTime.TotalMilliseconds));
-                RefreshSynchronizationPointsUI();
+                }
+
+                RefreshSynchronizationPointsUi();
             }
             SetSyncFactorLabel();
         }
@@ -220,8 +227,11 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 int index = SubtitleListview1.SelectedItems[0].Index;
                 if (_synchronizationPoints.ContainsKey(index))
+                {
                     _synchronizationPoints.Remove(index);
-                RefreshSynchronizationPointsUI();
+                }
+
+                RefreshSynchronizationPointsUi();
             }
             SetSyncFactorLabel();
         }
@@ -229,7 +239,10 @@ namespace Nikse.SubtitleEdit.Forms
         private void buttonOK_Click(object sender, EventArgs e)
         {
             if (buttonApplySync.Enabled)
+            {
                 buttonSync_Click(null, null);
+            }
+
             DialogResult = DialogResult.OK;
         }
 
@@ -241,7 +254,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void SyncPointsSync_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
             else if (e.KeyCode == UiUtil.HelpKeys)
             {
                 Utilities.ShowHelp("#sync");
@@ -300,7 +315,7 @@ namespace Nikse.SubtitleEdit.Forms
                 double subStart = _originalSubtitle.Paragraphs[_synchronizationPoints.First().Key].StartTime.TotalMilliseconds / TimeCode.BaseUnit;
 
                 var adjustment = startPos - subStart;
-                labelAdjustFactor.Text = string.Format("{0:+0.000;-0.000}", adjustment);
+                labelAdjustFactor.Text = $"{adjustment:+0.000;-0.000}";
             }
             else if (_synchronizationPoints.Count == 2)
             {
@@ -319,7 +334,7 @@ namespace Nikse.SubtitleEdit.Forms
                 // adjust to starting position
                 double adjust = startPos - subStart * factor;
 
-                labelAdjustFactor.Text = string.Format("*{0:0.000}, {1:+0.000;-0.000}", factor, adjust);
+                labelAdjustFactor.Text = $"*{factor:0.000}, {adjust:+0.000;-0.000}";
             }
         }
 
@@ -334,7 +349,7 @@ namespace Nikse.SubtitleEdit.Forms
                 double realDiff = endPos - startPos;
 
                 // speed factor
-                double factor = realDiff / subDiff;
+                double factor = Math.Abs(subDiff) < 0.001 ? 1 : realDiff / subDiff;
 
                 // adjust to starting position
                 double adjust = startPos - subStart * factor;
@@ -357,10 +372,13 @@ namespace Nikse.SubtitleEdit.Forms
             if (_synchronizationPoints.Count == 1)
             {
                 foreach (KeyValuePair<int, TimeSpan> kvp in _synchronizationPoints)
+                {
                     AdjustViaShowEarlierLater(kvp.Key, kvp.Value.TotalMilliseconds);
+                }
+
                 _synchronizationPoints = new SortedDictionary<int, TimeSpan>();
                 SubtitleListview1.Fill(_subtitle);
-                RefreshSynchronizationPointsUI();
+                RefreshSynchronizationPointsUi();
                 return;
             }
 
@@ -368,7 +386,10 @@ namespace Nikse.SubtitleEdit.Forms
             int minIndex = 0;
             var syncIndices = new List<int>();
             foreach (var kvp in _synchronizationPoints)
+            {
                 syncIndices.Add(kvp.Key);
+            }
+
             for (int i = 0; i < syncIndices.Count; i++)
             {
                 if (i == 0)
@@ -382,9 +403,13 @@ namespace Nikse.SubtitleEdit.Forms
 
                     int maxIndex;
                     if (i == syncIndices.Count - 1)
+                    {
                         maxIndex = _subtitle.Paragraphs.Count;
+                    }
                     else
-                        maxIndex = syncIndices[i]; // maxIndex = syncIndices[i + 1];
+                    {
+                        maxIndex = syncIndices[i];
+                    }
 
                     Sync(startIndex, endIndex, minIndex, maxIndex, _synchronizationPoints[startIndex].TotalMilliseconds / TimeCode.BaseUnit, _synchronizationPoints[endIndex].TotalMilliseconds / TimeCode.BaseUnit);
 
@@ -392,7 +417,7 @@ namespace Nikse.SubtitleEdit.Forms
                 }
             }
             SubtitleListview1.Fill(_subtitle);
-            RefreshSynchronizationPointsUI();
+            RefreshSynchronizationPointsUi();
         }
 
         private void AdjustViaShowEarlierLater(int index, double newTotalMilliseconds)
@@ -417,9 +442,13 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 int index = SubtitleListview1.SelectedItems[0].Index;
                 if (_synchronizationPoints.ContainsKey(index))
+                {
                     buttonRemoveSyncPoint_Click(null, null);
+                }
                 else
+                {
                     buttonSetSyncPoint_Click(null, null);
+                }
             }
         }
 
@@ -453,7 +482,9 @@ namespace Nikse.SubtitleEdit.Forms
                 findSubtitle.Initialize(_subtitle.Paragraphs, string.Empty);
                 findSubtitle.ShowDialog();
                 if (findSubtitle.SelectedIndex >= 0)
+                {
                     SubtitleListview1.SelectIndexAndEnsureVisible(findSubtitle.SelectedIndex);
+                }
             }
         }
 
@@ -464,7 +495,9 @@ namespace Nikse.SubtitleEdit.Forms
                 findSubtitle.Initialize(_otherSubtitle.Paragraphs, string.Empty);
                 findSubtitle.ShowDialog();
                 if (findSubtitle.SelectedIndex >= 0)
+                {
                     subtitleListView2.SelectIndexAndEnsureVisible(findSubtitle.SelectedIndex);
+                }
             }
         }
 

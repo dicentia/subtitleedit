@@ -41,9 +41,14 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             foreach (var name in _blackList)
             {
                 if (_namesList.Contains(name))
+                {
                     _namesList.Remove(name);
+                }
+
                 if (_namesMultiList.Contains(name))
+                {
                     _namesMultiList.Remove(name);
+                }
             }
         }
 
@@ -94,23 +99,9 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                 reader.MoveToContent();
                 while (reader.Read())
                 {
-                    if (reader.NodeType == XmlNodeType.Element)
+                    if (reader.NodeType == XmlNodeType.Element && !reader.IsEmptyElement)
                     {
-                        if (reader.Name == "blacklist")
-                        {
-                            while (reader.Read() && reader.NodeType != XmlNodeType.EndElement)
-                            {
-                                if (reader.Name == "name")
-                                {
-                                    string name = reader.ReadElementContentAsString().Trim();
-                                    if (name.Length > 0 && !_blackList.Contains(name))
-                                    {
-                                        _blackList.Add(name);
-                                    }
-                                }
-                            }
-                        }
-                        else if (reader.Name == "name")
+                        if (reader.Name == "name")
                         {
                             string name = reader.ReadElementContentAsString().Trim();
                             if (name.Length > 0)
@@ -128,10 +119,23 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
                                 }
                             }
                         }
+                        else if (reader.Name == "blacklist")
+                        {
+                            while (reader.Read() && reader.NodeType != XmlNodeType.EndElement)
+                            {
+                                if (reader.Name == "name")
+                                {
+                                    string name = reader.ReadElementContentAsString().Trim();
+                                    if (name.Length > 0 && !_blackList.Contains(name))
+                                    {
+                                        _blackList.Add(name);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-
         }
 
         public bool Remove(string name)
@@ -205,16 +209,24 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             if (name.Contains(' '))
             {
                 if (!_namesMultiList.Contains(name))
+                {
                     _namesMultiList.Add(name);
+                }
                 else
+                {
                     return false;
+                }
             }
             else
             {
                 if (!_namesList.Contains(name))
+                {
                     _namesList.Add(name);
+                }
                 else
+                {
                     return false;
+                }
             }
 
             // <two-letter-iso-code>_names.xml, e.g "en_names.xml"
@@ -240,12 +252,14 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             return true;
         }
 
-        public bool IsInNamesMultiWordList(string text, string word)
+        public bool IsInNamesMultiWordList(string input, string word)
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(input))
+            {
                 return false;
+            }
 
-            text = text.Replace(Environment.NewLine, " ");
+           var  text = input.Replace(Environment.NewLine, " ");
             text = text.FixExtraSpaces();
 
             if (_namesMultiList.Contains(word))
@@ -254,10 +268,12 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
             }
             foreach (string multiWordName in _namesMultiList)
             {
-                if (text.Contains(multiWordName))
+                if (text.FastIndexOf(multiWordName) >= 0)
                 {
                     if (multiWordName.StartsWith(word + " ", StringComparison.Ordinal) || multiWordName.EndsWith(" " + word, StringComparison.Ordinal) || multiWordName.Contains(" " + word + " "))
+                    {
                         return true;
+                    }
                 }
             }
             return false;
@@ -266,12 +282,16 @@ namespace Nikse.SubtitleEdit.Core.Dictionaries
         public bool ContainsCaseInsensitive(string name)
         {
             if (string.IsNullOrEmpty(name))
+            {
                 return false;
+            }
 
             foreach (var n in name.Contains(' ') ? _namesMultiList : _namesList)
             {
                 if (name.Equals(n, StringComparison.OrdinalIgnoreCase))
+                {
                     return true;
+                }
             }
             return false;
         }

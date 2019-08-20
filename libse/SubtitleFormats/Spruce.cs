@@ -70,9 +70,9 @@ $ColorIndex4    = 3
             return sb.ToString();
         }
 
-        private static string EncodeText(string text)
+        private static string EncodeText(string input)
         {
-            text = HtmlUtil.FixUpperTags(text);
+            var text = HtmlUtil.FixUpperTags(input);
             bool allItalic = text.StartsWith("<i>", StringComparison.Ordinal) && text.EndsWith("</i>", StringComparison.Ordinal) && Utilities.CountTagInText(text, "<i>") == 1;
             text = text.Replace("<b>", Bold);
             text = text.Replace("</b>", Bold);
@@ -82,14 +82,17 @@ $ColorIndex4    = 3
             text = text.Replace("</u>", Underline);
             text = HtmlUtil.RemoveHtmlTags(text, true);
             if (allItalic)
+            {
                 return text.Replace(Environment.NewLine, "|^I");
+            }
+
             return text.Replace(Environment.NewLine, "|");
         }
 
         private static string EncodeTimeCode(TimeCode time)
         {
             //00:01:54:19
-            int frames = MillisecondsToFrames(time.Milliseconds);
+            int frames = MillisecondsToFramesMaxFrameRate(time.Milliseconds);
             return $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}:{frames:00}";
         }
 
@@ -102,7 +105,9 @@ $ColorIndex4    = 3
             // Copy reference of static compiled regex (RegexTimeCodes1).
             Regex timeCodeRegex = RegexTimeCodes1;
             if (fileName != null && fileName.EndsWith(".stl", StringComparison.OrdinalIgnoreCase)) // allow empty text if extension is ".stl"...
+            {
                 timeCodeRegex = RegexTimeCodes2;
+            }
 
             var verticalAlign = "$VertAlign=Bottom";
             var horizontalAlign = "$HorzAlign=Center";
@@ -153,9 +158,9 @@ $ColorIndex4    = 3
             return new TimeCode(int.Parse(hour), int.Parse(minutes), int.Parse(seconds), milliseconds);
         }
 
-        private static string DecodeText(string text)
+        private static string DecodeText(string input)
         {
-            text = text.Replace("|", Environment.NewLine);
+            var text = input.Replace("|", Environment.NewLine);
 
             //^IBrillstein^I
             if (text.Contains(Bold))
@@ -174,10 +179,10 @@ $ColorIndex4    = 3
             return text;
         }
 
-        private static string DecoderTextExtension(string text, string spruceTag, string htmlOpenTag)
+        private static string DecoderTextExtension(string input, string spruceTag, string htmlOpenTag)
         {
             var htmlCloseTag = htmlOpenTag.Insert(1, "/");
-
+            var text = input;
             var idx = text.IndexOf(spruceTag, StringComparison.Ordinal);
             var c = Utilities.CountTagInText(text, spruceTag);
             if (c == 1)

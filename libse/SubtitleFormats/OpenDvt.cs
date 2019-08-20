@@ -145,14 +145,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                         sb.Clear();
                         foreach (XmlNode innerNode in text.ChildNodes)
                         {
-                            switch (innerNode.Name)
+                            if (innerNode.Name == "br")
                             {
-                                case "br":
-                                    sb.AppendLine();
-                                    break;
-                                default:
-                                    sb.Append(innerNode.InnerText);
-                                    break;
+                                sb.AppendLine();
+                            }
+                            else
+                            {
+                                sb.Append(innerNode.InnerText);
                             }
                         }
                         p.Text = sb.ToString();
@@ -164,7 +163,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                         string ms = timeMS.InnerText;
                         long milliseconds;
                         if (long.TryParse(ms, out milliseconds))
+                        {
                             p.StartTime = new TimeCode(milliseconds);
+                        }
                     }
                     p.EndTime = new TimeCode(p.StartTime.TotalMilliseconds + Utilities.GetOptimalDisplayMilliseconds(p.Text));
 

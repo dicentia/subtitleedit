@@ -1,4 +1,5 @@
 ﻿using System;
+using Nikse.SubtitleEdit.Core.Interfaces;
 
 namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
 {
@@ -15,7 +16,10 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                 if (callbacks.AllowFix(p, fixAction))
                 {
                     if (!p.Text.Contains(">>", StringComparison.Ordinal))
+                    {
                         continue;
+                    }
+
                     var text = p.Text;
                     var oldText = text;
                     if (!text.Contains(Environment.NewLine))

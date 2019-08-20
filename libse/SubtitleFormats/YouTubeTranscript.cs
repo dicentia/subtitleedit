@@ -23,6 +23,16 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             return sb.ToString();
         }
 
+        public override bool IsMine(List<string> lines, string fileName)
+        {
+            if (new UnknownSubtitle88().IsMine(lines, fileName))
+            {
+                return false;
+            }
+
+            return base.IsMine(lines, fileName);
+        }
+
         private static string EncodeTimeCode(TimeCode time)
         {
             return $"{time.Hours * 60 + time.Minutes}:{time.Seconds:00}";
@@ -48,9 +58,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 else if (p != null)
                 {
                     if (string.IsNullOrEmpty(p.Text))
+                    {
                         p.Text = s;
+                    }
                     else
+                    {
                         p.Text = p.Text + Environment.NewLine + s;
+                    }
 
                     if (p.Text.Length > 800)
                     {
@@ -63,7 +77,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 p2.Text = Utilities.AutoBreakLine(p2.Text);
             }
-            subtitle.RecalculateDisplayTimes(Configuration.Settings.General.SubtitleMaximumDisplayMilliseconds, null);
+            subtitle.RecalculateDisplayTimes(Configuration.Settings.General.SubtitleMaximumDisplayMilliseconds, null, Configuration.Settings.General.SubtitleOptimalCharactersPerSeconds);
             subtitle.Renumber();
         }
 

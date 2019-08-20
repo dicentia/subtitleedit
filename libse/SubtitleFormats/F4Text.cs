@@ -11,7 +11,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
     /// </summary>
     public class F4Text : SubtitleFormat
     {
-        private static readonly Regex regexTimeCodes = new Regex(@"^\d\d:\d\d:\d\d-\d$", RegexOptions.Compiled);
+        private static readonly Regex RegexTimeCodes = new Regex(@"^\d\d:\d\d:\d\d-\d$", RegexOptions.Compiled);
 
         public override string Extension => ".txt";
 
@@ -20,7 +20,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         public override bool IsMine(List<string> lines, string fileName)
         {
             if (fileName != null && !fileName.EndsWith(Extension, StringComparison.OrdinalIgnoreCase))
+            {
                 return false;
+            }
 
             return base.IsMine(lines, fileName);
         }
@@ -28,15 +30,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         public static string ToF4Text(Subtitle subtitle)
         {
             var sb = new StringBuilder();
-            //double lastEndTimeMilliseconds = -1;
             const string writeFormat = "{0}{1}";
             foreach (Paragraph p in subtitle.Paragraphs)
             {
-                // if (p.StartTime.TotalMilliseconds == lastEndTimeMilliseconds)
                 sb.AppendFormat(writeFormat, HtmlUtil.RemoveHtmlTags(p.Text, true), EncodeTimeCode(p.EndTime));
-                //else
-                //    sb.Append(string.Format("{0}{1}{2}", EncodeTimeCode(p.StartTime), HtmlUtil.RemoveHtmlTags(p.Text), EncodeTimeCode(p.EndTime)));
-                //lastEndTimeMilliseconds = p.EndTime.TotalMilliseconds;
             }
             return sb.ToString().Trim();
         }
@@ -56,10 +53,16 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             _errorCount = 0;
             var sb = new StringBuilder();
             foreach (string line in lines)
+            {
                 sb.AppendLine(line);
+            }
+
             string text = sb.ToString();
             if (text.Contains("{\\rtf") || text.Contains("<transcript>"))
+            {
                 return;
+            }
+
             LoadF4TextSubtitle(subtitle, text);
         }
 
@@ -71,7 +74,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             var currentText = new StringBuilder();
             foreach (string line in arr)
             {
-                if (regexTimeCodes.IsMatch(line))
+                if (RegexTimeCodes.IsMatch(line))
                 {
                     if (p == null)
                     {
@@ -102,8 +105,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 {
                     if (p == null && subtitle.Paragraphs.Count > 0)
                     {
-                        p = new Paragraph();
-                        p.StartTime.TotalMilliseconds = subtitle.Paragraphs[subtitle.Paragraphs.Count - 1].EndTime.TotalMilliseconds;
+                        p = new Paragraph { StartTime = { TotalMilliseconds = subtitle.Paragraphs[subtitle.Paragraphs.Count - 1].EndTime.TotalMilliseconds } };
                     }
                     currentText.AppendLine(line.Trim());
                 }
@@ -111,7 +113,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             if (currentText.Length > 0 && subtitle.Paragraphs.Count > 0 && currentText.Length < 1000)
             {
                 if (p == null)
+                {
                     p = new Paragraph();
+                }
 
                 p.Text = currentText.ToString().Trim().Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
                 p.Text = p.Text.Trim('\n', '\r').Trim();
@@ -133,7 +137,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
                 int milliseconds = (int) Math.Round(millisecond * 100.0);
                 if (milliseconds > 999)
+                {
                     milliseconds = 999;
+                }
 
                 tc = new TimeCode(hour, minutes, seconds, milliseconds);
             }

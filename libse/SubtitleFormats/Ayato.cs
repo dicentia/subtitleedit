@@ -19,7 +19,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 if (fi.Length >= 3000 && fi.Length < 1024000) // not too small or too big
                 {
                     if (!fileName.EndsWith(Extension, StringComparison.OrdinalIgnoreCase))
+                    {
                         return false;
+                    }
 
                     return base.IsMine(lines, fileName);
                 }
@@ -164,7 +166,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             }
         }
 
-        private void WriteParagraph(Stream stream, Paragraph paragraph, int number)
+        private static void WriteParagraph(Stream stream, Paragraph paragraph, int number)
         {
             // subtitle number
             stream.WriteByte((byte)(number & 0xff));
@@ -185,7 +187,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             WriteText(stream, paragraph.Text);
         }
 
-        private void WriteFrames(Stream stream, TimeCode timeCode)
+        private static void WriteFrames(Stream stream, TimeCode timeCode)
         {
             var frames = (uint)Math.Round((double)MillisecondsToFrames(timeCode.TotalMilliseconds));
             stream.WriteByte((byte)(frames & 0xff));
@@ -193,14 +195,16 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             stream.WriteByte((byte)((frames >> 16) & 0xff));
         }
 
-        private void WriteText(Stream stream, string text)
+        private static void WriteText(Stream stream, string text)
         {
             var bytes = MakeBytes(text);
 
             stream.WriteByte((byte)(bytes.Length + 1)); // text length
 
             for (int i = 0; i < 55; i++) // 55 bytes zero padding
+            {
                 stream.WriteByte(0);
+            }
 
             stream.WriteByte(7);
             stream.Write(bytes, 0, bytes.Length);

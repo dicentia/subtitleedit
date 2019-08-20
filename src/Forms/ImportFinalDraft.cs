@@ -15,7 +15,6 @@ namespace Nikse.SubtitleEdit.Forms
             InitializeComponent();
             UiUtil.FixFonts(this);
 
-            //Text = Configuration.Settings.Language.GoToLine.Title;
             buttonOk.Text = Configuration.Settings.Language.General.Ok;
             buttonCancel.Text = Configuration.Settings.Language.General.Cancel;
             UiUtil.FixLargeFonts(this, buttonOk);
@@ -46,7 +45,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void ImportFinalDraft_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
         private void buttonCancel_Click(object sender, System.EventArgs e)

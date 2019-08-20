@@ -33,18 +33,18 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             return false;
         }
 
-        internal const string Layout = @"<?xml version='1.0' encoding='UTF-8'?>
+        internal static string Layout = @"<?xml version='1.0' encoding='UTF-8'?>
 <TMPGEncVMESubtitleTextFormat>
     <Layout>
         <LayoutItem index='0'>
             <Name>
                 <![CDATA[Picture bottom layout]]>
             </Name>
-            <Position>23</Position>
+            <Position>[Position]</Position>
             <FontName>
-                <![CDATA[Tahoma]]>
+                <![CDATA[[FontName]]]>
             </FontName>
-            <FontHeight>0.069</FontHeight>
+            <FontHeight>[FontHeight]</FontHeight>
             <FontColor>17588159451135</FontColor>
             <FontBold>0</FontBold>
             <FontItalic>0</FontItalic>
@@ -73,11 +73,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             <Name>
                 <![CDATA[Picture top layout]]>
             </Name>
-            <Position>23</Position>
+            <Position>[Position]</Position>
             <FontName>
-                <![CDATA[Tahoma]]>
+                <![CDATA[[FontName]]]>
             </FontName>
-            <FontHeight>0.069</FontHeight>
+            <FontHeight>[FontHeight]</FontHeight>
             <FontColor>17588159451135</FontColor>
             <FontBold>0</FontBold>
             <FontItalic>0</FontItalic>
@@ -106,11 +106,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             <Name>
                 <![CDATA[Picture left layout]]>
             </Name>
-            <Position>23</Position>
+            <Position>[Position]</Position>
             <FontName>
-                <![CDATA[Tahoma]]>
+                <![CDATA[[FontName]]]>
             </FontName>
-            <FontHeight>0.069</FontHeight>
+            <FontHeight>[FontHeight]</FontHeight>
             <FontColor>17588159451135</FontColor>
             <FontBold>0</FontBold>
             <FontItalic>0</FontItalic>
@@ -139,11 +139,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             <Name>
                 <![CDATA[Picture right layout]]>
             </Name>
-            <Position>23</Position>
+            <Position>[Position]</Position>
             <FontName>
-                <![CDATA[Tahoma]]>
+                <![CDATA[[FontName]]]>
             </FontName>
-            <FontHeight>0.069</FontHeight>
+            <FontHeight>[FontHeight]</FontHeight>
             <FontColor>17588159451135</FontColor>
             <FontBold>0</FontBold>
             <FontItalic>0</FontItalic>
@@ -172,11 +172,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             <Name>
                 <![CDATA[Picture bottom layout]]>
             </Name>
-            <Position>23</Position>
+            <Position>[Position]</Position>
             <FontName>
-                <![CDATA[Tahoma]]>
+                <![CDATA[[FontName]]]>
             </FontName>
-            <FontHeight>0.069</FontHeight>
+            <FontHeight>[FontHeight]</FontHeight>
             <FontColor>17588159451135</FontColor>
             <FontBold>0</FontBold>
             <FontItalic>1</FontItalic>
@@ -205,7 +205,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
     <Subtitle>
         @
     </Subtitle>
-</TMPGEncVMESubtitleTextFormat>";
+</TMPGEncVMESubtitleTextFormat>"
+            .Replace("[FontName]", Configuration.Settings.SubtitleSettings.TmpegEncXmlFontName)
+            .Replace("[FontHeight]", Configuration.Settings.SubtitleSettings.TmpegEncXmlFontHeight)
+            .Replace("[Position]", Configuration.Settings.SubtitleSettings.TmpegEncXmlPosition);
+
 
         public override string ToText(Subtitle subtitle, string title)
         {
@@ -226,9 +230,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
                 XmlAttribute layoutIndex = xml.CreateAttribute("layoutindex");
                 if (p.Text.TrimStart().StartsWith("<i>", StringComparison.OrdinalIgnoreCase) && p.Text.TrimEnd().EndsWith("</i>", StringComparison.OrdinalIgnoreCase))
+                {
                     layoutIndex.InnerText = "4";
+                }
                 else
+                {
                     layoutIndex.InnerText = "0";
+                }
 
                 paragraph.Attributes.Append(layoutIndex);
 
@@ -274,9 +282,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 XmlNode fontItalic = node.SelectSingleNode("FontItalic");
                 if (fontItalic != null && fontItalic.InnerText == "1")
+                {
                     italicStyles.Add(true);
+                }
                 else
+                {
                     italicStyles.Add(false);
+                }
             }
 
             foreach (XmlNode node in xml.DocumentElement.SelectNodes("Subtitle/SubtitleItem"))
@@ -286,14 +298,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     var pText = new StringBuilder();
                     foreach (XmlNode innerNode in node.SelectSingleNode("Text").ChildNodes)
                     {
-                        switch (innerNode.Name)
+                        if (innerNode.Name == "br")
                         {
-                            case "br":
-                                pText.AppendLine();
-                                break;
-                            default:
-                                pText.Append(innerNode.InnerText.Trim());
-                                break;
+                            pText.AppendLine();
+                        }
+                        else
+                        {
+                            pText.Append(innerNode.InnerText.Trim());
                         }
                     }
 
@@ -328,22 +339,27 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     if (mustHaveLineBreakAsEnd)
                     {
                         if (!pText.ToString().EndsWith("\\n", StringComparison.Ordinal))
+                        {
                             _errorCount++;
+                        }
                     }
                     else
                     {
                         if (pText.ToString().EndsWith("\\n", StringComparison.Ordinal))
+                        {
                             _errorCount++;
+                        }
                     }
 
                     var p = new Paragraph(startCode, endCode, pText.ToString().Trim().Replace("<Text>", string.Empty).Replace("</Text>", string.Empty).Replace("\\n", Environment.NewLine).TrimEnd());
                     if (node.Attributes["layoutindex"] != null)
                     {
-                        int idx;
-                        if (int.TryParse(node.Attributes["layoutindex"].InnerText, out idx))
+                        if (int.TryParse(node.Attributes["layoutindex"].InnerText, out var idx))
                         {
                             if (idx >= 0 && idx < italicStyles.Count && italicStyles[idx])
+                            {
                                 p.Text = "<i>" + p.Text + "</i>";
+                            }
                         }
                     }
                     subtitle.Paragraphs.Add(p);

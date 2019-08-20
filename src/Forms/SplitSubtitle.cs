@@ -28,12 +28,14 @@ namespace Nikse.SubtitleEdit.Forms
             buttonSplit.Text = Configuration.Settings.Language.SplitSubtitle.Split;
             buttonDone.Text = Configuration.Settings.Language.SplitSubtitle.Done;
             buttonAdvanced.Text = Configuration.Settings.Language.General.Advanced;
-            labelHourMinSecMilliSecond.Text = Configuration.Settings.Language.General.HourMinutesSecondsMilliseconds;
+            labelHourMinSecMilliSecond.Text = Configuration.Settings.General.UseTimeFormatHHMMSSFF ? Configuration.Settings.Language.General.HourMinutesSecondsFrames : Configuration.Settings.Language.General.HourMinutesSecondsMilliseconds;
             buttonGetFrameRate.Left = splitTimeUpDownAdjust.Left + splitTimeUpDownAdjust.Width;
 
             label2.Top = label1.Bottom;
             if (Width < label1.Right + 5)
+            {
                 Width = label1.Right + 5;
+            }
 
             UiUtil.FixLargeFonts(this, buttonSplit);
         }
@@ -51,7 +53,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void FormSplitSubtitle_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
         private void ButtonSplitClick(object sender, EventArgs e)
@@ -114,7 +118,9 @@ namespace Nikse.SubtitleEdit.Forms
                 try
                 {
                     if (File.Exists(fileName))
+                    {
                         File.Delete(fileName);
+                    }
 
                     int index = 0;
                     foreach (SubtitleFormat format in SubtitleFormat.AllSubtitleFormats)
@@ -122,7 +128,10 @@ namespace Nikse.SubtitleEdit.Forms
                         if (saveFileDialog1.FilterIndex == index + 1)
                         {
                             if (format.IsFrameBased)
+                            {
                                 part.CalculateFrameNumbersFromTimeCodesNoCheck(Configuration.Settings.General.CurrentFrameRate);
+                            }
+
                             File.WriteAllText(fileName, part.ToText(format), _encoding);
                         }
                         index++;
@@ -138,7 +147,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void buttonGetFrameRate_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(openFileDialog1.InitialDirectory) && !string.IsNullOrEmpty(_fileName))
+            {
                 openFileDialog1.InitialDirectory = Path.GetDirectoryName(_fileName);
+            }
 
             openFileDialog1.Title = Configuration.Settings.Language.General.OpenVideoFileTitle;
             openFileDialog1.FileName = string.Empty;

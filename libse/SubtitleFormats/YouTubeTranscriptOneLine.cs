@@ -44,7 +44,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     subtitle.Paragraphs.Add(p);
                     text = text.Trim().Trim(trimChars).Trim();
                     if (text.Length > 0 && char.IsDigit(text[0]))
+                    {
                         _errorCount++;
+                    }
                 }
                 else
                 {
@@ -55,7 +57,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 p2.Text = Utilities.AutoBreakLine(p2.Text);
             }
-            subtitle.RecalculateDisplayTimes(Configuration.Settings.General.SubtitleMaximumDisplayMilliseconds, null);
+            subtitle.RecalculateDisplayTimes(Configuration.Settings.General.SubtitleMaximumDisplayMilliseconds, null, Configuration.Settings.General.SubtitleOptimalCharactersPerSeconds);
             subtitle.Renumber();
         }
 

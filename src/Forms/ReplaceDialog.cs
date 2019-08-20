@@ -31,7 +31,9 @@ namespace Nikse.SubtitleEdit.Forms
             buttonReplaceAll.Text = Configuration.Settings.Language.ReplaceDialog.ReplaceAll;
 
             if (Width < radioButtonRegEx.Right + 5)
+            {
                 Width = radioButtonRegEx.Right + 5;
+            }
 
             UiUtil.FixLargeFonts(this, buttonReplace);
         }
@@ -43,11 +45,18 @@ namespace Nikse.SubtitleEdit.Forms
         {
             var result = new ReplaceType();
             if (radioButtonNormal.Checked)
+            {
                 result.FindType = FindType.Normal;
+            }
             else if (radioButtonCaseSensitive.Checked)
+            {
                 result.FindType = FindType.CaseSensitive;
+            }
             else
+            {
                 result.FindType = FindType.RegEx;
+            }
+
             result.WholeWord = checkBoxWholeWord.Checked;
             return result;
         }
@@ -60,7 +69,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void FormReplaceDialog_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
         internal void Initialize(string selectedText, FindReplaceDialogHelper findHelper)
@@ -73,14 +84,22 @@ namespace Nikse.SubtitleEdit.Forms
             }
             textBoxFind.SelectAll();
             if (findHelper.FindReplaceType.FindType == FindType.RegEx)
+            {
                 radioButtonRegEx.Checked = true;
+            }
             else if (findHelper.FindReplaceType.FindType == FindType.CaseSensitive)
+            {
                 radioButtonCaseSensitive.Checked = true;
+            }
             else
+            {
                 radioButtonNormal.Checked = true;
+            }
 
             if (findHelper.FindReplaceType.FindType != FindType.RegEx)
+            {
                 checkBoxWholeWord.Checked = findHelper.FindReplaceType.WholeWord;
+            }
         }
 
         private void ButtonReplaceClick(object sender, EventArgs e)
@@ -119,7 +138,7 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 try
                 {
-                    _regEx = new Regex(textBoxFind.Text, RegexOptions.Compiled | RegexOptions.Multiline);
+                    _regEx = new Regex(RegexUtils.FixNewLine(textBoxFind.Text), RegexOptions.Compiled);
                     DialogResult = DialogResult.OK;
                     _userAction = true;
                 }
@@ -141,9 +160,14 @@ namespace Nikse.SubtitleEdit.Forms
         private void RadioButtonCheckedChanged(object sender, EventArgs e)
         {
             if (sender == radioButtonRegEx)
+            {
                 textBoxFind.ContextMenu = FindReplaceDialogHelper.GetRegExContextMenu(textBoxFind);
+            }
             else
+            {
                 textBoxFind.ContextMenu = null;
+            }
+            checkBoxWholeWord.Enabled = !radioButtonRegEx.Checked;
         }
 
         private void TextBoxFindKeyDown(object sender, KeyEventArgs e)
@@ -166,7 +190,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void ReplaceDialog_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (!_userAction)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
     }
 }

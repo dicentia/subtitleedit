@@ -18,15 +18,11 @@ namespace Nikse.SubtitleEdit.Forms
         public int FixedCount { get; private set; }
         public int MinMsBetweenLines
         {
-            get { return (int)numericUpDownMinMsBetweenLines.Value; }
-            set { numericUpDownMinMsBetweenLines.Value = value; }
+            get => (int)numericUpDownMinMsBetweenLines.Value;
+            set => numericUpDownMinMsBetweenLines.Value = value;
         }
 
-        public bool PreviousSubtitleTakesAllTime
-        {
-            get { return radioButtonProlongEndTime.Checked; }
-            set { radioButtonProlongEndTime.Checked = value; }
-        }
+        public bool PreviousSubtitleTakesAllTime => radioButtonProlongEndTime.Checked;
 
         public DurationsBridgeGaps(Subtitle subtitle)
         {
@@ -67,7 +63,9 @@ namespace Nikse.SubtitleEdit.Forms
                 numericUpDownMaxMs.Value = 100;
             }
             if (Configuration.Settings.General.MinimumMillisecondsBetweenLines >= 1 && Configuration.Settings.General.MinimumMillisecondsBetweenLines <= numericUpDownMinMsBetweenLines.Maximum)
+            {
                 numericUpDownMinMsBetweenLines.Value = Configuration.Settings.General.MinimumMillisecondsBetweenLines;
+            }
 
             if (subtitle != null)
             {
@@ -85,8 +83,8 @@ namespace Nikse.SubtitleEdit.Forms
 
         public sealed override string Text
         {
-            get { return base.Text; }
-            set { base.Text = value; }
+            get => base.Text;
+            set => base.Text = value;
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -113,7 +111,9 @@ namespace Nikse.SubtitleEdit.Forms
         {
             groupBoxLinesFound.Text = string.Empty;
             if (_subtitle == null)
+            {
                 return;
+            }
 
             Cursor = Cursors.WaitCursor;
             SubtitleListview1.Items.Clear();
@@ -126,16 +126,26 @@ namespace Nikse.SubtitleEdit.Forms
             FixedCount = Core.Forms.DurationsBridgeGaps.BridgeGaps(_fixedSubtitle, minMsBetweenLines, radioButtonDivideEven.Checked, (double)numericUpDownMaxMs.Value, fixedIndexes, _dic);
 
             SubtitleListview1.Fill(_fixedSubtitle);
-            for (int i = 0; i < _fixedSubtitle.Paragraphs.Count - 1; i++)
+            for (int i = 0; i < _fixedSubtitle.Paragraphs.Count; i++)
             {
                 Paragraph cur = _fixedSubtitle.Paragraphs[i];
                 if (_dic.ContainsKey(cur.ID))
+                {
                     SubtitleListview1.SetExtraText(i, _dic[cur.ID], SubtitleListview1.ForeColor);
+                }
+                else if (!string.IsNullOrEmpty(cur.Extra))
+                {
+                    SubtitleListview1.SetExtraText(i, string.Empty, SubtitleListview1.ForeColor);
+                }
+
                 SubtitleListview1.SetBackgroundColor(i, SubtitleListview1.BackColor);
             }
 
             foreach (var index in fixedIndexes)
+            {
                 SubtitleListview1.SetBackgroundColor(index, Color.LightGreen);
+            }
+
             SubtitleListview1.EndUpdate();
             groupBoxLinesFound.Text = string.Format(Configuration.Settings.Language.DurationsBridgeGaps.GapsBridgedX, FixedCount);
 
@@ -155,7 +165,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void DurationsBridgeGaps_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
         private void DurationsBridgeGaps_Shown(object sender, EventArgs e)

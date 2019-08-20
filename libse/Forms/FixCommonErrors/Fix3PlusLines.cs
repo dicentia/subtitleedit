@@ -1,4 +1,7 @@
-﻿namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
+﻿using System;
+using Nikse.SubtitleEdit.Core.Interfaces;
+
+namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
 {
     public class Fix3PlusLines : IFixCommonError
     {
@@ -12,10 +15,22 @@
                 Paragraph p = subtitle.Paragraphs[i];
                 if (Utilities.GetNumberOfLines(p.Text) > 2 && callbacks.AllowFix(p, fixAction))
                 {
+                    var old = Configuration.Settings.General.MaxNumberOfLines;
+                    Configuration.Settings.General.MaxNumberOfLines = 2;
                     string oldText = p.Text;
-                    p.Text = Utilities.AutoBreakLine(p.Text);
-                    iFixes++;
-                    callbacks.AddFixToListView(p, fixAction, oldText, p.Text);
+                    try
+                    {
+                        p.Text = Utilities.AutoBreakLine(p.Text);
+                    }
+                    finally
+                    {
+                        Configuration.Settings.General.MaxNumberOfLines = old;
+                    }
+                    if (oldText != p.Text)
+                    {
+                        iFixes++;
+                        callbacks.AddFixToListView(p, fixAction, oldText, p.Text);
+                   }
                 }
             }
             callbacks.UpdateFixStatus(iFixes, language.Fix3PlusLines, language.X3PlusLinesFixed);

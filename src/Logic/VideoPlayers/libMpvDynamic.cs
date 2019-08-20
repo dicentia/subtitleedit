@@ -64,7 +64,7 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
 
         #endregion
 
-        private IntPtr _libMpvDll;
+        private static IntPtr _libMpvDll = IntPtr.Zero;
         private IntPtr _mpvHandle;
         private Timer _videoLoadedTimer;
         private double? _pausePosition; // Hack to hold precise seeking when paused
@@ -139,10 +139,11 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
         private void DoMpvCommand(params string[] args)
         {
             if (_mpvHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
-            IntPtr[] byteArrayPointers;
-            var mainPtr = AllocateUtf8IntPtrArrayWithSentinel(args, out byteArrayPointers);
+            var mainPtr = AllocateUtf8IntPtrArrayWithSentinel(args, out var byteArrayPointers);
             _mpvCommand(_mpvHandle, mainPtr);
             foreach (var ptr in byteArrayPointers)
             {
@@ -156,10 +157,7 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
         private int _volume = 75;
         public override int Volume
         {
-            get
-            {
-                return _volume;
-            }
+            get => _volume;
             set
             {
                 var v = Configuration.Settings.General.AllowVolumeBoost ? (int)Math.Round(value * 1.5) : value;
@@ -173,7 +171,9 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             get
             {
                 if (_mpvHandle == IntPtr.Zero)
+                {
                     return 0;
+                }
 
                 int mpvFormatDouble = 5;
                 double d = 0;
@@ -187,12 +187,17 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             get
             {
                 if (_mpvHandle == IntPtr.Zero)
+                {
                     return 0;
+                }
 
                 if (_pausePosition != null)
                 {
                     if (_pausePosition < 0)
+                    {
                         return 0;
+                    }
+
                     return _pausePosition.Value;
                 }
 
@@ -204,10 +209,14 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             set
             {
                 if (_mpvHandle == IntPtr.Zero)
+                {
                     return;
+                }
 
                 if (IsPaused && value <= Duration)
+                {
                     _pausePosition = value;
+                }
 
                 DoMpvCommand("seek", value.ToString(CultureInfo.InvariantCulture), "absolute");
             }
@@ -216,10 +225,7 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
         private double _playRate = 1.0;
         public override double PlayRate
         {
-            get
-            {
-                return _playRate;
-            }
+            get => _playRate;
             set
             {
                 DoMpvCommand("set", "speed", value.ToString(CultureInfo.InvariantCulture));
@@ -230,7 +236,9 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
         public void GetNextFrame()
         {
             if (_mpvHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             DoMpvCommand("frame-step");
             _pausePosition = null;
@@ -239,7 +247,9 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
         public void GetPreviousFrame()
         {
             if (_mpvHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             DoMpvCommand("frame-back-step");
             _pausePosition = null;
@@ -250,7 +260,9 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             _pausePosition = null;
 
             if (_mpvHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             var bytes = GetUtf8Bytes("no");
             _mpvSetProperty(_mpvHandle, GetUtf8Bytes("pause"), MpvFormatString, ref bytes);
@@ -259,7 +271,9 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
         public override void Pause()
         {
             if (_mpvHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             var bytes = GetUtf8Bytes("yes");
             _mpvSetProperty(_mpvHandle, GetUtf8Bytes("pause"), MpvFormatString, ref bytes);
@@ -277,7 +291,9 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             get
             {
                 if (_mpvHandle == IntPtr.Zero)
+                {
                     return true;
+                }
 
                 var lpBuffer = IntPtr.Zero;
                 _mpvGetPropertyString(_mpvHandle, GetUtf8Bytes("pause"), MpvFormatString, ref lpBuffer);
@@ -287,10 +303,7 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             }
         }
 
-        public override bool IsPlaying
-        {
-            get { return !IsPaused; }
-        }
+        public override bool IsPlaying => !IsPaused;
 
         private List<string> _audioTrackIds;
         public int AudioTrackCount
@@ -349,7 +362,9 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             get
             {
                 if (_mpvHandle == IntPtr.Zero)
+                {
                     return string.Empty;
+                }
 
                 var version = _mpvClientApiVersion();
                 var high = version >> 16;
@@ -401,12 +416,14 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
 
         public static string GetMpvPath(string fileName)
         {
-            if (Configuration.IsRunningOnLinux() || Configuration.IsRunningOnMac())
-                return null;
-
-            var path = Path.Combine(Configuration.DataDirectory, fileName);
-            if (File.Exists(path))
-                return path;
+            if (Configuration.IsRunningOnWindows)
+            {
+                var path = Path.Combine(Configuration.DataDirectory, fileName);
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
 
             return null;
         }
@@ -416,16 +433,20 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             string dllFile = GetMpvPath("mpv-1.dll");
             if (File.Exists(dllFile))
             {
-                var path = Path.GetDirectoryName(dllFile);
-                if (path != null)
-                    Directory.SetCurrentDirectory(path);
-                _libMpvDll = NativeMethods.LoadLibrary(dllFile);
+                if (_libMpvDll == IntPtr.Zero)
+                {
+                    _libMpvDll = NativeMethods.LoadLibrary(dllFile);
+                }
+
                 LoadLibVlcDynamic();
                 if (!IsAllMethodsLoaded())
                 {
                     throw new Exception("MPV - not all needed methods found in dll file");
                 }
                 _mpvHandle = _mpvCreate.Invoke();
+
+                //var logFileName = Path.Combine(Configuration.DataDirectory, "mpv-log-" + Guid.NewGuid() + ".txt");
+                //_mpvSetOptionString(_mpvHandle, GetUtf8Bytes("log-file"), GetUtf8Bytes(logFileName));
             }
             else if (!Directory.Exists(videoFileName))
             {
@@ -442,13 +463,19 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
 
                 string videoOutput = "direct3d";
                 if (!string.IsNullOrWhiteSpace(Configuration.Settings.General.MpvVideoOutput))
+                {
                     videoOutput = Configuration.Settings.General.MpvVideoOutput;
+                }
+
                 _mpvSetOptionString(_mpvHandle, GetUtf8Bytes("vo"), GetUtf8Bytes(videoOutput)); // use "direct3d" or "opengl"
                 _mpvSetOptionString(_mpvHandle, GetUtf8Bytes("keep-open"), GetUtf8Bytes("always")); // don't auto close video
                 _mpvSetOptionString(_mpvHandle, GetUtf8Bytes("no-sub"), GetUtf8Bytes("")); // don't load subtitles
                 if (videoFileName.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
                     videoFileName.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
                     _mpvSetOptionString(_mpvHandle, GetUtf8Bytes("ytdl"), GetUtf8Bytes("yes"));
+                }
+
                 DoMpvCommand("loadfile", videoFileName);
 
                 _videoLoadedTimer = new Timer { Interval = 50 };
@@ -521,7 +548,7 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             Dispose();
         }
 
-        private void ReleaseUnmangedResources()
+        private void ReleaseUnmanagedResources()
         {
             try
             {
@@ -529,15 +556,18 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
                 {
                     if (_mpvHandle != IntPtr.Zero)
                     {
-                        _mpvTerminateDestroy(_mpvHandle);
-                        _mpvHandle = IntPtr.Zero;
-                    }
+                        DoMpvCommand("stop");
+                        Application.DoEvents();
+                        DoMpvCommand("quit");
+                        Application.DoEvents();
+                        Application.DoEvents();
 
-                    //if (_libMpvDll != IntPtr.Zero) - hm, will make video hang on second video...
-                    //{
-                    //    NativeMethods.FreeLibrary(_libMpvDll);
-                    //    _libMpvDll = IntPtr.Zero;
-                    //}
+                        //if (_mpvHandle != IntPtr.Zero)
+                        //{
+                        //    _mpvTerminateDestroy(_mpvHandle);
+                        //    _mpvHandle = IntPtr.Zero;
+                        //}
+                    }
                 }
             }
             catch
@@ -554,7 +584,6 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         public void HardDispose()
@@ -563,14 +592,16 @@ namespace Nikse.SubtitleEdit.Logic.VideoPlayers
             Application.DoEvents();
             DoMpvCommand("quit");
             Application.DoEvents();
-            Dispose();
+
+            _mpvTerminateDestroy(_mpvHandle);
+            _mpvHandle = IntPtr.Zero;
             NativeMethods.FreeLibrary(_libMpvDll);
+            _libMpvDll = IntPtr.Zero;
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            ReleaseUnmangedResources();
+            ReleaseUnmanagedResources();
         }
-
     }
 }

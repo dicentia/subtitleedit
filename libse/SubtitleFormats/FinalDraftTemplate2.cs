@@ -41,7 +41,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                         if (paragraphType != null)
                         {
                             if (paragraphType != null && !_paragraphTypes.Contains(paragraphType.InnerText))
+                            {
                                 _paragraphTypes.Add(paragraphType.InnerText);
+                            }
 
                             sb.Clear();
                             foreach (XmlNode text in node.SelectNodes("Text"))
@@ -56,13 +58,16 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                                 actor = actor.Replace("( CONT’D )", string.Empty).Trim();
                                 actor = actor.Replace("(CONT'D)", string.Empty).Trim();
                                 actor = actor.Replace("(CONT’D)", string.Empty).Trim();
-                                actor = actor.ToUpper();
+                                actor = actor.ToUpperInvariant();
                             }
                             else if (paragraphType != null && lowercaseChosencategories.Contains(paragraphType.InnerText.ToLowerInvariant()))
                             {
                                 var p = new Paragraph(Utilities.AutoBreakLine(sb.ToString().Trim()), 0, 0);
                                 if (!string.IsNullOrWhiteSpace(actor))
+                                {
                                     p.Actor = actor;
+                                }
+
                                 subtitle.Paragraphs.Add(p);
                             }
                         }

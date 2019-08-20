@@ -11,7 +11,6 @@ namespace Nikse.SubtitleEdit.Forms
     public sealed partial class EffectTypewriter : Form
     {
         private Paragraph _paragraph;
-        private List<Paragraph> _animation;
         private int _timerCount;
 
         public EffectTypewriter()
@@ -21,26 +20,22 @@ namespace Nikse.SubtitleEdit.Forms
             UiUtil.FixFonts(this);
 
             Text = Configuration.Settings.Language.EffectTypewriter.Title;
-            labelTM.Text = Configuration.Settings.Language.EffectKaraoke.TotalMilliseconds;
-            labelEndDelay.Text = Configuration.Settings.Language.EffectKaraoke.EndDelayInMilliseconds;
+            labelTM.Text = Configuration.Settings.Language.EffectTypewriter.TotalMilliseconds;
+            labelEndDelay.Text = Configuration.Settings.Language.EffectTypewriter.EndDelayInMilliseconds;
             buttonPreview.Text = Configuration.Settings.Language.General.Preview;
             buttonOK.Text = Configuration.Settings.Language.General.Ok;
             buttonCancel.Text = Configuration.Settings.Language.General.Cancel;
             UiUtil.FixLargeFonts(this, buttonOK);
         }
 
-        public List<Paragraph> TypewriterParagraphs
-        {
-            get
-            {
-                return _animation;
-            }
-        }
+        public List<Paragraph> TypewriterParagraphs { get; private set; }
 
         private void FormEffectTypewriter_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
         internal void Initialize(Paragraph paragraph)
@@ -50,7 +45,7 @@ namespace Nikse.SubtitleEdit.Forms
             AddToPreview(richTextBoxPreview, paragraph.Text);
             RefreshPreview();
 
-            labelTotalMilliseconds.Text = string.Format("{0:#,##0.000}", paragraph.Duration.TotalMilliseconds / TimeCode.BaseUnit);
+            labelTotalMilliseconds.Text = $"{paragraph.Duration.TotalMilliseconds / TimeCode.BaseUnit:#,##0.000}";
             numericUpDownDelay.Maximum = (decimal)((paragraph.Duration.TotalMilliseconds - 500) / TimeCode.BaseUnit);
             numericUpDownDelay.Minimum = 0;
 
@@ -80,26 +75,40 @@ namespace Nikse.SubtitleEdit.Forms
                 {
                     AddTextToRichTextBox(rtb, bold > 0, italic > 0, underline > 0, currentColor, sb.ToString());
                     sb.Clear();
-                    string tag = GetTag(text.Substring(i).ToLower());
+                    string tag = GetTag(text.Substring(i).ToLowerInvariant());
                     if (i + 1 < text.Length && text[i + 1] == '/')
                     {
                         if (tag == "</i>" && italic > 0)
+                        {
                             italic--;
+                        }
                         else if (tag == "</b>" && bold > 0)
+                        {
                             bold--;
+                        }
                         else if (tag == "<u>" && underline > 0)
+                        {
                             underline--;
+                        }
                         else if (tag == "</font>")
+                        {
                             currentColor = fontColors.Count > 0 ? fontColors.Pop() : string.Empty;
+                        }
                     }
                     else
                     {
                         if (tag == "<i>")
+                        {
                             italic++;
+                        }
                         else if (tag == "<b>")
+                        {
                             bold++;
+                        }
                         else if (tag == "<u>")
+                        {
                             underline++;
+                        }
                         else if (tag.StartsWith("<font ", StringComparison.Ordinal))
                         {
                             const string colorTag = " color=";
@@ -109,14 +118,20 @@ namespace Nikse.SubtitleEdit.Forms
                                 var start = tag.IndexOf(colorTag, StringComparison.Ordinal);
                                 int j = start + colorTag.Length;
                                 if (@"""'".Contains(tag[j]))
+                                {
                                     j++;
+                                }
+
                                 while (j < tag.Length && (@"#" + Utilities.LowercaseLettersWithNumbers).Contains(tag[j]))
                                 {
                                     tempColor += tag[j];
                                     j++;
                                 }
                                 if (!string.IsNullOrEmpty(currentColor))
+                                {
                                     fontColors.Push(currentColor);
+                                }
+
                                 currentColor = tempColor;
                             }
                         }
@@ -130,7 +145,9 @@ namespace Nikse.SubtitleEdit.Forms
                 }
             }
             if (sb.Length > 0)
+            {
                 AddTextToRichTextBox(rtb, bold > 0, italic > 0, underline > 0, currentColor, sb.ToString());
+            }
 
             foreach (var fontEntry in _fontList)
             {
@@ -156,15 +173,44 @@ namespace Nikse.SubtitleEdit.Forms
                 int length = rtb.Text.Length;
                 richTextBoxPreview.Text += text;
 
-                _colorList.Add(new EffectKaraoke.ColorEntry { Start = length, Length = text.Length, Color = string.IsNullOrWhiteSpace(color) ? Color.White : ColorTranslator.FromHtml(color) });
+                var c = Color.White;
+                if (!string.IsNullOrWhiteSpace(color))
+                {
+                    try
+                    {
+                        c = ColorTranslator.FromHtml(color);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            c = ColorTranslator.FromHtml("#" + color.Trim('#', ' ', '"', '\''));
+                        }
+                        catch
+                        {
+                            c = Color.White;
+                        }
+                    }
+                }
+
+                _colorList.Add(new EffectKaraoke.ColorEntry { Start = length, Length = text.Length, Color = c });
 
                 var fontStyle = new FontStyle();
                 if (underline)
+                {
                     fontStyle |= FontStyle.Underline;
+                }
+
                 if (italic)
+                {
                     fontStyle |= FontStyle.Italic;
+                }
+
                 if (bold)
+                {
                     fontStyle |= FontStyle.Bold;
+                }
+
                 _fontList.Add(new EffectKaraoke.FontEntry { Start = length, Length = text.Length, Font = new Font(rtb.Font.FontFamily, rtb.Font.Size, fontStyle) });
             }
         }
@@ -176,7 +222,9 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 sb.Append(text[i]);
                 if (text[i] == '>')
+                {
                     return sb.ToString();
+                }
             }
             return sb.ToString();
         }
@@ -207,13 +255,26 @@ namespace Nikse.SubtitleEdit.Forms
 
         private static double CalculateStepLength(string text, double duration)
         {
+            if (text.StartsWith("{\\", StringComparison.Ordinal) && text.IndexOf('}') > 2)
+            {
+                int i = 0;
+                while (i < text.Length &&
+                       text.Substring(i).StartsWith("{\\", StringComparison.Ordinal) &&
+                       text.Substring(i).IndexOf('}', i) > 2)
+                {
+                    int idx = text.IndexOf('}', i);
+                    i = idx + 1;
+                }
+                text = text.Remove(0, i);
+            }
+
             text = HtmlUtil.RemoveHtmlTags(text);
             return duration / text.Length;
         }
 
         private void MakeAnimation()
         {
-            _animation = new List<Paragraph>();
+            TypewriterParagraphs = new List<Paragraph>();
             double duration = _paragraph.Duration.TotalMilliseconds - ((double)numericUpDownDelay.Value * TimeCode.BaseUnit);
             double stepsLength = CalculateStepLength(_paragraph.Text, duration);
 
@@ -232,9 +293,16 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 if (i == 0 && _paragraph.Text.StartsWith("{\\", StringComparison.Ordinal) && _paragraph.Text.IndexOf('}') > 2)
                 {
-                    int idx = _paragraph.Text.IndexOf('}');
-                    alignment = _paragraph.Text.Substring(0, idx + 1);
-                    i = idx;
+                    int j = i;
+                    while (j < _paragraph.Text.Length &&
+                           _paragraph.Text.Substring(j).StartsWith("{\\", StringComparison.Ordinal) &&
+                           _paragraph.Text.Substring(j).IndexOf('}', j) > 2)
+                    {
+                        int idx = _paragraph.Text.IndexOf('}', j);
+                        i = idx;
+                        j = i + 1;
+                    }
+                    alignment = _paragraph.Text.Substring(0, j);
                 }
                 else if (tagOn)
                 {
@@ -273,11 +341,11 @@ namespace Nikse.SubtitleEdit.Forms
 
                     startMilliseconds = index * stepsLength;
                     startMilliseconds += _paragraph.StartTime.TotalMilliseconds;
-                    endMilliseconds = ((index + 1) * stepsLength) - 1;
+                    endMilliseconds = (index + 1) * stepsLength - 1;
                     endMilliseconds += _paragraph.StartTime.TotalMilliseconds;
                     start = new TimeCode(startMilliseconds);
                     end = new TimeCode(endMilliseconds);
-                    _animation.Add(new Paragraph(start, end, alignment + text + beforeEndTag));
+                    TypewriterParagraphs.Add(new Paragraph(start, end, alignment + text + beforeEndTag) { Extra = _paragraph.Extra });
                     index++;
                 }
                 i++;
@@ -290,11 +358,11 @@ namespace Nikse.SubtitleEdit.Forms
                 endMilliseconds = _paragraph.EndTime.TotalMilliseconds;
                 start = new TimeCode(startMilliseconds);
                 end = new TimeCode(endMilliseconds);
-                _animation.Add(new Paragraph(start, end, _paragraph.Text));
+                TypewriterParagraphs.Add(new Paragraph(start, end, _paragraph.Text) { Extra = _paragraph.Extra });
             }
-            else if (_animation.Count > 0)
+            else if (TypewriterParagraphs.Count > 0)
             {
-                _animation[_animation.Count - 1].EndTime.TotalMilliseconds = _paragraph.EndTime.TotalMilliseconds;
+                TypewriterParagraphs[TypewriterParagraphs.Count - 1].EndTime.TotalMilliseconds = _paragraph.EndTime.TotalMilliseconds;
             }
         }
 
@@ -302,7 +370,7 @@ namespace Nikse.SubtitleEdit.Forms
         {
             _timerCount += timer1.Interval;
 
-            string s = GetText(_timerCount, _animation);
+            string s = GetText(_timerCount, TypewriterParagraphs);
             ClearPreview();
             AddToPreview(richTextBoxPreview, s);
             RefreshPreview();

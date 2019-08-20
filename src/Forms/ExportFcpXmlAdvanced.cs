@@ -13,7 +13,7 @@ namespace Nikse.SubtitleEdit.Forms
 {
     /// <summary>
     /// Export to FCP XML for import into other programs, like DaVinci Resolve
-    /// 
+    ///
     /// Elements from FCP XML 1.5 DTD
     // <!ATTLIST text-style ref IDREF #IMPLIED>
     // <!ATTLIST text-style font CDATA #IMPLIED>
@@ -33,12 +33,12 @@ namespace Nikse.SubtitleEdit.Forms
     // <!ATTLIST text-style lineSpacing CDATA #IMPLIED>
     // <!ATTLIST text-style tabStops CDATA #IMPLIED>
     /// </summary>
-    public partial class ExportFcpXmlAdvanced : Form
+    public sealed partial class ExportFcpXmlAdvanced : Form
     {
 
-        private string _fontName = "Arial";
-        private Subtitle _subtitle;
-        private string _videoFileName;
+        private readonly string _fontName = "Arial";
+        private readonly Subtitle _subtitle;
+        private readonly string _videoFileName;
 
         public ExportFcpXmlAdvanced(Subtitle subtitle, string videoFileName)
         {
@@ -50,6 +50,8 @@ namespace Nikse.SubtitleEdit.Forms
             _videoFileName = videoFileName;
 
             Text = Configuration.Settings.Language.ExportFcpXmlAdvanced.Title;
+            groupBoxImageSettings.Text = Configuration.Settings.Language.ExportPngXml.ImageSettings;
+            buttonColor.Text = Configuration.Settings.Language.ExportPngXml.FontColor;
             labelSubtitleFont.Text = Configuration.Settings.Language.ExportFcpXmlAdvanced.FontName;
             labelSubtitleFontSize.Text = Configuration.Settings.Language.ExportFcpXmlAdvanced.FontSize;
             labelSubtitleFontFace.Text = Configuration.Settings.Language.ExportFcpXmlAdvanced.FontFace;
@@ -60,24 +62,32 @@ namespace Nikse.SubtitleEdit.Forms
             buttonSave.Text = Configuration.Settings.Language.ExportCustomText.SaveAs;
             buttonCancel.Text = Configuration.Settings.Language.General.Cancel;
 
+            comboBoxHAlign.Items.Clear();
+            comboBoxHAlign.Items.Add(Configuration.Settings.Language.ExportPngXml.Left);
+            comboBoxHAlign.Items.Add(Configuration.Settings.Language.ExportPngXml.Center);
+            comboBoxHAlign.Items.Add(Configuration.Settings.Language.ExportPngXml.Right);
+            comboBoxHAlign.Items.Add(Configuration.Settings.Language.ExportPngXml.CenterLeftJustify);
+
             foreach (var x in FontFamily.Families)
             {
                 if (x.IsStyleAvailable(FontStyle.Regular) || x.IsStyleAvailable(FontStyle.Bold))
                 {
                     comboBoxFontName.Items.Add(x.Name);
                     if (x.Name.Equals(_fontName, StringComparison.OrdinalIgnoreCase))
+                    {
                         comboBoxFontName.SelectedIndex = comboBoxFontName.Items.Count - 1;
+                    }
                 }
             }
 
-            comboBoxFrameRate.Items.Add((23.976).ToString(CultureInfo.CurrentCulture));
-            comboBoxFrameRate.Items.Add((24.0).ToString(CultureInfo.CurrentCulture));
-            comboBoxFrameRate.Items.Add((25.0).ToString(CultureInfo.CurrentCulture));
-            comboBoxFrameRate.Items.Add((29.97).ToString(CultureInfo.CurrentCulture));
-            comboBoxFrameRate.Items.Add((30.00).ToString(CultureInfo.CurrentCulture));
-            comboBoxFrameRate.Items.Add((50.00).ToString(CultureInfo.CurrentCulture));
-            comboBoxFrameRate.Items.Add((59.94).ToString(CultureInfo.CurrentCulture));
-            comboBoxFrameRate.Items.Add((60.00).ToString(CultureInfo.CurrentCulture));
+            comboBoxFrameRate.Items.Add(23.976.ToString(CultureInfo.CurrentCulture));
+            comboBoxFrameRate.Items.Add(24.0.ToString(CultureInfo.CurrentCulture));
+            comboBoxFrameRate.Items.Add(25.0.ToString(CultureInfo.CurrentCulture));
+            comboBoxFrameRate.Items.Add(29.97.ToString(CultureInfo.CurrentCulture));
+            comboBoxFrameRate.Items.Add(30.00.ToString(CultureInfo.CurrentCulture));
+            comboBoxFrameRate.Items.Add(50.00.ToString(CultureInfo.CurrentCulture));
+            comboBoxFrameRate.Items.Add(59.94.ToString(CultureInfo.CurrentCulture));
+            comboBoxFrameRate.Items.Add(60.00.ToString(CultureInfo.CurrentCulture));
 
             comboBoxResolution.Items.Clear();
             comboBoxResolution.Items.Add("NTSC-601");
@@ -112,6 +122,8 @@ namespace Nikse.SubtitleEdit.Forms
                 }
             }
 
+            comboBoxFontFace.Items.Clear();
+            comboBoxFontFace.Items.Add(Configuration.Settings.Language.ExportFcpXmlAdvanced.FontFaceRegular);
             comboBoxFontFace.SelectedIndex = 0;
 
             comboBoxHAlign.SelectedIndex = 1;
@@ -171,12 +183,14 @@ namespace Nikse.SubtitleEdit.Forms
                 var oldFrameRate = Configuration.Settings.General.CurrentFrameRate;
                 double d;
                 if (double.TryParse(comboBoxFrameRate.SelectedItem.ToString(), out d))
+                {
                     Configuration.Settings.General.CurrentFrameRate = d;
+                }
 
                 var format = new FinalCutProXml15();
                 format.DefaultStyle.FontName = comboBoxFontName.SelectedItem.ToString();
                 format.DefaultStyle.FontSize = int.Parse(comboBoxFontSize.SelectedItem.ToString());
-                format.DefaultStyle.FontFace = comboBoxFontFace.SelectedItem.ToString();
+                format.DefaultStyle.FontFace = GetFontFace();
                 format.DefaultStyle.Alignment = comboBoxHAlign.SelectedItem.ToString();
                 format.DefaultStyle.Baseline = int.Parse(comboBoxBaseline.SelectedItem.ToString());
                 int height, width;
@@ -192,10 +206,14 @@ namespace Nikse.SubtitleEdit.Forms
             }
         }
 
+        private string GetFontFace()
+        {
+            return "Regular";
+        }
+
         private void buttonColor_Click(object sender, EventArgs e)
         {
-            bool showAlpha = true;
-            using (var colorChooser = new ColorChooser { Color = panelColor.BackColor, ShowAlpha = showAlpha })
+            using (var colorChooser = new ColorChooser { Color = panelColor.BackColor, ShowAlpha = true })
             {
                 if (colorChooser.ShowDialog() == DialogResult.OK)
                 {
@@ -214,7 +232,9 @@ namespace Nikse.SubtitleEdit.Forms
             width = 1920;
             height = 1080;
             if (comboBoxResolution.SelectedIndex < 0)
+            {
                 return;
+            }
 
             string text = comboBoxResolution.Text.Trim();
             if (text == "NTSC-601")
@@ -288,7 +308,10 @@ namespace Nikse.SubtitleEdit.Forms
             }
 
             if (text.Contains('('))
+            {
                 text = text.Remove(0, text.IndexOf('(')).Trim();
+            }
+
             text = text.TrimStart('(').TrimEnd(')').Trim();
             string[] arr = text.Split('x');
             width = int.Parse(arr[0]);
@@ -310,56 +333,53 @@ namespace Nikse.SubtitleEdit.Forms
         private void SetResolution(string xAndY)
         {
             if (string.IsNullOrEmpty(xAndY))
+            {
                 return;
+            }
 
-            xAndY = xAndY.ToLower();
+            var xy = xAndY.ToLowerInvariant();
 
-            switch (xAndY)
+            switch (xy)
             {
                 case "720x480":
-                    xAndY = "NTSC-601";
+                    xy = "NTSC-601";
                     break;
                 case "720x576":
-                    xAndY = "PAL-601";
+                    xy = "PAL-601";
                     break;
                 case "640x480":
-                    xAndY = "square";
+                    xy = "square";
                     break;
                 case "1280x720":
-                    xAndY = "DVCPROHD-720P";
+                    xy = "DVCPROHD-720P";
                     break;
                 case "960x720":
-                    xAndY = "HD-(960x720)";
+                    xy = "HD-(960x720)";
                     break;
                 case "1920x1080":
-                    xAndY = "FullHD 1920x1080";
+                    xy = "FullHD 1920x1080";
                     break;
                 case "1280x1080":
-                    xAndY = "HD-(1280x1080)";
+                    xy = "HD-(1280x1080)";
                     break;
                 case "1440x1080":
-                    xAndY = "HD-(1440x1080)";
+                    xy = "HD-(1440x1080)";
                     break;
             }
 
-            if (Regex.IsMatch(xAndY, @"\d+x\d+", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(xy, @"\d+x\d+", RegexOptions.IgnoreCase))
             {
                 for (int i = 0; i < comboBoxResolution.Items.Count; i++)
                 {
-                    if (comboBoxResolution.Items[i].ToString().Contains(xAndY))
+                    if (comboBoxResolution.Items[i].ToString().Contains(xy))
                     {
                         comboBoxResolution.SelectedIndex = i;
                         return;
                     }
                 }
-                comboBoxResolution.Items[comboBoxResolution.Items.Count - 1] = xAndY;
+                comboBoxResolution.Items[comboBoxResolution.Items.Count - 1] = xy;
                 comboBoxResolution.SelectedIndex = comboBoxResolution.Items.Count - 1;
             }
-        }
-
-        private void ExportFcpXmlAdvanced_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void ExportFcpXmlAdvanced_Shown(object sender, EventArgs e)

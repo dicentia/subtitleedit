@@ -32,7 +32,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 string numberOfLinesCode = "10"; // two lines
                 if (Utilities.GetNumberOfLines(p.Text) == 1)
+                {
                     numberOfLinesCode = "11"; // two lines
+                }
 
                 sb.AppendLine($"{index + 1:0000} : {EncodeTimeCode(p.StartTime)},{EncodeTimeCode(p.EndTime)},{numberOfLinesCode}");
                 sb.AppendLine("80 80 80");
@@ -55,7 +57,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 var arr = extra.Split(':');
                 if (lineNumber < arr.Length && arr[lineNumber].Length == 5)
+                {
                     return arr[lineNumber];
+                }
             }
             return "C1Y00";
         }
@@ -77,7 +81,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 if (line.IndexOf(':') == 5 && RegexTimeCodes.IsMatch(line))
                 {
                     if (p != null)
+                    {
                         subtitle.Paragraphs.Add(p);
+                    }
 
                     string start = line.Substring(7, 11);
                     string end = line.Substring(19, 11);
@@ -102,10 +108,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                         p.Text += Environment.NewLine + line.Substring(5).Trim();
                     }
                 }
-                else if (line.Length < 10 && RegexSomeCodes.IsMatch(line))
-                {
-                }
-                else if (string.IsNullOrWhiteSpace(line))
+                else if (string.IsNullOrWhiteSpace(line) || line.Length < 10 && RegexSomeCodes.IsMatch(line))
                 {
                     // skip these lines
                 }
@@ -120,18 +123,23 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                         if (!line.TrimEnd().EndsWith(": --:--:--:--,--:--:--:--,-1", StringComparison.Ordinal))
                         {
                             if (string.IsNullOrEmpty(p.Text))
+                            {
                                 p.Text = line.Trim();
+                            }
                             else
+                            {
                                 p.Text += Environment.NewLine + line.Trim();
+                            }
                         }
                     }
                 }
             }
-            if (p != null && !string.IsNullOrEmpty(p.Text))
+            if (!string.IsNullOrEmpty(p?.Text))
+            {
                 subtitle.Paragraphs.Add(p);
+            }
 
             subtitle.Renumber();
         }
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Nikse.SubtitleEdit.Core.Interfaces;
 
 namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
 {
@@ -9,20 +10,30 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
         private static bool IsOneLineUrl(string s)
         {
             if (s.Contains(' ') || s.Contains(Environment.NewLine))
+            {
                 return false;
+            }
 
             if (s.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            {
                 return true;
+            }
 
             if (s.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
                 return true;
+            }
 
             if (s.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
+            {
                 return true;
+            }
 
             string[] parts = s.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 3 && parts[2].Length > 1 && parts[2].Length < 7)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -61,7 +72,7 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                     !ExpectedString1.Contains(tempNoHtml[tempNoHtml.Length - 1]))
                 {
                     string tempTrimmed = tempNoHtml.TrimEnd().TrimEnd('\'', '"', '“', '”').TrimEnd();
-                    if (tempTrimmed.Length > 0 && !ExpectedString2.Contains(tempTrimmed[tempTrimmed.Length - 1]) && p.Text != p.Text.ToUpper())
+                    if (tempTrimmed.Length > 0 && !ExpectedString2.Contains(tempTrimmed[tempTrimmed.Length - 1]) && p.Text != p.Text.ToUpperInvariant())
                     {
                         //don't end the sentence if the next word is an I word as they're always capped.
                         bool isNextCloseAndStartsWithI = isNextClose && (nextText.StartsWith("I ", StringComparison.Ordinal) ||
@@ -77,16 +88,24 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                                 {
                                     int lastLessThan = p.Text.LastIndexOf('<');
                                     if (lastLessThan > 0)
+                                    {
                                         p.Text = p.Text.Insert(lastLessThan, ".");
+                                    }
                                 }
                                 else
                                 {
                                     if (p.Text.EndsWith('“') && tempNoHtml.StartsWith('„'))
+                                    {
                                         p.Text = p.Text.TrimEnd('“') + ".“";
+                                    }
                                     else if (p.Text.EndsWith('"') && tempNoHtml.StartsWith('"'))
+                                    {
                                         p.Text = p.Text.TrimEnd('"') + ".\"";
+                                    }
                                     else
+                                    {
                                         p.Text += ".";
+                                    }
                                 }
                                 if (p.Text != oldText)
                                 {
@@ -99,22 +118,30 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                 }
                 else if (next != null && !string.IsNullOrEmpty(p.Text) && Utilities.AllLettersAndNumbers.Contains(p.Text[p.Text.Length - 1]))
                 {
-                    if (p.Text != p.Text.ToUpper())
+                    if (p.Text != p.Text.ToUpperInvariant())
                     {
                         var st = new StrippableText(next.Text);
-                        if (st.StrippedText.Length > 0 && st.StrippedText != st.StrippedText.ToUpper() &&
+                        if (st.StrippedText.Length > 0 && st.StrippedText != st.StrippedText.ToUpperInvariant() &&
                             char.IsUpper(st.StrippedText[0]))
                         {
                             if (callbacks.AllowFix(p, fixAction))
                             {
                                 int j = p.Text.Length - 1;
                                 while (j >= 0 && !@".!?¿¡".Contains(p.Text[j]))
+                                {
                                     j--;
+                                }
+
                                 string endSign = ".";
                                 if (j >= 0 && p.Text[j] == '¿')
+                                {
                                     endSign = "?";
+                                }
+
                                 if (j >= 0 && p.Text[j] == '¡')
+                                {
                                     endSign = "!";
+                                }
 
                                 string oldText = p.Text;
                                 missigPeriodsAtEndOfLine++;
@@ -129,11 +156,20 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                 {
                     int indexOfNewLine = p.Text.IndexOf(Environment.NewLine + " -", 3, StringComparison.Ordinal);
                     if (indexOfNewLine < 0)
+                    {
                         indexOfNewLine = p.Text.IndexOf(Environment.NewLine + "-", 3, StringComparison.Ordinal);
+                    }
+
                     if (indexOfNewLine < 0)
+                    {
                         indexOfNewLine = p.Text.IndexOf(Environment.NewLine + "<i>-", 3, StringComparison.Ordinal);
+                    }
+
                     if (indexOfNewLine < 0)
+                    {
                         indexOfNewLine = p.Text.IndexOf(Environment.NewLine + "<i> -", 3, StringComparison.Ordinal);
+                    }
+
                     if (indexOfNewLine > 0 && char.IsUpper(char.ToUpper(p.Text[indexOfNewLine - 1])) && callbacks.AllowFix(p, fixAction))
                     {
                         string oldText = p.Text;
@@ -141,11 +177,17 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                         string text = p.Text.Substring(0, indexOfNewLine);
                         var st = new StrippableText(text);
                         if (st.Pre.TrimEnd().EndsWith('¿')) // Spanish ¿
+                        {
                             p.Text = p.Text.Insert(indexOfNewLine, "?");
+                        }
                         else if (st.Pre.TrimEnd().EndsWith('¡')) // Spanish ¡
+                        {
                             p.Text = p.Text.Insert(indexOfNewLine, "!");
+                        }
                         else
+                        {
                             p.Text = p.Text.Insert(indexOfNewLine, ".");
+                        }
 
                         missigPeriodsAtEndOfLine++;
                         callbacks.AddFixToListView(p, fixAction, oldText, p.Text);

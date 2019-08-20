@@ -2,7 +2,7 @@
 <Language Name="中文(繁體)">
   <General>
     <Title>Subtitle Edit</Title>
-    <Version>3.5.6</Version>
+    <Version>3.5.10</Version>
     <TranslatedBy>翻譯: BAWAN | 風逸蘭 | Jackie Lam</TranslatedBy>
     <CultureName>zh-TW</CultureName>
     <HelpFile />
@@ -1705,8 +1705,7 @@ C# 原始碼可從 https://github.com/SubtitleEdit/subtitleedit 取得。
     <WaveformShowWpm>顯示每分鐘單字</WaveformShowWpm>
     <ReverseMouseWheelScrollDirection>反轉滑鼠捲動方向</ReverseMouseWheelScrollDirection>
     <WaveformAllowOverlap>允許重疊 (當 移動/調整大小 時)</WaveformAllowOverlap>
-    <WaveformSetVideoPosMoveStartEnd>
-    </WaveformSetVideoPosMoveStartEnd>
+    <WaveformSetVideoPosMoveStartEnd />
     <WaveformFocusMouseEnter>滑鼠移過後設定焦點</WaveformFocusMouseEnter>
     <WaveformListViewFocusMouseEnter>當滑鼠移過時將焦點設定到清單檢視</WaveformListViewFocusMouseEnter>
     <WaveformBorderHitMs1>邊框標記的最短相接間隔須為</WaveformBorderHitMs1>
@@ -1795,7 +1794,7 @@ C# 原始碼可從 https://github.com/SubtitleEdit/subtitleedit 取得。
     <Alignment>對齊 (選擇的行)</Alignment>
     <CopyTextOnly>僅複製文字到剪貼簿 (選擇的行)</CopyTextOnly>
     <AutoDurationSelectedLines>自動設定持續時間 (選擇的行)</AutoDurationSelectedLines>
-    <ReverseStartAndEndingForRTL>反轉 RTL 開始/結束</ReverseStartAndEndingForRTL>
+    <ReverseStartAndEndingForRtl>反轉 RTL 開始/結束</ReverseStartAndEndingForRtl>
     <VerticalZoom>垂直放大</VerticalZoom>
     <VerticalZoomOut>垂直縮小</VerticalZoomOut>
     <WaveformSeekSilenceForward>向前搜尋靜音</WaveformSeekSilenceForward>
@@ -1838,8 +1837,7 @@ C# 原始碼可從 https://github.com/SubtitleEdit/subtitleedit 取得。
     <GoToFirstSelectedLine>移至第一個選擇的行</GoToFirstSelectedLine>
     <GoToNextEmptyLine>移至下一個空行</GoToNextEmptyLine>
     <MergeSelectedLines>合併選擇的行</MergeSelectedLines>
-    <MergeSelectedLinesOnlyFirstText>
-    </MergeSelectedLinesOnlyFirstText>
+    <MergeSelectedLinesOnlyFirstText />
     <ToggleTranslationMode>切換翻譯模式</ToggleTranslationMode>
     <SwitchOriginalAndTranslation>切換原文和翻譯</SwitchOriginalAndTranslation>
     <MergeOriginalAndTranslation>合併原文和翻譯</MergeOriginalAndTranslation>

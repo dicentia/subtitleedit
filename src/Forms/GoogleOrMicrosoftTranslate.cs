@@ -1,7 +1,11 @@
 ﻿using Nikse.SubtitleEdit.Core;
 using Nikse.SubtitleEdit.Logic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
+using Nikse.SubtitleEdit.Core.Translate;
 
 namespace Nikse.SubtitleEdit.Forms
 {
@@ -43,14 +47,32 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 var item = (GoogleTranslate.ComboBoxItem)comboBox.Items[i];
                 if (item.Value != FixMsLocale(item.Value))
+                {
                     comboBox.Items.RemoveAt(i);
+                }
             }
         }
 
-        internal void InitializeFromLanguage(string defaultFromLanguage, string defaultToLanguage)
+        internal void InitializeFromLanguage(string defaultFromLanguage)
         {
-            if (defaultFromLanguage == defaultToLanguage)
-                defaultToLanguage = "en";
+            string defaultToLanguage = Configuration.Settings.Tools.GoogleTranslateLastTargetLanguage;
+            if (defaultToLanguage == defaultFromLanguage)
+            {
+                foreach (string s in Utilities.GetDictionaryLanguages())
+                {
+                    string temp = s.Replace("[", string.Empty).Replace("]", string.Empty);
+                    if (temp.Length > 4)
+                    {
+                        temp = temp.Substring(temp.Length - 5, 2).ToLowerInvariant();
+
+                        if (temp != defaultToLanguage)
+                        {
+                            defaultToLanguage = temp;
+                            break;
+                        }
+                    }
+                }
+            }
 
             int i = 0;
             comboBoxFrom.SelectedIndex = 0;
@@ -93,28 +115,19 @@ namespace Nikse.SubtitleEdit.Forms
             Cursor = Cursors.WaitCursor;
             try
             {
-                string from = (comboBoxFrom.SelectedItem as GoogleTranslate.ComboBoxItem).Value;
-                string to = (comboBoxTo.SelectedItem as GoogleTranslate.ComboBoxItem).Value;
-                string languagePair = from + "|" + to;
-
+                string from = ((GoogleTranslate.ComboBoxItem)comboBoxFrom.SelectedItem).Value;
+                string to = ((GoogleTranslate.ComboBoxItem)comboBoxTo.SelectedItem).Value;
                 buttonGoogle.Text = string.Empty;
 
                 // google translate
-                bool romanji = languagePair.EndsWith("|romanji", StringComparison.InvariantCulture);
-                if (romanji)
-                    languagePair = from + "|ja";
-                var screenScrapingEncoding = GoogleTranslate.GetScreenScrapingEncoding(languagePair);
-                buttonGoogle.Text = GoogleTranslate.TranslateTextViaScreenScraping(textBoxSourceText.Text, languagePair, screenScrapingEncoding, romanji);
+                buttonGoogle.Text = new GoogleTranslator1().Translate(from, to, new List<Paragraph> { new Paragraph { Text = textBoxSourceText.Text } }, new StringBuilder()).FirstOrDefault();
 
-                using (var gt = new GoogleTranslate())
+                // ms translator
+                if (!string.IsNullOrEmpty(Configuration.Settings.Tools.MicrosoftTranslatorApiKey))
                 {
-                    Subtitle subtitle = new Subtitle();
-                    subtitle.Paragraphs.Add(new Paragraph(0, 0, textBoxSourceText.Text));
-                    gt.Initialize(subtitle, string.Empty, false, System.Text.Encoding.UTF8);
-                    from = FixMsLocale(from);
-                    to = FixMsLocale(to);
-                    gt.DoMicrosoftTranslate(from, to);
-                    buttonMicrosoft.Text = gt.TranslatedSubtitle.Paragraphs[0].Text;
+                    var translator = new MicrosoftTranslator(Configuration.Settings.Tools.MicrosoftTranslatorApiKey);
+                    var result = translator.Translate(from, to, new List<Paragraph> { new Paragraph { Text = textBoxSourceText.Text } }, new StringBuilder());
+                    buttonMicrosoft.Text = result[0];
                 }
             }
             finally
@@ -126,7 +139,10 @@ namespace Nikse.SubtitleEdit.Forms
         private static string FixMsLocale(string from)
         {
             if ("ar bg zh-CHS zh-CHT cs da nl en et fi fr de el ht he hu id it ja ko lv lt no pl pt ro ru sk sl es sv th tr uk vi".Contains(from))
+            {
                 return from;
+            }
+
             return "en";
         }
 
@@ -150,7 +166,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void GoogleOrMicrosoftTranslate_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
     }

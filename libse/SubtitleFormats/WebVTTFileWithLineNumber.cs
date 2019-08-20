@@ -42,7 +42,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
                 string style = string.Empty;
                 if (!string.IsNullOrEmpty(p.Extra) && subtitle.Header == "WEBVTT FILE")
+                {
                     style = p.Extra;
+                }
+
                 sb.Append(count);
                 sb.AppendLine();
                 sb.AppendLine(string.Format(paragraphWriteFormat, start, end, positionInfo, WebVTT.FormatText(p), style, Environment.NewLine));
@@ -57,13 +60,15 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             Paragraph p = null;
             string positionInfo = string.Empty;
             bool hadEmptyLine = false;
-            int numbers = 0;
             for (var index = 0; index < lines.Count; index++)
             {
                 string line = lines[index];
                 string next = string.Empty;
                 if (index < lines.Count - 1)
+                {
                     next = lines[index + 1];
+                }
+
                 string s = line;
                 bool isTimeCode = line.Contains("-->");
                 if (isTimeCode && RegexTimeCodesMiddle.IsMatch(s))
@@ -106,22 +111,30 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 {
                     subtitle.Header = "WEBVTT FILE";
                 }
-                else if (p != null && hadEmptyLine && Utilities.IsInteger(line) &&
+                else if (p != null && hadEmptyLine && Utilities.IsInteger(line.RemoveChar('-')) &&
                          (RegexTimeCodesMiddle.IsMatch(next) ||
                           RegexTimeCodesShort.IsMatch(next) ||
                           RegexTimeCodes.IsMatch(next)))
                 {
-                    numbers++;
+                    // line number
                 }
                 else if (p != null)
                 {
                     string text = positionInfo + line.Trim();
                     if (string.IsNullOrEmpty(text))
+                    {
                         hadEmptyLine = true;
+                    }
+
                     if (string.IsNullOrEmpty(p.Text))
+                    {
                         p.Text = text + Environment.NewLine;
+                    }
                     else
+                    {
                         p.Text += text + Environment.NewLine;
+                    }
+
                     positionInfo = string.Empty;
                 }
             }
@@ -135,6 +148,12 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 p.Text = p.Text.TrimEnd();
                 subtitle.Paragraphs.Add(p);
+            }
+
+            foreach (var paragraph in subtitle.Paragraphs)
+            {
+                paragraph.Text = WebVTT.ColorWebVttToHtml(paragraph.Text);
+                paragraph.Text = System.Net.WebUtility.HtmlDecode(paragraph.Text);
             }
 
             subtitle.Renumber();

@@ -8,12 +8,11 @@ using System.Windows.Forms;
 
 namespace Nikse.SubtitleEdit.Forms.Styles
 {
-    public partial class SubStationAlphaStylesExport : Form
+    public sealed partial class SubStationAlphaStylesExport : Form
     {
-        private string _header;
-        private bool _isSubStationAlpha;
-        private SubtitleFormat _format;
-        private List<string> _styles;
+        private readonly string _header;
+        private readonly bool _isSubStationAlpha;
+        private readonly SubtitleFormat _format;
         public List<string> ExportedStyles { get; set; }
 
         public SubStationAlphaStylesExport(string header, bool isSubStationAlpha, SubtitleFormat format)
@@ -23,10 +22,10 @@ namespace Nikse.SubtitleEdit.Forms.Styles
             _header = header;
             _isSubStationAlpha = isSubStationAlpha;
             _format = format;
-            _styles = AdvancedSubStationAlpha.GetStylesFromHeader(_header);
+            var styles = AdvancedSubStationAlpha.GetStylesFromHeader(_header);
 
             listViewExportStyles.Columns[0].Width = listViewExportStyles.Width - 20;
-            foreach (var style in _styles)
+            foreach (var style in styles)
             {
                 listViewExportStyles.Items.Add(new ListViewItem(style) { Checked = true });
             }
@@ -43,7 +42,9 @@ namespace Nikse.SubtitleEdit.Forms.Styles
             foreach (ListViewItem item in listViewExportStyles.Items)
             {
                 if (item.Checked)
+                {
                     ExportedStyles.Add(item.Text);
+                }
             }
             if (ExportedStyles.Count == 0)
             {
@@ -67,18 +68,17 @@ namespace Nikse.SubtitleEdit.Forms.Styles
             {
                 if (File.Exists(saveFileDialogStyle.FileName))
                 {
-                    Encoding encoding = null;
                     var s = new Subtitle();
-                    var format = s.LoadSubtitle(saveFileDialogStyle.FileName, out encoding, null);
+                    var format = s.LoadSubtitle(saveFileDialogStyle.FileName, out _, null);
                     if (format == null)
                     {
                         MessageBox.Show("Not subtitle format: " + _format.Name);
                         return;
                     }
-                    else if (format.Name != _format.Name)
+
+                    if (format.Name != _format.Name)
                     {
                         MessageBox.Show(string.Format("Cannot save {1} style in {0} file!", format.Name, _format.Name));
-                        return;
                     }
                     else
                     {
@@ -110,16 +110,21 @@ namespace Nikse.SubtitleEdit.Forms.Styles
                                     {
                                         sb.AppendLine(style.ToRawAss(styleFormat));
                                     }
-                                }                                
+                                }
                             }
                             sb.AppendLine(line);
                             foreach (var styleName in ExportedStyles)
                             {
                                 var toLower = line.Trim().ToLowerInvariant();
                                 while (toLower.Contains(": "))
+                                {
                                     toLower = toLower.Replace(": ", ":");
+                                }
+
                                 while (toLower.Contains(" :"))
+                                {
                                     toLower = toLower.Replace(" :", ":");
+                                }
 
                                 if (stylesOn && toLower.StartsWith("style:" + styleName.Trim() + ",", StringComparison.OrdinalIgnoreCase))
                                 {
@@ -142,12 +147,19 @@ namespace Nikse.SubtitleEdit.Forms.Styles
                             {
                                 var toLower = line.Trim().ToLowerInvariant();
                                 while (toLower.Contains(": "))
+                                {
                                     toLower = toLower.Replace(": ", ":");
+                                }
+
                                 while (toLower.Contains(" :"))
+                                {
                                     toLower = toLower.Replace(" :", ":");
+                                }
 
                                 if (toLower.StartsWith("style:" + styleName.ToLowerInvariant().Trim(), StringComparison.Ordinal))
+                                {
                                     sb.AppendLine(line);
+                                }
                             }
                         }
                         else

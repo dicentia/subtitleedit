@@ -13,7 +13,7 @@ namespace Nikse.SubtitleEdit.Forms
         public Panel PanelContainer => panelContainer;
 
         public VideoControlsUndocked(Main mainForm)
-        {            
+        {
             AutoScaleMode = AutoScaleMode.Dpi;
             InitializeComponent();
             _mainForm = mainForm;
@@ -44,9 +44,13 @@ namespace Nikse.SubtitleEdit.Forms
         private void VideoControlsUndocked_KeyDown(object sender, KeyEventArgs e)
         {
             if (_redockKeys == e.KeyData)
+            {
                 _mainForm.RedockVideoControlsToolStripMenuItemClick(null, null);
+            }
             else
+            {
                 _mainForm.MainKeyDown(sender, e);
+            }
         }
     }
 }

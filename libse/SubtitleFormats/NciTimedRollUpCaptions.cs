@@ -98,7 +98,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                             string text = line.Trim();
                             paragraph.Text = (paragraph.Text + Environment.NewLine + text).Trim();
                             if (!subtitle.Paragraphs.Contains(paragraph))
+                            {
                                 subtitle.Paragraphs.Add(paragraph);
+                            }
+
                             expecting = ExpectingLine.TimeCodes;
                         }
                     }
@@ -113,18 +116,22 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 if (next != null)
                 {
                     if (next.StartTime.TotalMilliseconds - p.StartTime.TotalMilliseconds <= MaxDurationMs)
+                    {
                         p.EndTime.TotalMilliseconds = next.StartTime.TotalMilliseconds - Configuration.Settings.General.MinimumMillisecondsBetweenLines;
+                    }
                     else
+                    {
                         p.EndTime.TotalMilliseconds = p.StartTime.TotalMilliseconds + Utilities.GetOptimalDisplayMilliseconds(p.Text);
+                    }
                 }
             }
             subtitle.RemoveEmptyLines();
             subtitle.Renumber();
         }
 
-        private static string FixText(string text)
+        private static string FixText(string input)
         {
-            text = text.Replace("\u0011P", Environment.NewLine);
+            var text = input.Replace("\u0011P", Environment.NewLine);
             text = text.Replace("\u00117", "♪");
 
             text = text.Replace("\u0012\u0029", string.Empty);

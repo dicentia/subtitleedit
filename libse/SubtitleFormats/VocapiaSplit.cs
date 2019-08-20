@@ -32,10 +32,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     header.LoadXml(subtitle.Header);
                     var speakerListNode = header.DocumentElement.SelectSingleNode("SpeakerList");
                     if (speakerListNode != null)
+                    {
                         xml.DocumentElement.SelectSingleNode("SpeakerList").InnerXml = speakerListNode.InnerXml;
+                    }
                 }
                 catch
                 {
+                    // ignored
                 }
             }
 
@@ -81,7 +84,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             string xmlString = sb.ToString();
             if (!xmlString.Contains("<SpeechSegment"))
+            {
                 return;
+            }
 
             var xml = new XmlDocument { XmlResolver = null };
             try
@@ -120,7 +125,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             }
             subtitle.Renumber();
             if (subtitle.Paragraphs.Count > 0)
+            {
                 subtitle.Header = xmlString;
+            }
         }
 
         private static double ParseTimeCode(string s)
@@ -128,24 +135,6 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             return Convert.ToDouble(s) * TimeCode.BaseUnit;
         }
 
-        public override bool HasStyleSupport
-        {
-            get { return true; }
-        }
-
-        public static List<string> GetStylesFromHeader(Subtitle subtitle)
-        {
-            var list = new List<string>();
-            foreach (Paragraph p in subtitle.Paragraphs)
-            {
-                if (!string.IsNullOrEmpty(p.Actor))
-                {
-                    if (list.IndexOf(p.Actor) < 0)
-                        list.Add(p.Actor);
-                }
-            }
-            return list;
-        }
-
+        public override bool HasStyleSupport => true;
     }
 }

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using Nikse.SubtitleEdit.Core;
 
 namespace Nikse.SubtitleEdit.Forms
 {
-    public partial class NetflixQCResult : Form
+    public sealed partial class NetflixQCResult : Form
     {
-        private string Message { get; set; }
-        private List<string> FilesToLocate { get; set; }
+        private string Message { get; }
+        private List<string> FilesToLocate { get; }
 
         public NetflixQCResult(string message, List<string> filesToLocate)
         {
@@ -20,7 +21,9 @@ namespace Nikse.SubtitleEdit.Forms
 
             Message = message;
             FilesToLocate = filesToLocate;
-
+            btnOk.Text = Configuration.Settings.Language.General.Ok;
+            Text = Configuration.Settings.Language.Main.Menu.ToolBar.NetflixQualityCheck;
+            btnOpen.Text = Configuration.Settings.Language.Main.Menu.ToolBar.Open;
             InitUi();
         }
 
@@ -38,13 +41,13 @@ namespace Nikse.SubtitleEdit.Forms
                 FilesToLocate
                     .Where(Message.Contains)
                     .ToList()
-                    .ForEach(s => lnkLblText.Links.Add(Message.IndexOf(s), s.Length, s));
+                    .ForEach(s => lnkLblText.Links.Add(Message.IndexOf(s, StringComparison.Ordinal), s.Length, s));
             }
             else
             {
                 lnkLblText.Visible = false;
                 lblText.Text = Message;
-                usedLabel = lblText;                
+                usedLabel = lblText;
             }
 
             Width = Math.Max(usedLabel.Width + usedLabel.Left * 3, 300);
@@ -60,7 +63,7 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 buttonsPosMid = btnOk.Left + btnOk.Width / 2;
             }
-            
+
             btnOpen.Left = btnOpen.Left - buttonsPosMid + Width / 2;
             btnOk.Left = btnOk.Left - buttonsPosMid + Width / 2;
         }
@@ -93,7 +96,7 @@ namespace Nikse.SubtitleEdit.Forms
 
         private void OpenFileLocation(string filePath)
         {
-            Process.Start("explorer.exe", string.Format(@"/select,""{0}"" ", filePath));
+            Process.Start("explorer.exe", $@"/select,""{filePath}"" ");
         }
     }
 }

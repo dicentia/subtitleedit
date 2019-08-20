@@ -9,8 +9,8 @@ namespace Nikse.SubtitleEdit.Logic
     public class FindReplaceDialogHelper
     {
         private const string SeparatorChars = " #><-\"„”“[]'‘`´¶(){}♪,.!?:;¿¡.…—،؟\r\n\u2028";
-        private readonly string _findText = string.Empty;
-        private readonly string _replaceText = string.Empty;
+        private readonly string _findText;
+        private readonly string _replaceText;
         private Regex _regEx;
         private int _findTextLength;
 
@@ -22,32 +22,15 @@ namespace Nikse.SubtitleEdit.Logic
         public bool MatchInOriginal { get; set; }
         public bool InProgress { get; set; }
 
-        public int FindTextLength
-        {
-            get
-            {
-                return _findTextLength;
-            }
-        }
+        public int FindTextLength => _findTextLength;
 
-        public string FindText
-        {
-            get
-            {
-                return _findText;
-            }
-        }
+        public string FindText => _findText;
 
-        public string ReplaceText
-        {
-            get
-            {
-                return _replaceText;
-            }
-        }
+        public string ReplaceText => _replaceText;
 
         public FindReplaceDialogHelper(ReplaceType findType, string findText, Regex regEx, string replaceText, int startLineIndex)
         {
+            _replaceText = string.Empty;
             FindReplaceType = findType;
             _findText = findText;
 
@@ -76,7 +59,9 @@ namespace Nikse.SubtitleEdit.Logic
         private int FindPositionInText(string text, int startIndex)
         {
             if (startIndex >= text.Length && !(FindReplaceType.FindType == FindType.RegEx && startIndex == 0))
+            {
                 return -1;
+            }
 
             if (FindReplaceType.FindType == FindType.CaseSensitive || FindReplaceType.FindType == FindType.Normal)
             {
@@ -89,7 +74,9 @@ namespace Nikse.SubtitleEdit.Logic
                         var startOk = idx == 0 || SeparatorChars.Contains(text[idx - 1]);
                         var endOk = idx + _findText.Length == text.Length || SeparatorChars.Contains(text[idx + _findText.Length]);
                         if (startOk && endOk)
+                        {
                             return idx;
+                        }
                     }
                     else
                     {
@@ -120,15 +107,21 @@ namespace Nikse.SubtitleEdit.Logic
             Success = false;
             int index = 0;
             if (position < 0)
+            {
                 position = 0;
+            }
+
             bool first = true;
             foreach (Paragraph p in subtitle.Paragraphs)
             {
                 if (index >= startIndex)
                 {
                     if (!first)
+                    {
                         position = 0;
-                    int pos = 0;
+                    }
+
+                    int pos;
                     if (!MatchInOriginal)
                     {
                         pos = FindPositionInText(p.Text, position);
@@ -142,8 +135,10 @@ namespace Nikse.SubtitleEdit.Logic
                         }
                         position = 0;
                     }
-                    if (index < subtitle.Paragraphs.Count -1)
+                    if (index < subtitle.Paragraphs.Count - 1)
+                    {
                         MatchInOriginal = false;
+                    }
 
                     if (originalSubtitle != null && allowEditOfOriginalSubtitle)
                     {
@@ -164,6 +159,79 @@ namespace Nikse.SubtitleEdit.Logic
                     first = false;
                 }
                 index++;
+            }
+            return false;
+        }
+
+        public bool FindPrevious(Subtitle subtitle, Subtitle originalSubtitle, int startIndex, int position, bool allowEditOfOriginalSubtitle)
+        {
+            Success = false;
+            int index = startIndex;
+            bool first = true;
+            for (var i = startIndex; i >= 0; i--)
+            {
+                Paragraph p = subtitle.Paragraphs[i];
+
+                if (originalSubtitle != null && allowEditOfOriginalSubtitle)
+                {
+                    if (!first || MatchInOriginal)
+                    {
+                        Paragraph o = Utilities.GetOriginalParagraph(index, p, originalSubtitle.Paragraphs);
+                        if (o != null)
+                        {
+                            if (!first)
+                            {
+                                position = o.Text.Length - 1;
+                            }
+
+                            for (var j = 0; j <= position; j++)
+                            {
+                                if (position - j >= 0 && position - j + j < o.Text.Length)
+                                {
+                                    var t = o.Text.Substring(position - j, j);
+                                    int pos = FindPositionInText(t, 0);
+                                    if (pos >= 0)
+                                    {
+                                        pos += position - j;
+                                        MatchInOriginal = true;
+                                        SelectedIndex = index;
+                                        SelectedPosition = pos;
+                                        Success = true;
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                        position = p.Text.Length - 1;
+                    }
+                }
+
+                MatchInOriginal = false;
+                if (!first)
+                {
+                    position = p.Text.Length - 1;
+                }
+
+                for (var j = 0; j <= position; j++)
+                {
+                    if (position - j >= 0 && position < p.Text.Length)
+                    {
+                        var t = p.Text.Substring(position - j, j + 1);
+                        int pos = FindPositionInText(t, 0);
+                        if (pos >= 0)
+                        {
+                            pos += position - j;
+                            MatchInOriginal = false;
+                            SelectedIndex = index;
+                            SelectedPosition = pos;
+                            Success = true;
+                            return true;
+                        }
+                    }
+                }
+                position = 0;
+                first = false;
+                index--;
             }
             return false;
         }
@@ -250,6 +318,67 @@ namespace Nikse.SubtitleEdit.Logic
             return false;
         }
 
+        public bool FindPrevious(string text, int startIndex)
+        {
+            Success = false;
+            startIndex--;
+            if (startIndex < text.Length)
+            {
+                if (FindReplaceType.FindType == FindType.RegEx)
+                {
+                    var matches = _regEx.Matches(text.Substring(0, startIndex));
+                    if (matches.Count > 0)
+                    {
+                        string groupName = RegexUtils.GetRegExGroup(_findText);
+                        var last = matches[matches.Count - 1];
+                        if (groupName != null && last.Groups[groupName] != null && last.Groups[groupName].Success)
+                        {
+                            _findTextLength = last.Groups[groupName].Length;
+                            SelectedIndex = last.Groups[groupName].Index;
+                        }
+                        else
+                        {
+                            _findTextLength = last.Length;
+                            SelectedIndex = last.Index;
+                        }
+                        Success = true;
+                    }
+                    return Success;
+                }
+                string searchText = text.Substring(0, startIndex);
+                int pos = -1;
+                var comparison = GetComparison();
+                var idx = searchText.LastIndexOf(_findText, startIndex, comparison);
+                while (idx >= 0)
+                {
+                    if (FindReplaceType.WholeWord)
+                    {
+                        var startOk = idx == 0 || SeparatorChars.Contains(searchText[idx - 1]);
+                        var endOk = idx + _findText.Length == searchText.Length || SeparatorChars.Contains(searchText[idx + _findText.Length]);
+                        if (startOk && endOk)
+                        {
+                            pos = idx;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        pos = idx;
+                        break;
+                    }
+                    searchText = text.Substring(0, idx);
+                    idx = searchText.LastIndexOf(_findText, comparison);
+                }
+                if (pos >= 0)
+                {
+                    SelectedIndex = pos;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         public int FindCount(Subtitle subtitle, bool wholeWord)
         {
             var count = 0;
@@ -262,7 +391,7 @@ namespace Nikse.SubtitleEdit.Logic
                     MessageBox.Show(Configuration.Settings.Language.General.RegularExpressionIsNotValid);
                     return count;
                 }
-                _regEx = new Regex(findText, RegexOptions.Multiline);
+                _regEx = new Regex(findText);
             }
             var comparison = GetComparison();
             foreach (var p in subtitle.Paragraphs)
@@ -294,7 +423,9 @@ namespace Nikse.SubtitleEdit.Logic
                     var startOk = (idx == 0) || (SeparatorChars.Contains(text[idx - 1]));
                     var endOk = (idx + pattern.Length == text.Length) || (SeparatorChars.Contains(text[idx + pattern.Length]));
                     if (startOk && endOk)
+                    {
                         count++;
+                    }
                 }
                 else
                 {

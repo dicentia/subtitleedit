@@ -1,15 +1,215 @@
 ﻿Subtitle Edit Changelog
 
-3.5.7 (xth August 2018) BETA
+3.5.10 (18th August 2019)
 * NEW:
-   * Add Indonesian translation (+ installer) - thx Nicedward
+   * Profiles - thx philippwr, OmrSi, moob
+   * Re-break line at cursor position shortcuts
+   * Reset video speed/waveform zoom shortcut - thx goodju
+   * Optimal CPS configurable in UI - thx Flitskikker
+   * Import scene changes from EZTitles - thx Flitskikker 
+   * Add new sub format - thx Matmanamane
+   * Add new sub format - thx Rob
+   * Add new sub format - thx Ketan
+   * Add new sub format - thx thehulk
+   * Add "remove formatting" via command line - thx JySzE
+   * Allow binary formats in compare
+   * Add download link to Slovenian spell check dictionary - thx Milenko
+   * Add some support for remove spaces and 3 lines - thx James
+* IMPROVED:
+   * Update Portuguese translation - thx moob
+   * Update Brazil translation - thx Igor
+   * Update Korean translation - thx domdoll
+   * Update Hungarian translation - thx Zityi
+   * Update Japanese translation - thx ScratchBuild
+   * Update Polish translation - thx admas
+   * Update Russian translation - thx Elheym
+   * Update Dutch translation - thx xylographe
+   * Update Swedish translation - thx Sopor
+   * Update Romanian translation - thx Mircea
+   * Update Chinese translation - thx Leon
+   * Move formatting split to sub items - thx Leon/OmrSi/marb99/cyberbrix
+   * Auto rename after translate via plugin - thx Sopor
+   * Allow dash in number for WebVTT files - thx Maksim
+   * Make export font name dropdown wider - thx Eduard
+   * Remove empty line between original/current after merge - thx darnn
+   * Improve language tag handling in WebVTT - thx OmrSi/Jamakmake
+   * Add stuttering support in "Change casing" - thx techguru
+   * Add checkboxes to "Apply duration limits" - thx Flitskikker
+   * "Extend only" option for "Duration recalculate" - thx Flitskikker
+   * Add track number to cmd line convert - thx sneaker_ger
+   * Include "Remove native formatting" in convert - thx Jamakmake
+   * Include more Unicode spaces in "Spell check" word split - thx Greg
+   * Improve handling of font tags in auto translation - thx Martin
+   * Allow negative video offset - thx Marcello
+   * Update in-program-download of Tesseract 4.0.0 to 4.1.0
+   * Remove dependency on font "Segoe UI" - thx MeH
+* FIXED:
+   * Fix for minor change in Google translate V1
+   * Fix "Change all" for whole text in OCR - thx wtester7
+   * Fix renumber problem - thx marb99
+   * Fix for "Split long lines" with html tags - thx moob
+   * Fix minor issue with quotes in reverse RTL - thx OmrSi
+   * Fix shortcut searching with "&" character - thx Leon
+   * Remove "gotta" to "got to" from English OCR fix replace list
+   * Fix name/abbreviation check in OCR fix engine - thx teodargent
+   * Make "column->delete text" work in translator mode - thx darnn
+   * Fix focus issue in "Fix common errors" - thx OmrSi/Ding-adong
+   * SRT: Allow spaces before/after time codes - thx SirEllert
+   * Fix issue with music tags/remove text for HI - thx btsix
+   * Keep format/frame rate/video after merge original/current - thx darnn
+   * Fix batch OCR issue - thx orbittwz
+   * Fix issue with reloading subtitle from source view - thx ivandrofly
+   * Allow multiple blank lines in .srt files - thx Sopor
+   * Fix listview not going to video position - thx OmrSi
+   * Fix crash when copy empty text to clipboard - thx OmrSi
+   * Keep alignment tags first when changing font - thx LeXXuz
+   * Fix translate italic issue - thx moob
+   * Fix file ext when importing from mkv - thx innuit
+   * Fix remove empty lines in "Multiple replace" + "Apply" - thx Kronopt
+   * Fix rename ass style name bug - thx Jamakmake
+   * Fix TTML to ASS with multi "font-family" - thx Leon Sk
+   * Fix crash after going to next/prev subtitle line - thx green-pigeon
+   * Fix translate shortcuts in adjust/create mode - thx OmrSi
+   * Fix a few issues regarding RTF - thx Liora
+   * Fix crash in cmd line when running on Linux - thx xylographe
+   * Fix bug in "Modify selection": Show time box for "Duration greater than"
+   * Fix line-break with ampersand in TTML - thx Krystian
+   * Fix find MPC installed via K-Lite Codec Pack - thx OmrSi/xylographe
+   * Fix error in FCE regarding Spanish ¿? and ¡! - thx Lokotito/xylographe
+   * Fix go to next/prev after remove scene change - thx Ingo
+   * Fix "Bridge small gaps in durations" bug - thx AlexandreMT
+   * Fix reading name list online - thx splerman
+
+
+3.5.9 (10th February 2019)
+* NEW:
+   * Bookmarks - thx OmrSi/marb99
+   * Auto save option
+   * Spell check - keep "Use always" replace list option
+   * Image export - option to have single lines top justified - thx joedmartin
+   * Add shortcut: Modify selection
+   * Add format "OGM chapters" - thx Franc
+   * Add format "sptx" (read) - thx Peter
+   * Add Norwegian name list - thx SvenErik
+* IMPROVED:
+   * Update Hungarian translation - thx Zityi
+   * Update Korean translation - thx domddol
+   * Update Portuguese translation - thx moob
+   * Update French translation - thx JM GBT
+   * Update Polish translation - thx admas
+   * Update a few wrong translations (Spanish) - thx Ovidio
+   * Create/adjust/translate shortcuts now global - thx OmrSi/uckthis
+   * Auto break adheres to "Max number of lines" setting
+   * Translate selected lines for MS translator + plugins
+   * Make "select current sub while playing" smoother in waveform
+   * Support .rtf files in "Import plain text" - thx Tilen
+   * Improve Binary OCR of comma / apostrophe - thx Tuukka
+   * Improve quote/italic detection in binary OCR - thx Miggu
+   * Add context menu to OCR spell check
+   * Improve DVD Studio Pro tag reading - thx Shas2509
+   * "Toggle music tags" uses "music symbol" from tool settings
+   * Improve language auto-detect - thx Xy
+   * Improve parsing of badly formatted srt files - thx Darnn
+   * Update names list - thx ivandrofly
+   * Binary OCR auto detect best DB - thx Mr. Rage
+* FIXED:
+   * Fix missing/bad html tags after "Auto br" - thx iromafia111
+   * Fix crash in OCR window when closing - thx spetragl
+   * Fix OCR in batch convert - thx danstraughn
+   * Fix crash parsing empty word in OCR via Tesseract - thx Barry
+   * Fix reading ttml 2016-10 draft with "dur" tags - thx bbpqman
+   * Fix underline with "Reverse start/end" - thx OmrSi
+   * Fix possible crash in load of settings - thx eugenesvk
+   * Fix/improve eng_OCRFixReplaceList.xml - thx Ding-adong
+   * Fix minor tag issue in vtt - thx Arjan
+   * Fix minor issues regarding pasting in list view - thx OmrSi
+   * Fix a few minor issues in "Fix common errors" - thx darnn
+   * Fix bug in "Multiple replace" with delete empty lines - thx OmrSi
+   * Fix bug regarding VTT position - thx devilcoelhodog
+   * Fix crash in "Remove text for HI" - thx Rouzax
+   * Fix wrong label in "frame mode" (ms -> frames) - thx Dominik
+   * Fix some missing translations - thx Jamakmake
+
+
+3.5.8 (20th December 2018)
+* NEW:
    * Add new subtitle formats
+   * Add some image pre-processing for OCR
+   * Add "DVD Studio Pro" file properties - thx Daniel
+   * Add ebu stl boxing - thx Milenko
+   * Add "Fix RTL" to batch convert - thx OmrSi/MosDos96/ghost
+   * Add new shortcuts (mostly related to alignment)
+* IMPROVED:
+   * Update Bulgarian translation - thx KalinM
+   * Update Finnish translation - thx Teijo S
+   * Update Korean translation - thx domddol
+   * Update Catalan translation - thx Juansa
+   * Update Hungarian translation - thx Zityi
+   * Update Chinese translation - thx tinyboxvk
+   * Update Portuguese translation - thx moob
+   * Update Brazil translation - thx Igor
+   * Updated Russian translation - thx  Elheym
+   * Improve plain text import - thx uckthis/darnn/Leon
+   * Make custom "Choose font" dialog - thx OmrSi
+   * Update Bing translator from V2 to V3 API
+   * Faster Tesseract OCR if CPU has many cores
+   * Try using word lists for uppercase "i" inside words - thx TeDDy
+   * Improve unknown json importer - thx Thamy
+   * Improve paste in list view - thx OmrSi/darnn
+   * Add "Fix RTL" to batch convert - thx OmrSi/MosDos96/ghost
+   * Add support Google Cloud API key
+   * Allow translate selected lines in translate mode
+   * Don't count "new line" for total chars in Statistics - thx Andy
+   * Update Netflix allowed glyphs - thx Justin
+* FIXED:
+   * Go back to Tesseract 3.02 (T4 available as in-program download)
+   * Fix Bing translator sign-up url - thx sopor
+   * Fix common OCR errors "L" vs "I" issue - thx Araynilmar/Zoltán
+   * Fix for loading video file after openening .mks file
+   * Fix crash in "Point sync" - thx Kari
+   * Fix crash in export of compare result - thx billysamk
+   * Fix line length issue in Netflix QC with italics - thx billysamk
+   * Fix missing titles from PGS inside MKV - thx ManChicken1911
+   * Fix opening empty 890 file - thx Janica
+   * Fix auto-select text in undocked mode - thx Ingo
+   * Fix Toggle dialog dashes with ASS tags - thx OmrSi
+   * Fix "Set end, next start + go to next" w org sub - thx OmrSi
+   * Fix crash in Remove text for HI" - thx indeed-a-genius
+   * Fix "total seconds" in "Export custom format" - thx David
+   * Fix mpv crash/hang after open 4+ videos
+   * Add custom fade up/down for DCinema smpte - thx felagund
+   * Fix reading last line with zero duration - thx darnn
+   * Fix for column paste - thx OmrSi
+   * Fix adding music symbols with tags - thx 
+   * Fix syntax coloring in "Fix common errors" - thx OmrSi
+   * Fix somtimes not updating total line length - thx OmrSi
+   * Fix text/image overlap in manual image to text OCR - thx amichaeltm
+   * Do not ignore words of combined letters/numbers - thx Boulder08
+   * Trying to fix mpv missing text refresh - thx darnn
+   * Fix crash in "add better multi match" - thx Boulder08
+   * Remove empty pics when importing mkv/vobsub - thx Roy
+   * Don't lose coloring after delete line in OCR - thx BxMxK
+   * Fix adjust via end position w original subtitle - thx OmrSi
+   * Fix toggle dialog dashes with font tags
+   * Fix freeze in spell check change all - thx Edwin
+   * Fix extra space when using "Toggle play/pause" - thx Luiz
+   * Fix "Go to next error" for last line - thx Leon/OmrSi
+   * Fix crash in "Typewriter effect" - thx tharindu
+   * Avoid leaving files in temp folder - thx borifax
+
+
+3.5.7 (9th August 2018)
+* NEW:
+   * Add new subtitle formats
+   * Font can be different for subtitle list view / text box
+   * Add Indonesian translation - thx Nicedward
    * Add support for mp4 dash ttml - thx Octirius
    * Add shortcut for toggle music symbols - thx robtor
    * Add shortcuts "Batch convert" + "waveform split"
+   * Add shortcuts for bilingual line merge/split
+   * Add "Shift+F3" shortcut for backward search - thx OmrSi/Leon
    * Add new setting: volume boost
    * Add new setting: "save as..." take file name from
-   * Font can be different for subtitle list view / text box
    * Add download of ffmpeg
 * IMPROVED:
    * Update Brazilian translation - thx Igor
@@ -23,7 +223,7 @@
    * Update Basque translation - thx Xabier
    * Update Portuguese translation - thx moob
    * Update Russian translation - thx Elheym
-   * Update Tesseract OCR from 3.02 to 4.0 (beta 1)
+   * Update Tesseract OCR from 3.02 to 4.0 (beta 3)
    * Minor improvements for Video -> Generate/import scene changes
    * Remember OCR spell check dictionary for tesseract - thx raymondjpg
    * Add some style support to "Modify selection"
@@ -32,6 +232,17 @@
    * Add shortcut "Go to previous sub (from video pos)" - thx OmrSi
    * Hide cursor in video fullscreen mode/mpv - thx OmrSi
    * Respect line break for waveform preview text - thx Leon
+   * Add check for frame rate in Netflix quality checker - thx Justin
+   * Add ">" and "<" duration in "Modify selection"
+   * Improve EBU STL properties regarding "language code"
+   * Add "Export" for compare tool - thx Kait
+   * Add "Search" in Options -> Settings -> Shortcuts - thx Leon/OmrSi
+   * Add "Search" in "Open subtitle w manual chosen encoding"
+   * Some improvements of waveform file name - thx OmrSi/Jamakmake
+   * Allow up to 2 mb ebu stl sub files - thx Yusuf
+   * Add "Import as plain text" button for unknown subtitle types
+   * Improve ansi code page detection a bit - thx Xy
+   * Batch convert can now handle mkv pgs/vobsub
 * FIXED:
    * Fix "Add to names list" in OCR spell check - thx daed-alus/Sergiy
    * Fix "Generate scene changes" decimal point issue - thx Max
@@ -68,6 +279,18 @@
    * Fix crash with Gap Column - thx Leon
    * Fix issue with "Fix missing spaces" and "?" - thx Boulder08
    * Fix crash in "Remove text for HI" - thx tormento
+   * Fix reset video position after new file - thx OmrSi
+   * Fix shortcut "Column, Delete text" - thx OmrSi
+   * Fix character count in EBU STL propertie - thx FVonFaschion
+   * Fix style when add subtitle with F9 in create mode - thx OmrSi
+   * Fix typewriter effect with tags - thx OmrSi
+   * Copy source to clipboard now adds video offset - thx Ingo
+   * Fix duplicate postfix in "translate selected" - thx Jamakmake
+   * Fix for last line in "Replace all"  - thx ryvec
+   * Fix for setting index for recent file - thx OmrSi
+   * Fix current line issue for "Set end, offset rest" - thx OmrSi
+   * Fixed decimal point issue with ASS - thx Thierry
+   * Fixed info msg after "Multiple replace" - thx OmrSi
 
 
 3.5.6 (27th February 2018)

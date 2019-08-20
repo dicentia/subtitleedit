@@ -20,9 +20,8 @@ namespace Nikse.SubtitleEdit.Forms
             UiUtil.FixFonts(this);
             ResetTotalAdjustment();
             timeUpDownAdjust.MaskedTextBox.Text = "000000000";
-
             Text = Configuration.Settings.Language.ShowEarlierLater.Title;
-            labelHourMinSecMilliSecond.Text = Configuration.Settings.Language.General.HourMinutesSecondsMilliseconds;
+            labelHourMinSecMilliSecond.Text = Configuration.Settings.General.UseTimeFormatHHMMSSFF ? Configuration.Settings.Language.General.HourMinutesSecondsFrames : Configuration.Settings.Language.General.HourMinutesSecondsMilliseconds;
             buttonShowEarlier.Text = Configuration.Settings.Language.ShowEarlierLater.ShowEarlier;
             buttonShowLater.Text = Configuration.Settings.Language.ShowEarlierLater.ShowLater;
             radioButtonAllLines.Text = Configuration.Settings.Language.ShowEarlierLater.AllLines;
@@ -53,11 +52,17 @@ namespace Nikse.SubtitleEdit.Forms
         internal void Initialize(AdjustEventHandler adjustCallback, bool onlySelected)
         {
             if (onlySelected)
+            {
                 radioButtonSelectedLinesOnly.Checked = true;
+            }
             else if (Configuration.Settings.Tools.LastShowEarlierOrLaterSelection == SelectionChoice.SelectionAndForward.ToString())
+            {
                 radioButtonSelectedLineAndForward.Checked = true;
+            }
             else
+            {
                 radioButtonAllLines.Checked = true;
+            }
 
             _adjustCallback = adjustCallback;
             timeUpDownAdjust.TimeCode = new TimeCode(Configuration.Settings.General.DefaultAdjustMilliseconds);
@@ -66,11 +71,16 @@ namespace Nikse.SubtitleEdit.Forms
         private SelectionChoice GetSelectionChoice()
         {
             if (radioButtonSelectedLinesOnly.Checked)
+            {
                 return SelectionChoice.SelectionOnly;
-            else if (radioButtonSelectedLineAndForward.Checked)
+            }
+
+            if (radioButtonSelectedLineAndForward.Checked)
+            {
                 return SelectionChoice.SelectionAndForward;
-            else
-                return SelectionChoice.AllLines;
+            }
+
+            return SelectionChoice.AllLines;
         }
 
         private void ButtonShowEarlierClick(object sender, EventArgs e)

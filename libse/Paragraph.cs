@@ -49,17 +49,17 @@ namespace Nikse.SubtitleEdit.Core
 
         public bool NewSection { get; set; }
 
+        public string Bookmark { get; set; }
+
+        public bool IsDefault => StartTime.TotalMilliseconds == 0 && EndTime.TotalMilliseconds == 0 && string.IsNullOrEmpty(Text);
+
         private string GenerateId()
         {
             return Guid.NewGuid().ToString();
         }
 
-        public Paragraph()
+        public Paragraph() : this(new TimeCode(), new TimeCode(), string.Empty)
         {
-            StartTime = TimeCode.FromSeconds(0);
-            EndTime = TimeCode.FromSeconds(0);
-            Text = string.Empty;
-            ID = GenerateId();
         }
 
         public Paragraph(TimeCode startTime, TimeCode endTime, string text)
@@ -92,30 +92,27 @@ namespace Nikse.SubtitleEdit.Core
             Language = paragraph.Language;
             Style = paragraph.Style;
             NewSection = paragraph.NewSection;
+            Bookmark = paragraph.Bookmark;
         }
 
-        public Paragraph(int startFrame, int endFrame, string text)
+        public Paragraph(int startFrame, int endFrame, string text) :
+            this(new TimeCode(), new TimeCode(), text)
         {
-            StartTime = new TimeCode();
-            EndTime = new TimeCode();
             StartFrame = startFrame;
             EndFrame = endFrame;
-            Text = text;
-            ID = GenerateId();
         }
 
         public Paragraph(string text, double startTotalMilliseconds, double endTotalMilliseconds)
+            : this(new TimeCode(startTotalMilliseconds), new TimeCode(endTotalMilliseconds), text)
         {
-            StartTime = new TimeCode(startTotalMilliseconds);
-            EndTime = new TimeCode(endTotalMilliseconds);
-            Text = text;
-            ID = GenerateId();
         }
 
         public void Adjust(double factor, double adjustmentInSeconds)
         {
             if (StartTime.IsMaxTime)
+            {
                 return;
+            }
 
             StartTime.TotalMilliseconds = StartTime.TotalMilliseconds * factor + (adjustmentInSeconds * TimeCode.BaseUnit);
             EndTime.TotalMilliseconds = EndTime.TotalMilliseconds * factor + (adjustmentInSeconds * TimeCode.BaseUnit);
@@ -151,7 +148,10 @@ namespace Nikse.SubtitleEdit.Core
             get
             {
                 if (string.IsNullOrEmpty(Text))
+                {
                     return 0;
+                }
+
                 return (60.0 / Duration.TotalSeconds) * Text.CountWords();
             }
         }

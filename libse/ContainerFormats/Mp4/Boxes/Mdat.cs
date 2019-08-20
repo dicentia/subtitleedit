@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace Nikse.SubtitleEdit.Core.ContainerFormats.Mp4.Boxes
@@ -17,13 +16,11 @@ namespace Nikse.SubtitleEdit.Core.ContainerFormats.Mp4.Boxes
             while (fs.Position < (long)maximumLength)
             {
                 if (!InitializeSizeAndName(fs))
-                    return;
-
-                if (Name == "vtte")
                 {
-                    Console.WriteLine("vtte");
-                }                
-                else if (Name == "vttc")
+                    return;
+                }
+
+                if (Name == "vttc")
                 {
                     var vttc = new Vttc(fs, Position);
                     if (vttc.Payload != null)
@@ -31,11 +28,6 @@ namespace Nikse.SubtitleEdit.Core.ContainerFormats.Mp4.Boxes
                         Payloads.AddRange(vttc.Payload);
                     }
                 }
-                else if (Name == "payl")
-                {
-                    Console.WriteLine("payl");
-                }
-
                 fs.Seek((long)Position, SeekOrigin.Begin);
             }
         }

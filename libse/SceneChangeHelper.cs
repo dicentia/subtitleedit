@@ -12,11 +12,11 @@ namespace Nikse.SubtitleEdit.Core
         {
             var dir = Configuration.SceneChangesDirectory.TrimEnd(Path.DirectorySeparatorChar);
             if (!Directory.Exists(dir))
+            {
                 Directory.CreateDirectory(dir);
+            }
 
-            var file = new FileInfo(videoFileName);
-            var newFileName = Utilities.Sha256Hash(file.Name + file.Length + file.CreationTimeUtc.ToShortDateString()) + ".scenechanges";
-            newFileName = newFileName.RemoveChar('=').RemoveChar('/').RemoveChar(',').RemoveChar('?').RemoveChar('*').RemoveChar('+').RemoveChar('\\');
+            var newFileName = MovieHasher.GenerateHash(videoFileName) + ".scenechanges";
             newFileName = Path.Combine(dir, newFileName);
             return newFileName;
         }
@@ -31,7 +31,9 @@ namespace Nikse.SubtitleEdit.Core
             var list = new List<double>();
             var sceneChangesFileName = GetSceneChangesFileName(videoFileName);
             if (!File.Exists(sceneChangesFileName))
+            {
                 return list;
+            }
 
             foreach (var line in File.ReadLines(sceneChangesFileName))
             {
@@ -66,7 +68,9 @@ namespace Nikse.SubtitleEdit.Core
         {
             var sceneChangesFileName = GetSceneChangesFileName(videoFileName);
             if (File.Exists(sceneChangesFileName))
+            {
                 File.Delete(sceneChangesFileName);
+            }
         }
 
     }

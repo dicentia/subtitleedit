@@ -17,11 +17,19 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         {
             var sb = new StringBuilder();
             foreach (string line in lines)
+            {
                 sb.AppendLine(line);
+            }
+
             if (sb.ToString().Contains(Environment.NewLine + "SP_NUMBER\tSTART\tEND\tFILE_NAME"))
+            {
                 return false; // SON
+            }
+
             if (sb.ToString().Contains(Environment.NewLine + "SP_NUMBER     START        END       FILE_NAME"))
+            {
                 return false; // SON
+            }
 
             return base.IsMine(lines, fileName);
         }
@@ -30,6 +38,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         {
             var sb = new StringBuilder();
             int index = 0;
+            var language = LanguageAutoDetect.AutoDetectGoogleLanguage(subtitle);
             foreach (Paragraph p in subtitle.Paragraphs)
             {
                 index++;
@@ -40,7 +49,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 text = text.Replace("</i>", "@Italic@");
                 text = HtmlUtil.RemoveHtmlTags(text, true);
                 if (Utilities.CountTagInText(Environment.NewLine, text) > 1)
-                    text = Utilities.AutoBreakLineMoreThanTwoLines(text, Configuration.Settings.General.SubtitleLineMaximumLength, string.Empty);
+                {
+                    text = Utilities.AutoBreakLineMoreThanTwoLines(text, Configuration.Settings.General.SubtitleLineMaximumLength, Configuration.Settings.General.MergeLinesShorterThan, language);
+                }
+
                 text = text.Replace(Environment.NewLine, Environment.NewLine + "\t\t\t\t");
                 sb.AppendLine($"{index:0000} {EncodeTimeCode(p.StartTime)} {EncodeTimeCode(p.EndTime)}\t{text}");
             }
@@ -79,7 +91,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                             {
                                 string text = s.Remove(0, RegexTimeCodes.Match(s).Length - 1).Trim();
                                 if (!text.Contains(Environment.NewLine))
+                                {
                                     text = text.Replace("//", Environment.NewLine);
+                                }
+
                                 if (text.Contains("@Italic@"))
                                 {
                                     bool italicOn = false;
@@ -88,7 +103,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                                         var index = text.IndexOf("@Italic@", StringComparison.Ordinal);
                                         string italicTag = "<i>";
                                         if (italicOn)
+                                        {
                                             italicTag = "</i>";
+                                        }
+
                                         text = text.Remove(index, "@Italic@".Length).Insert(index, italicTag);
                                         italicOn = !italicOn;
                                     }
@@ -112,7 +130,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 else if (line.StartsWith("\t\t\t\t", StringComparison.Ordinal) && p != null)
                 {
                     if (p.Text.Length < 200)
+                    {
                         p.Text = (p.Text + Environment.NewLine + line.Trim()).Trim();
+                    }
                 }
                 else if (!string.IsNullOrWhiteSpace(line) && p != null)
                 {

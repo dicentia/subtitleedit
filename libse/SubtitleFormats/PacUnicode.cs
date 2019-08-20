@@ -48,7 +48,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                             buffer[19] == 0 &&
                             buffer[20] == 0 &&
                             fileName.EndsWith(".fpc", StringComparison.OrdinalIgnoreCase))
+                        {
                             return true;
+                        }
                     }
                 }
                 catch
@@ -75,9 +77,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 Paragraph p = GetPacParagraph(ref index, buffer);
                 if (p != null)
+                {
                     subtitle.Paragraphs.Add(p);
+                }
             }
-            if (subtitle.Paragraphs.Count > 2 && subtitle.Paragraphs[0].StartTime.TotalMilliseconds < 0.001 && subtitle.Paragraphs[1].StartTime.TotalMilliseconds < 0.001)
+            if (subtitle.Paragraphs.Count > 2 && subtitle.Paragraphs[0].StartTime.TotalMilliseconds < 0.001 && subtitle.Paragraphs[0].EndTime.TotalMilliseconds < 0.001)
             {
                 subtitle.Paragraphs.RemoveAt(0);
             }
@@ -95,10 +99,14 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 index++;
                 if (index + 20 >= buffer.Length)
+                {
                     return null;
+                }
 
                 if (buffer[index] == 0xFE && buffer[index - 1] == 0x80)
+                {
                     con = false;
+                }
             }
 
             int feIndex = index;
@@ -112,7 +120,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             int textLength = buffer[timeStartIndex + 9] + buffer[timeStartIndex + 10] * 256;
             if (textLength > 500)
+            {
                 return null; // probably not correct index
+            }
+
             int maxIndex = timeStartIndex + 10 + textLength;
 
             var sb = new StringBuilder();
@@ -126,7 +137,15 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 {
                     if (textIndex > textBegin)
                     {
-                        sb.AppendLine(Encoding.UTF8.GetString(buffer, textBegin, textIndex - textBegin - 1));
+                        for (int j = textBegin; j <= textIndex - textBegin - 1; j++)
+                        {
+                            if (buffer[j] == 0xff)
+                            {
+                                buffer[j] = 0x2e; // replace end of line marker
+                            }
+                        }
+
+                        sb.AppendLine(Encoding.UTF8.GetString(buffer, textBegin, textIndex - textBegin));
                         textBegin = textIndex + 7;
                         textIndex += 6;
                     }
@@ -142,6 +161,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 sb.Append(Encoding.UTF8.GetString(buffer, textBegin, textIndex - textBegin - 1));
             }
             p.Text = sb.ToString().Trim();
+            if (p.Text.Length > 1 && (p.Text[0] == 31 || p.Text[1] == 65279))
+            {
+                p.Text = p.Text.Remove(0, 2);
+            }
             for (int k = 0; k < p.Text.Length; k++)
             {
                 if (p.Text[k] == 65533)
@@ -152,7 +175,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             index += textLength;
             if (index + 20 >= buffer.Length)
+            {
                 return null;
+            }
 
             p.Text = p.Text.Replace(Environment.NewLine + " ", Environment.NewLine);
             p.Text = p.Text.Replace(Environment.NewLine + " ", Environment.NewLine);
@@ -162,30 +187,66 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             if (verticalAlignment < 5)
             {
                 if (alignment == 1) // left
+                {
                     p.Text = "{\\an7}" + p.Text;
+                }
                 else if (alignment == 0) // right
+                {
                     p.Text = "{\\an9}" + p.Text;
+                }
                 else
+                {
                     p.Text = "{\\an8}" + p.Text;
+                }
             }
             else if (verticalAlignment < 9)
             {
                 if (alignment == 1) // left
+                {
                     p.Text = "{\\an4}" + p.Text;
+                }
                 else if (alignment == 0) // right
+                {
                     p.Text = "{\\an6}" + p.Text;
+                }
                 else
+                {
                     p.Text = "{\\an5}" + p.Text;
+                }
             }
             else
             {
                 if (alignment == 1) // left
+                {
                     p.Text = "{\\an1}" + p.Text;
+                }
                 else if (alignment == 0) // right
+                {
                     p.Text = "{\\an3}" + p.Text;
+                }
             }
+
             // Remove all control-characters if any in p.Text.
             p.Text = p.Text.RemoveControlCharactersButWhiteSpace();
+
+
+            p.Text = p.Text.Replace(Environment.NewLine + " ", Environment.NewLine);
+            p.Text = p.Text.Replace(Environment.NewLine + " ", Environment.NewLine);
+            p.Text = p.Text.Replace(Environment.NewLine + " ", Environment.NewLine);
+
+            // Fix italics (basic)
+            if (p.Text.StartsWith('<') &&
+                !p.Text.StartsWith("<i>", StringComparison.OrdinalIgnoreCase) &&
+                !p.Text.StartsWith("<b>", StringComparison.OrdinalIgnoreCase) &&
+                !p.Text.StartsWith("<u>", StringComparison.OrdinalIgnoreCase) &&
+                !p.Text.StartsWith("<font ", StringComparison.OrdinalIgnoreCase))
+            {
+                p.Text = "<i>" + p.Text.TrimStart('<').Replace(Environment.NewLine + "<", Environment.NewLine) + "</i>";
+            }
+            else if (p.Text.Contains(Environment.NewLine + "<"))
+            {
+                p.Text = p.Text.Replace(Environment.NewLine + "<", Environment.NewLine + "<i>") + "</i>";
+            }
             return p;
         }
 
@@ -196,11 +257,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 // header
                 fs.WriteByte(1);
                 for (int i = 1; i < 24; i++)
+                {
                     fs.WriteByte(0);
+                }
 
                 // paragraphs
                 var sub = new Subtitle(subtitle);
-                sub.Paragraphs.Insert(0, new Paragraph() { Text = "-" });
+                sub.Paragraphs.Insert(0, new Paragraph { Text = "-" });
 
                 int number = 0;
                 foreach (Paragraph p in sub.Paragraphs)
@@ -212,7 +275,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 // footer
                 fs.WriteByte(0xff);
                 for (int i = 0; i < 11; i++)
+                {
                     fs.WriteByte(0);
+                }
+
                 fs.WriteByte(0x11);
                 fs.WriteByte(0);
                 byte[] footerBuffer = Encoding.ASCII.GetBytes("dummy end of file.");
@@ -228,7 +294,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             byte alignment = 2; // center
             byte verticalAlignment = 0x0a; // bottom
             if (!p.Text.Contains(Environment.NewLine))
+            {
                 verticalAlignment = 0x0b;
+            }
+
             string text = p.Text;
             if (text.StartsWith("{\\an1}", StringComparison.Ordinal) || text.StartsWith("{\\an4}", StringComparison.Ordinal) || text.StartsWith("{\\an7}", StringComparison.Ordinal))
             {
@@ -247,7 +316,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 verticalAlignment = 5; // center
             }
             if (text.Length >= 6 && text[0] == '{' && text[5] == '}')
+            {
                 text = text.Remove(0, 6);
+            }
+
             text = Pac.MakePacItalicsAndRemoveOtherTags(text);
 
             byte[] textBuffer = GetUf8Bytes(text, alignment);
@@ -280,8 +352,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         {
             var result = new List<byte>();
             bool firstLine = true;
-            foreach (var line in text.SplitToLines())
+            var lines = text.SplitToLines();
+            for (var i = 0; i < lines.Count; i++)
             {
+                var line = lines[i];
                 if (!firstLine)
                 {
                     result.Add(0xfe);
@@ -300,7 +374,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     var ch = s[index];
                     if (ch == '.') // 0x2e
                     {
-                        result.Add(0xff); // to avoid confusion with end of line marker
+                        result.Add(0xff); // period
                     }
                     else
                     {
@@ -310,9 +384,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                         }
                     }
                 }
+
+
                 firstLine = false;
             }
-            result.Add(0x2e); // end of line marker?
+            result.Add(0x2e);
             return result.ToArray();
         }
 

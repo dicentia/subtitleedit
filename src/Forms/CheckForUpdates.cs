@@ -9,9 +9,9 @@ namespace Nikse.SubtitleEdit.Forms
     public partial class CheckForUpdates : Form
     {
         private CheckForUpdatesHelper _updatesHelper;
-        private double _seconds = 0;
-        private bool _performCheckOnShown = true;
-        private Main _mainForm;
+        private double _seconds;
+        private readonly bool _performCheckOnShown = true;
+        private readonly Main _mainForm;
 
         public CheckForUpdates(Main mainForm)
         {
@@ -56,7 +56,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void CheckForUpdates_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
         private void CheckForUpdates_Shown(object sender, EventArgs e)
@@ -110,9 +112,13 @@ namespace Nikse.SubtitleEdit.Forms
             _seconds += timerCheckForUpdates.Interval / TimeCode.BaseUnit;
 
             if (buttonDownloadAndInstall.Visible)
+            {
                 buttonDownloadAndInstall.Focus();
+            }
             else if (buttonOK.Visible)
+            {
                 buttonOK.Focus();
+            }
         }
 
         private void SetLargeSize()

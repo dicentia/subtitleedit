@@ -1,4 +1,5 @@
 ﻿using System;
+using Nikse.SubtitleEdit.Core.Interfaces;
 
 namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
 {
@@ -37,7 +38,10 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                         {
                             var lines = text.SplitToLines();
                             for (int k = 0; k < lines.Count; k++)
+                            {
                                 lines[k] = Helper.RemoveSpacesBeginLineAfterEllipses(lines[k]);
+                            }
+
                             text = string.Join(Environment.NewLine, lines);
                         }
                         else

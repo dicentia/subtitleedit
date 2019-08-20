@@ -1,4 +1,5 @@
 ﻿using System;
+using Nikse.SubtitleEdit.Core.Interfaces;
 
 namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
 {
@@ -11,9 +12,12 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
             string fixAction0 = language.RemovedEmptyLine;
             string fixAction1 = language.RemovedEmptyLineAtTop;
             string fixAction2 = language.RemovedEmptyLineAtBottom;
+            string fixAction3 = language.RemovedEmptyLineInMiddle;
 
             if (subtitle.Paragraphs.Count == 0)
+            {
                 return;
+            }
 
             int emptyLinesRemoved = 0;
 
@@ -50,7 +54,9 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                         {
                             var closeIdx = text.IndexOf('>');
                             if (closeIdx <= 2)
+                            {
                                 break;
+                            }
 
                             pre += text.Substring(0, closeIdx + 1);
                             text = text.Remove(0, closeIdx + 1);
@@ -76,9 +82,14 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                     if (callbacks.AllowFix(p, fixAction1) && text.StartsWith(Environment.NewLine, StringComparison.Ordinal))
                     {
                         if (pre.Length > 0)
+                        {
                             text = pre + text.TrimStart(Utilities.NewLineChars);
+                        }
                         else
+                        {
                             text = text.TrimStart(Utilities.NewLineChars);
+                        }
+
                         p.Text = text;
                         emptyLinesRemoved++;
                         callbacks.AddFixToListView(p, fixAction1, oldText, p.Text);
@@ -91,13 +102,32 @@ namespace Nikse.SubtitleEdit.Core.Forms.FixCommonErrors
                     if (callbacks.AllowFix(p, fixAction2) && text.EndsWith(Environment.NewLine, StringComparison.Ordinal))
                     {
                         if (post.Length > 0)
+                        {
                             text = text.TrimEnd(Utilities.NewLineChars) + post;
+                        }
                         else
+                        {
                             text = text.TrimEnd(Utilities.NewLineChars);
+                        }
+
                         p.Text = text;
                         emptyLinesRemoved++;
                         callbacks.AddFixToListView(p, fixAction2, oldText, p.Text);
                     }
+
+                    if (Configuration.Settings.Tools.RemoveEmptyLinesBetweenText &&
+                        callbacks.AllowFix(p, fixAction3) && text.Contains(Environment.NewLine + Environment.NewLine))
+                    {
+                        int beforeLength = text.Length;
+                        while (text.Contains(Environment.NewLine + Environment.NewLine))
+                        {
+                            text = text.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
+                        }
+                        p.Text = text;
+                        emptyLinesRemoved += (beforeLength - text.Length) / Environment.NewLine.Length;
+                        callbacks.AddFixToListView(p, fixAction3, oldText, p.Text);
+                    }
+
                 }
             }
 

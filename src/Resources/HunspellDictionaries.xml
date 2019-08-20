@@ -30,6 +30,12 @@
     <Description>Belarusian dictionary(spelling, hyphenation) - classic orthography</Description>
   </Dictionary>
   <Dictionary>
+    <EnglishName>Bosnian</EnglishName>
+    <NativeName>Bosanski</NativeName>
+    <DownloadLink>https://extensions.libreoffice.org/extensions/spellchecking-dictionary-for-bosnian-language/1.0/@@download/file/dict-bs.oxt</DownloadLink>
+    <Description>Spellchecking dictionary for Bosnian language - 1.0 (Jan 24, 2013)</Description>
+  </Dictionary>
+  <Dictionary>
     <EnglishName>Breton</EnglishName>
     <NativeName>Brezhoneg</NativeName>
     <DownloadLink>https://extensions.libreoffice.org/extensions/an-drouizig-breton-spellchecker/0.8/@@download/file/dict-br_0.8.oxt</DownloadLink>
@@ -80,8 +86,8 @@
   <Dictionary>
     <EnglishName>English</EnglishName>
     <NativeName></NativeName>
-    <DownloadLink>http://downloads.sourceforge.net/project/aoo-extensions/17102/3/dict-en.oxt?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Faoo-extensions%2Ffiles%2F17102%2F3%2F&amp;ts=1435653533&amp;use_mirror=heanet</DownloadLink>
-    <Description>All English dictionaries (AU, CA, GB, US, ZA) (2014-02-10)</Description>
+    <DownloadLink>https://github.com/marcoagpinto/aoo-mozilla-en-dict/archive/master.zip</DownloadLink>
+    <Description>All English dictionaries (AU, CA, GB, US, ZA), 2018-04-16+</Description>
   </Dictionary>
   <Dictionary>
     <EnglishName>Estonian</EnglishName>
@@ -236,8 +242,8 @@
   <Dictionary>
     <EnglishName>Portuguese (Brazilian)</EnglishName>
     <NativeName>Português (do Brasil)</NativeName>
-    <DownloadLink>https://extensions.libreoffice.org/extensions/vero-verificador-ortografico-e-hifenizador-em-portugues-do-brasil/2.1.2/@@download/file/vero_pt_br_v212aoc.oxt</DownloadLink>
-    <Description>Brazilian Portuguese Spelling Dictionary - 1990 Spelling Agreement - V2.1.2</Description>
+    <DownloadLink>https://extensions.libreoffice.org/extensions/vero-verificador-ortografico-e-hifenizador-em-portugues-do-brasil/3.2/@@download/file/VeroptBRV320AOC.oxt</DownloadLink>
+    <Description>Brazilian Portuguese Spelling Dictionary - 1990 Spelling Agreement - V3.2</Description>
   </Dictionary>
   <Dictionary>
     <EnglishName>Portuguese (European Portuguese Dictionary)</EnglishName>
@@ -281,6 +287,12 @@
     <DownloadLink>http://www.sk-spell.sk.cx/files/hunspell-sk-20110228.zip</DownloadLink>
     <Description>Slovak dictionary package / Slovenské slovníky</Description>
   </Dictionary>
+  <Dictionary>
+    <EnglishName>Slovenian</EnglishName>
+    <NativeName>slovenski</NativeName>
+    <DownloadLink>https://extensions.libreoffice.org/extensions/slovenian-dictionary-pack/2018-01.04/@@download/file/pack-sl.oxt</DownloadLink>
+    <Description>Slovenian Dictionary Pack - 2018.01.04</Description>
+  </Dictionary>  
   <Dictionary>
     <EnglishName>Spanish</EnglishName>
     <NativeName>España</NativeName>

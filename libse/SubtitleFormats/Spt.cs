@@ -15,12 +15,15 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
         public static void Save(string fileName, Subtitle subtitle)
         {
-            FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+            var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
 
             // header
             fs.WriteByte(1);
             for (int i = 1; i < 23; i++)
+            {
                 fs.WriteByte(0);
+            }
+
             fs.WriteByte(0x60);
 
             // paragraphs
@@ -32,7 +35,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             // footer
             fs.WriteByte(0xff);
             for (int i = 0; i < 11; i++)
+            {
                 fs.WriteByte(0);
+            }
+
             fs.WriteByte(0x11);
             byte[] footerBuffer = Encoding.ASCII.GetBytes("dummy end of file");
             fs.Write(footerBuffer, 0, footerBuffer.Length);
@@ -47,7 +53,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             string text = p.Text;
             if (Utilities.GetNumberOfLines(text) > 2)
+            {
                 text = Utilities.AutoBreakLine(p.Text);
+            }
 
             var lines = text.SplitToLines();
             int textLengthFirstLine = 0;
@@ -56,7 +64,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 textLengthFirstLine = lines[0].Length;
                 if (lines.Count > 1)
+                {
                     textLengthSecondLine = lines[1].Length;
+                }
             }
         }
 
@@ -78,8 +88,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
                         if (buffer[00] > 10 &&
                             buffer[01] == 0 &&
-                            fileName.EndsWith(".spt", StringComparison.OrdinalIgnoreCase))
+                            fileName.EndsWith(Extension, StringComparison.OrdinalIgnoreCase))
+                        {
                             return true;
+                        }
                     }
                 }
                 catch
@@ -105,7 +117,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 Paragraph p = GetSptParagraph(ref index, buffer);
                 if (p != null)
+                {
                     subtitle.Paragraphs.Add(p);
+                }
             }
             subtitle.Renumber();
         }
@@ -120,49 +134,43 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             int textLengthFirstLine = buffer[index + 16 + 20];
             int textLengthSecondLine = buffer[index + 16 + 20 + 4];
+            var allItalic = buffer[index + 16 + 4] == 1;
 
             if (textLengthFirstLine == 0 && textLengthSecondLine == 0)
             {
-                index += (16 + 20 + 16);
+                index += 16 + 20 + 16;
                 _errorCount++;
                 return null;
             }
 
             try
             {
-                var p = new Paragraph();
-                p.StartTime = GetTimeCode(Encoding.Default.GetString(buffer, index, 8));
-                p.EndTime = GetTimeCode(Encoding.Default.GetString(buffer, index + 8, 8));
-
-                p.Text = Encoding.Default.GetString(buffer, index + 16 + 20 + 16, textLengthFirstLine);
+                var p = new Paragraph
+                {
+                    StartTime = Sptx.GetTimeCode(Encoding.Default.GetString(buffer, index, 8)),
+                    EndTime = Sptx.GetTimeCode(Encoding.Default.GetString(buffer, index + 8, 8)),
+                    Text = Sptx.FixItalics(Encoding.Default.GetString(buffer, index + 16 + 20 + 16, textLengthFirstLine))
+                };
 
                 if (textLengthSecondLine > 0)
+                {
                     p.Text += Environment.NewLine + Encoding.Default.GetString(buffer, index + 16 + 20 + 16 + textLengthFirstLine, textLengthSecondLine);
+                }
 
-                index += (16 + 20 + 16 + textLengthFirstLine + textLengthSecondLine);
+                if (allItalic)
+                {
+                    p.Text = "<i>" + p.Text.Trim() + "</i>";
+                }
+
+                index += 16 + 20 + 16 + textLengthFirstLine + textLengthSecondLine;
                 return p;
             }
             catch
             {
-                index += (16 + 20 + 16 + textLengthFirstLine + textLengthSecondLine);
+                index += 16 + 20 + 16 + textLengthFirstLine + textLengthSecondLine;
                 _errorCount++;
                 return null;
             }
         }
-
-        private static TimeCode GetTimeCode(string timeCode)
-        {
-            int hour = int.Parse(timeCode.Substring(0, 2));
-            int minute = int.Parse(timeCode.Substring(2, 2));
-            int second = int.Parse(timeCode.Substring(4, 2));
-            int frames = int.Parse(timeCode.Substring(6, 2));
-
-            int milliseconds = (int)Math.Round(1000.0 / Configuration.Settings.General.CurrentFrameRate * frames);
-            if (milliseconds > 999)
-                milliseconds = 999;
-
-            return new TimeCode(hour, minute, second, milliseconds);
-        }
-
     }
 }

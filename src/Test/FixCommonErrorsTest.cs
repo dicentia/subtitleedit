@@ -1017,6 +1017,36 @@ namespace Test
             }
         }
 
+        [TestMethod]
+        public void FixMissingSpacesDialogThreeLines()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "-Person one speaks" + Environment.NewLine +
+                    "and continues speaking some." + Environment.NewLine +
+                    "-The other person speaks and there will be no fix executed.");
+                new FixMissingSpaces().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual("- Person one speaks" + Environment.NewLine +
+                    "and continues speaking some." + Environment.NewLine +
+                    "- The other person speaks and there will be no fix executed.", _subtitle.Paragraphs[0].Text);
+            }
+        }
+
+        [TestMethod]
+        public void FixMissingSpacesDialogThreeLines2()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "-Person one speaks." + Environment.NewLine +
+                    "-The other person starts speaking and continues" + Environment.NewLine +
+                    "to speak loudly for a little white.");
+                new FixMissingSpaces().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual("- Person one speaks." + Environment.NewLine +
+                    "- The other person starts speaking and continues" + Environment.NewLine +
+                    "to speak loudly for a little white.", _subtitle.Paragraphs[0].Text);
+            }
+        }
+
         #endregion Fix missing spaces
 
         #region Fix unneeded spaces
@@ -1363,10 +1393,10 @@ namespace Test
             var prev = new Paragraph("Bye", 0, 1000);
             var p = new Paragraph("bye.", 1200, 5000);
             var s = new Subtitle();
-            s.Paragraphs.Add((prev));
-            s.Paragraphs.Add((p));
+            s.Paragraphs.Add(prev);
+            s.Paragraphs.Add(p);
             new FixStartWithUppercaseLetterAfterParagraph().Fix(s, new EmptyFixCallback());
-            Assert.AreEqual(p.Text, "bye.");
+            Assert.AreEqual("bye.", p.Text);
         }
 
         [TestMethod]
@@ -1375,10 +1405,10 @@ namespace Test
             var prev = new Paragraph("Bye -", 0, 1000);
             var p = new Paragraph("- moss!", 1200, 5000);
             var s = new Subtitle();
-            s.Paragraphs.Add((prev));
-            s.Paragraphs.Add((p));
+            s.Paragraphs.Add(prev);
+            s.Paragraphs.Add(p);
             new FixStartWithUppercaseLetterAfterParagraph().Fix(s, new EmptyFixCallback());
-            Assert.AreEqual(p.Text, "- moss!");
+            Assert.AreEqual("- moss!", p.Text);
         }
 
         [TestMethod]
@@ -1387,10 +1417,34 @@ namespace Test
             var prev = new Paragraph("Bye -", 0, 1000);
             var p = new Paragraph("- moss!" + Environment.NewLine + " - Bye.", 1200, 5000);
             var s = new Subtitle();
-            s.Paragraphs.Add((prev));
-            s.Paragraphs.Add((p));
+            s.Paragraphs.Add(prev);
+            s.Paragraphs.Add(p);
             new FixStartWithUppercaseLetterAfterParagraph().Fix(s, new EmptyFixCallback());
-            Assert.AreEqual(p.Text, "- moss!" + Environment.NewLine + " - Bye.");
+            Assert.AreEqual("- moss!" + Environment.NewLine + " - Bye.", p.Text);
+        }
+
+        [TestMethod]
+        public void StartWithUppercaseAfterParagraphDashAfterPeriod()
+        {
+            var prev = new Paragraph("Bye.", 0, 1000);
+            var p = new Paragraph("Bye." + Environment.NewLine + "- bye.", 1200, 5000);
+            var s = new Subtitle();
+            s.Paragraphs.Add(prev);
+            s.Paragraphs.Add(p);
+            new FixStartWithUppercaseLetterAfterParagraph().Fix(s, new EmptyFixCallback());
+            Assert.AreEqual("Bye." + Environment.NewLine + "- Bye.", p.Text);
+        }
+
+        [TestMethod]
+        public void StartWithUppercaseAfterParagraphDashAfterPeriod2()
+        {
+            var prev = new Paragraph("Bye.", 0, 1000);
+            var p = new Paragraph("Bye." + Environment.NewLine + "<i>- bye.</i>", 1200, 5000);
+            var s = new Subtitle();
+            s.Paragraphs.Add(prev);
+            s.Paragraphs.Add(p);
+            new FixStartWithUppercaseLetterAfterParagraph().Fix(s, new EmptyFixCallback());
+            Assert.AreEqual("Bye." + Environment.NewLine + "<i>- Bye.</i>", p.Text);
         }
 
         #endregion Start with uppercase after paragraph
@@ -1471,6 +1525,54 @@ namespace Test
                 InitializeFixCommonErrorsLine(target, "¡Cómo estás?");
                 new FixSpanishInvertedQuestionAndExclamationMarks().Fix(_subtitle, new EmptyFixCallback());
                 Assert.AreEqual(_subtitle.Paragraphs[0].Text, "¿¡Cómo estás!?");
+            }
+        }
+
+        [TestMethod]
+        public void FixSpanishExclamationMarkAndQuestionMarkReplaceLastPeriod()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "¡Cómo estás.");
+                new FixSpanishInvertedQuestionAndExclamationMarks().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual(_subtitle.Paragraphs[0].Text, "¡Cómo estás!");
+            }
+        }
+
+        [TestMethod]
+        public void FixSpanishExclamationMarkAndQuestionMarkThreePeriods()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "¿Cómo estás...");
+                new FixSpanishInvertedQuestionAndExclamationMarks().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual(_subtitle.Paragraphs[0].Text, "¿Cómo estás...?");
+            }
+        }
+
+        [TestMethod]
+        public void FixSpanishExclamationMarkAndQuestionMarkEllipsis()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "¿Cómo estás…");
+                new FixSpanishInvertedQuestionAndExclamationMarks().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual(_subtitle.Paragraphs[0].Text, "¿Cómo estás…?");
+            }
+        }
+
+        [TestMethod]
+        public void FixSpanishExclamationMarkAndQuestionMarkMultiLineNoChange()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                _subtitle = new Subtitle();
+                _subtitle.Paragraphs.Add(new Paragraph("¿Debo preguntar...", 7000, 10000));
+                _subtitle.Paragraphs.Add(new Paragraph("...otra vez?", 10100, 12000));
+                target.Initialize(_subtitle, new SubRip(), System.Text.Encoding.UTF8);
+                new FixSpanishInvertedQuestionAndExclamationMarks().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual(_subtitle.Paragraphs[0].Text, "¿Debo preguntar...");
+                Assert.AreEqual(_subtitle.Paragraphs[1].Text, "...otra vez?");
             }
         }
 
@@ -1842,6 +1944,28 @@ namespace Test
             }
         }
 
+        [TestMethod]
+        public void FixUppercaseIInsideWords_Dont_Change()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "I've had multiple MRIs today.");
+                new FixUppercaseIInsideWords().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual(_subtitle.Paragraphs[0].Text, "I've had multiple MRIs today.");
+            }
+        }
+
+        [TestMethod]
+        public void FixUppercaseIInsideWords_Dont_Change_Starting_I()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "Ioannises had a nice day.");
+                new FixUppercaseIInsideWords().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual("Ioannises had a nice day.", _subtitle.Paragraphs[0].Text);
+            }
+        }
+
         #endregion Fix uppercase I inside words
 
         #region Fix dialogs on one line
@@ -1878,6 +2002,15 @@ namespace Test
         {
             string source = "- Haiman, say: \"I love you.\" - So," + Environment.NewLine + "what are you up to? Another question!";
             string target = "- Haiman, say: \"I love you.\"" + Environment.NewLine + "- So, what are you up to? Another question!";
+            string result = Helper.FixDialogsOnOneLine(source, "en");
+            Assert.AreEqual(result, target);
+        }
+
+        [TestMethod]
+        public void FixDialogsOnOneLine5()
+        {
+            string source = "- [Gunshot] - [Scream]";
+            string target = "- [Gunshot]" + Environment.NewLine + "- [Scream]";
             string result = Helper.FixDialogsOnOneLine(source, "en");
             Assert.AreEqual(result, target);
         }
@@ -1997,6 +2130,30 @@ namespace Test
         }
 
         [TestMethod]
+        public void FixMusicNotationQuestionMarks()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "? Hello world?");
+                Configuration.Settings.Tools.MusicSymbol = "♫";
+                new FixMusicNotation().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual("♫ Hello world ♫", _subtitle.Paragraphs[0].Text);
+            }
+        }
+
+        [TestMethod]
+        public void FixMusicNotationQuestionMarksNarrator()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                InitializeFixCommonErrorsLine(target, "Foobar: ? Hello world?");
+                Configuration.Settings.Tools.MusicSymbol = "♫";
+                new FixMusicNotation().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual(string.Format("Foobar: {0} Hello world {0}", Configuration.Settings.Tools.MusicSymbol), _subtitle.Paragraphs[0].Text);
+            }
+        }
+
+        [TestMethod]
         public void FixMusicNotationNoHashtags()
         {
             using (var target = GetFixCommonErrorsLib())
@@ -2019,6 +2176,20 @@ namespace Test
                 Configuration.Settings.Tools.MusicSymbol = "♫";
                 new FixMusicNotation().Fix(_subtitle, new EmptyFixCallback());
                 Assert.AreEqual(s, _subtitle.Paragraphs[0].Text);
+            }
+        }
+
+        [TestMethod]
+        public void FixMusicNotationQuestionDoNotChange()
+        {
+            using (var target = GetFixCommonErrorsLib())
+            {
+                var input = "- (whispers): like this..." + Environment.NewLine +
+                            "- Like what?";
+                InitializeFixCommonErrorsLine(target, input);
+                Configuration.Settings.Tools.MusicSymbol = "♫";
+                new FixMusicNotation().Fix(_subtitle, new EmptyFixCallback());
+                Assert.AreEqual(input, _subtitle.Paragraphs[0].Text);
             }
         }
 
@@ -2117,6 +2288,26 @@ namespace Test
             Assert.AreEqual(ExpectedOuput, p.Text);
         }
 
+        [TestMethod]
+        public void FixStartWithUppercaseLetterAfterPeriodInsideParagraphTest6()
+        {
+            var s = new Subtitle();
+            var p = new Paragraph("And I was... i was just tired.", 1200, 5000);
+            s.Paragraphs.Add(p);
+            new FixStartWithUppercaseLetterAfterPeriodInsideParagraph().Fix(s, new EmptyFixCallback());
+            Assert.AreEqual("And I was... I was just tired.", p.Text);
+        }
+
+        [TestMethod]
+        public void FixStartWithUppercaseLetterAfterPeriodInsideParagraphTest7()
+        {
+            var s = new Subtitle();
+            var p = new Paragraph("And I was... he was just tired.", 1200, 5000);
+            s.Paragraphs.Add(p);
+            new FixStartWithUppercaseLetterAfterPeriodInsideParagraph().Fix(s, new EmptyFixCallback());
+            Assert.AreEqual("And I was... he was just tired.", p.Text);
+        }
+
         #endregion
 
         #region Fix unneeded periods after [?!]
@@ -2193,6 +2384,52 @@ namespace Test
             Assert.AreEqual(ExpectedOuput, p.Text);
         }
 
+        #endregion
+
+        #region AddMissingQuotes
+
+        [TestMethod]
+        public void AddMissingQuotesMissingStart()
+        {
+            var p = new Paragraph("Bad Ape!\"", 1200, 5000);
+            var s = new Subtitle();
+            s.Paragraphs.Add(p);
+            new AddMissingQuotes().Fix(s, new EmptyFixCallback());
+            Assert.AreEqual("\"Bad Ape!\"", p.Text);
+        }
+
+        [TestMethod]
+        public void AddMissingQuotesMissingEnd()
+        {
+            var p = new Paragraph("\"Bad Ape!", 1200, 5000);
+            var s = new Subtitle();
+            s.Paragraphs.Add(p);
+            new AddMissingQuotes().Fix(s, new EmptyFixCallback());
+            Assert.AreEqual("\"Bad Ape!\"", p.Text);
+        }
+
+        [TestMethod]
+        public void AddMissingQuotesMissingMultiple()
+        {
+            var s = new Subtitle();
+            s.Paragraphs.Add(new Paragraph("\"Bad Ape!", 1200, 5000));
+            s.Paragraphs.Add(new Paragraph("\"Bad Ape!", 11200, 15000));
+            s.Paragraphs.Add(new Paragraph("\"Bad Ape!", 21200, 25000));
+            new AddMissingQuotes().Fix(s, new EmptyFixCallback());
+            Assert.AreEqual("\"Bad Ape!\"", s.Paragraphs[0].Text);
+            Assert.AreEqual("\"Bad Ape!\"", s.Paragraphs[1].Text);
+            Assert.AreEqual("\"Bad Ape!\"", s.Paragraphs[2].Text);
+        }
+
+        [TestMethod]
+        public void AddMissingQuotesOtherQuote()
+        {
+            var p = new Paragraph("\"Bad Ape!”", 1200, 5000);
+            var s = new Subtitle();
+            s.Paragraphs.Add(p);
+            new AddMissingQuotes().Fix(s, new EmptyFixCallback());
+            Assert.AreEqual("\"Bad Ape!\"", p.Text);
+        }
         #endregion
     }
 }

@@ -2,7 +2,7 @@
 <Language Name="한국어">
   <General>
     <Title>Subtitle Edit</Title>
-    <Version>3.5.6</Version>
+    <Version>3.5.10</Version>
     <TranslatedBy>☞ 한글화: 도움돌 (domddol@gmail.com)</TranslatedBy>
     <CultureName>ko-KR</CultureName>
     <HelpFile />
@@ -33,6 +33,7 @@
     <Number>번호</Number>
     <Text>텍스트</Text>
     <HourMinutesSecondsMilliseconds>시:분:초:밀리초</HourMinutesSecondsMilliseconds>
+    <HourMinutesSecondsFrames>시:분:초:프레임</HourMinutesSecondsFrames>
     <Bold>굵게</Bold>
     <Italic>기울임꼴</Italic>
     <Underline>밑줄</Underline>
@@ -54,7 +55,6 @@
     <OverlapNextX>현재 시작이 다음 시작보다 느림 ({0:#,##0.###})</OverlapNextX>
     <Negative>음수값!</Negative>
     <RegularExpressionIsNotValid>정규 표현식이 유효하지 않습니다!</RegularExpressionIsNotValid>
-    <SubtitleSaved>자막이 저장되었습니다.</SubtitleSaved>
     <CurrentSubtitle>현재 자막</CurrentSubtitle>
     <OriginalText>원본 텍스트</OriginalText>
     <OpenOriginalSubtitleFile>원본 자막 파일 열기</OpenOriginalSubtitleFile>
@@ -77,6 +77,8 @@
     <Before>이전</Before>
     <After>이후</After>
     <Size>크기</Size>
+    <Search>검색</Search>
+    <DeleteCurrentLine>현재 줄 삭제</DeleteCurrentLine>
   </General>
   <About>
     <Title>* Subtitle Edit 정보</Title>
@@ -139,7 +141,9 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <AddSeconds>초를 가감합니다.</AddSeconds>
     <SetAsPercent>비율로 조정합니다.</SetAsPercent>
     <Note>※ 현재 자막이 표시되는 시간은 다음 자막이 시작하는 시간을 초과하지 않습니다!</Note>
-    <PleaseSelectAValueFromTheDropDownList>드롭다운 목록에서 하나의 값을 선택하십시오!</PleaseSelectAValueFromTheDropDownList>
+    <Fixed>수정됨</Fixed>
+    <Milliseconds>밀리초</Milliseconds>
+    <ExtendOnly>확장 만</ExtendOnly>
   </AdjustDisplayDuration>
   <ApplyDurationLimits>
     <Title>최대/최소 표시시간 설정</Title>
@@ -182,6 +186,10 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <NotConverted>실패함</NotConverted>
     <Converted>변환됨</Converted>
     <Settings>설정</Settings>
+    <FixRtl>RTL 수정</FixRtl>
+    <FixRtlAddUnicode>유니코드 태그를 통해 RTL 수정</FixRtlAddUnicode>
+    <FixRtlRemoveUnicode>RTL 유니코드 태그 제거</FixRtlRemoveUnicode>
+    <FixRtlReverseStartEnd>RTL 시작/끝 반전</FixRtlReverseStartEnd>
     <SplitLongLines>긴 줄 분할</SplitLongLines>
     <AutoBalance>자동 줄맞춤</AutoBalance>
     <ScanFolder>폴더 찾아보기</ScanFolder>
@@ -204,6 +212,11 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
   <Beamer>
     <Title>프로젝터</Title>
   </Beamer>
+  <Bookmarks>
+    <EditBookmark>책갈피 편집</EditBookmark>
+    <AddBookmark>책갈피 추가</AddBookmark>
+    <GoToBookmark>책갈피로 이동</GoToBookmark>
+  </Bookmarks>
   <ChangeCasing>
     <Title>* 대/소문자 바꾸기</Title>
     <ChangeCasingTo>대/소문자 변경 기준</ChangeCasingTo>
@@ -396,6 +409,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <TextLeftJustifiedText>왼쪽 정렬</TextLeftJustifiedText>
     <TextCenteredText>가운데 정렬</TextCenteredText>
     <TextRightJustifiedText>오른쪽 정렬</TextRightJustifiedText>
+    <UseBoxForOneNewLine>하나의 새 줄에만 '텍스트 주위에 상자 사용' 체크</UseBoxForOneNewLine>
   </EbuSaveOptions>
   <EffectKaraoke>
     <Title>노래방 효과</Title>
@@ -414,7 +428,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <New>신규</New>
     <Edit>편집</Edit>
     <Delete>삭제</Delete>
-    <SaveAs>다른 이름으로 저장(&amp;A)...</SaveAs>
+    <SaveAs>새로 저장(&amp;A)...</SaveAs>
     <SaveSubtitleAs>다름 이름으로 자막 저장...</SaveSubtitleAs>
     <SubtitleExportedInCustomFormatToX>사용자 지정 형식으로 내보낸 자막: {0}</SubtitleExportedInCustomFormatToX>
   </ExportCustomText>
@@ -433,6 +447,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <FontName>글꼴 이름</FontName>
     <FontSize>글꼴 크기</FontSize>
     <FontFace>글꼴 모양</FontFace>
+    <FontFaceRegular>정규식</FontFaceRegular>
     <Alignment>정렬</Alignment>
     <Baseline>기준선</Baseline>
   </ExportFcpXmlAdvanced>
@@ -441,7 +456,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <ImageSettings>이미지 설정</ImageSettings>
     <FontFamily>글꼴 모양</FontFamily>
     <FontSize>글꼴 크기</FontSize>
-    <FontColor>글꼴 색상</FontColor>
+    <FontColor>색상</FontColor>
     <BorderColor>테두리 색상</BorderColor>
     <BorderWidth>테두리 폭</BorderWidth>
     <BorderStyle>테두리 모양</BorderStyle>
@@ -456,8 +471,8 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <SimpleRendering>간단한 렌더링</SimpleRendering>
     <AntiAliasingWithTransparency>투명하게 앤티 앨리어싱</AntiAliasingWithTransparency>
     <Text3D>3D</Text3D>
-    <SideBySide3D>하프-좌/우</SideBySide3D>
-    <HalfTopBottom3D>하프-상/하</HalfTopBottom3D>
+    <SideBySide3D>좌/우</SideBySide3D>
+    <HalfTopBottom3D>상/하</HalfTopBottom3D>
     <Depth>깊이</Depth>
     <ExportAllLines>모든 줄 내보내기...</ExportAllLines>
     <XImagesSavedInY>{0}개의 이미지가 {1}에 저장되었습니다.</XImagesSavedInY>
@@ -467,6 +482,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <Right>오른쪽</Right>
     <Center>가운데</Center>
     <CenterLeftJustify>가운데, 왼쪽 맞춤</CenterLeftJustify>
+    <CenterTopJustify>가운데, 상단 맞춤</CenterTopJustify>
     <BottomMargin>하단 여백</BottomMargin>
     <LeftRightMargin>좌/우 여백</LeftRightMargin>
     <SaveBluRraySupAs>블루레이 자막 (sup) 파일로 저장</SaveBluRraySupAs>
@@ -547,6 +563,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <RemovedEmptyLine>빈 줄 제거</RemovedEmptyLine>
     <RemovedEmptyLineAtTop>첫번째 빈 줄 제거</RemovedEmptyLineAtTop>
     <RemovedEmptyLineAtBottom>마지막 빈 줄 제거</RemovedEmptyLineAtBottom>
+    <RemovedEmptyLineInMiddle>가운데 빈 줄 제거</RemovedEmptyLineInMiddle>
     <RemovedEmptyLinesUnsedLineBreaks>빈 줄 및 불필요한 줄의 줄바꿈 제거</RemovedEmptyLinesUnsedLineBreaks>
     <EmptyLinesRemovedX>제거한 빈 줄: {0}</EmptyLinesRemovedX>
     <FixOverlappingDisplayTimes>중복된 표시시간 수정하기</FixOverlappingDisplayTimes>
@@ -590,8 +607,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <FixesFoundX>수정할 곳: {0}</FixesFoundX>
     <XFixesApplied>수정된 곳: {0}</XFixesApplied>
     <NothingToFixBut>수정하는 것은 아니지만 향상시킬 수 있습니다. - 자세한 내용은 로그를 참조하십시오.</NothingToFixBut>
-    <Continue>계속</Continue>
-    <ContinueAnyway>계속하시겠습니까?</ContinueAnyway>
     <UncheckedFixLowercaseIToUppercaseI>"소문자 'i'를 대문자 'I'로 수정하기(영어)" 실행을 취소합니다.</UncheckedFixLowercaseIToUppercaseI>
     <XIsChangedToUppercase>{0}개의 'i'가 대문자로 변환되었습니다.</XIsChangedToUppercase>
     <FixFirstLetterToUppercaseAfterParagraph>단락이 끝난 뒤에 나오는 첫글자를 대문자로 바꾸기</FixFirstLetterToUppercaseAfterParagraph>
@@ -610,7 +625,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <FixUppercaseIInsindeLowercaseWordsExample>The earth is fIat. -&gt; The earth is flat.</FixUppercaseIInsindeLowercaseWordsExample>
     <FixLowercaseIToUppercaseIExample>What do i care. -&gt; What do I care.</FixLowercaseIToUppercaseIExample>
     <StartTimeLaterThanEndTime>텍스트 번호 {0}: 시작 시간이 종료 시간보다 느림: {4}{1} -&gt; {2} {3}</StartTimeLaterThanEndTime>
-    <UnableToFixStartTimeLaterThanEndTime>텍스트 번호 {0}을 수정할 수 없음: 시작 시간이 종료 시간보다 느림: {1}</UnableToFixStartTimeLaterThanEndTime>
+    <UnableToFixStartTimeLaterThanEndTime>텍스트 번호 {0}을 수정할 수 없음. 시작 시간이 종료 시간 {1} 보다 느림</UnableToFixStartTimeLaterThanEndTime>
     <XFixedToYZ>{0} 수정함: {1}{2}</XFixedToYZ>
     <UnableToFixTextXY>텍스트 번호 {0}을 수정할 수 없음: {1}</UnableToFixTextXY>
     <XOverlappingTimestampsFixed>{0}개의 중복된 시간을 수정했습니다.</XOverlappingTimestampsFixed>
@@ -659,7 +674,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <Title>* 사전 다운로드</Title>
     <DescriptionLine1>Subtitle Edit 맞춤법 검사는 Open Office의 맞춤법 검사용 엔진인</DescriptionLine1>
     <DescriptionLine2>"NHunspell" 엔진을 기반으로 하고 있습니다.</DescriptionLine2>
-    <GetDictionariesHere>사전 가져올 곳:</GetDictionariesHere>
     <ChooseLanguageAndClickDownload>언어를 선택하고 다운로드를 클릭하십시오!</ChooseLanguageAndClickDownload>
     <OpenDictionariesFolder>'Dictionaries' 폴더 열기</OpenDictionariesFolder>
     <Download>다운로드</Download>
@@ -683,6 +697,13 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <PleaseWait>번역 중... 잠시 기다려 주세요.</PleaseWait>
     <PoweredByGoogleTranslate>Google 번역기 실행</PoweredByGoogleTranslate>
     <PoweredByMicrosoftTranslate>Microsoft 번역기 실행</PoweredByMicrosoftTranslate>
+    <MsClientSecretNeeded>죄송합니다,  최신 Microsoft 번역기를 사용하려면, Microsoft에서 인지 가능한 'Translator Text' 키 필요합니다.
+
+키를 입력하려면 "옵션 -&gt; 환경설정 -&gt; 도구" 로 이동하십시오.</MsClientSecretNeeded>
+    <GoogleApiKeyNeeded>죄송합니다, 최신 Google 번역기를 사용하려면 Google의 API 키가 필요합니다.
+
+Google 번역 API 키를 입력하려면 "옵션 -&gt; 환경설정 -&gt; 도구" 로 이동하십시오.</GoogleApiKeyNeeded>
+    <GoogleNoApiKeyWarning>API 키 없이 번역하기... (느리고 데이터가 제한됨)</GoogleNoApiKeyWarning>
   </GoogleTranslate>
   <GoogleOrMicrosoftTranslate>
     <Title>Google | Microsoft 번역기</Title>
@@ -719,6 +740,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <GetSceneChangesWithFfmpeg>FFmpeg으로 장면 전환 가져오기</GetSceneChangesWithFfmpeg>
     <Sensitivity>민감도</Sensitivity>
     <SensitivityDescription>값을 낮추면 장면이 더 많이 전환됨</SensitivityDescription>
+    <NoSceneChangesFound>장면 전환 없음</NoSceneChangesFound>
   </ImportSceneChanges>
   <ImportText>
     <Title>일반 텍스트 파일로 새 자막 구성</Title>
@@ -729,6 +751,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <Splitting>줄 분할</Splitting>
     <AutoSplitText>자동으로</AutoSplitText>
     <OneLineIsOneSubtitle>하나의 줄을 하나의 자막으로</OneLineIsOneSubtitle>
+    <TwoLinesAreOneSubtitle>두 줄은 하나의 자막입니다.</TwoLinesAreOneSubtitle>
     <LineBreak>줄바꿈</LineBreak>
     <SplitAtBlankLines>빈 줄에서 분할</SplitAtBlankLines>
     <MergeShortLines>연속해서 짧은 줄 병합</MergeShortLines>
@@ -742,6 +765,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <TextFiles>텍스트 파일</TextFiles>
     <PreviewLinesModifiedX>미리 보기 - 자막 수정: {0}개</PreviewLinesModifiedX>
     <TimeCodes>타임코드</TimeCodes>
+    <SplitAtEndChars>끝 문자에서 분할</SplitAtEndChars>
   </ImportText>
   <Interjections>
     <Title>감탄사</Title>
@@ -915,6 +939,8 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
         <AdvancedSubStationAlphaProperties>Advanced Sub Station Alpha(.ass)의 속성...</AdvancedSubStationAlphaProperties>
         <SubStationAlphaProperties>Sub Station Alpha(.ssa)의 속성...</SubStationAlphaProperties>
         <EbuProperties>EBU STL 속성...</EbuProperties>
+        <DvdStuioProProperties>DVD Studio Pro 속성...</DvdStuioProProperties>
+        <TimedTextProperties>시간 제한 텍스트 속성...</TimedTextProperties>
         <PacProperties>PAC 속성...</PacProperties>
         <OpenOriginal>원본 자막 열기 (번역 모드)</OpenOriginal>
         <SaveOriginal>원본 자막 저장...</SaveOriginal>
@@ -993,6 +1019,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
         <SplitLongLines>긴 줄 분할하기</SplitLongLines>
         <MinimumDisplayTimeBetweenParagraphs>자막 사이의 최소 간격 설정...</MinimumDisplayTimeBetweenParagraphs>
         <SortBy>정렬 기준</SortBy>
+        <NetflixQualityCheck>Netflix 품질 검사...</NetflixQualityCheck>
         <Number>번호 순</Number>
         <StartTime>시작 시간</StartTime>
         <EndTime>종료 시간</EndTime>
@@ -1017,11 +1044,13 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
       <Video>
         <Title>비디오</Title>
         <OpenVideo>비디오 파일 열기</OpenVideo>
+        <OpenVideoFromUrl>URL에서 비디오 열기</OpenVideoFromUrl>
         <OpenDvd>DVD 열기...</OpenDvd>
         <ChooseAudioTrack>오디오 트랙 선택하기</ChooseAudioTrack>
         <CloseVideo>비디오 파일 닫기</CloseVideo>
         <SetVideoOffset>비디오 오프셋 설정...</SetVideoOffset>
         <SmptTimeMode>SMPTE 타이밍 (드롭 프레임)</SmptTimeMode>
+        <GenerateTextFromVideo>비디오에서 텍스트 생성...</GenerateTextFromVideo>
         <GenerateImportSceneChanges>장면 전환 생성/가져오기...</GenerateImportSceneChanges>
         <RemoveSceneChanges>장면 전환 제거</RemoveSceneChanges>
         <WaveformBatchGenerate>파형 일괄 생성...</WaveformBatchGenerate>
@@ -1130,10 +1159,20 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
         <MergeSelectedLinesAsDialog>선택한 대화 라인 병합</MergeSelectedLinesAsDialog>
         <MergeWithLineBefore>이전 줄과 병합</MergeWithLineBefore>
         <MergeWithLineAfter>다음 줄과 병합</MergeWithLineAfter>
-        <Normal>기본 (서식 태그 제거)</Normal>
+        <RemoveFormatting>서식 제거</RemoveFormatting>
+        <RemoveFormattingAll>모든 서식 제거</RemoveFormattingAll>
+        <RemoveFormattingBold>굵게 제거</RemoveFormattingBold>
+        <RemoveFormattingItalic>기울임꼴 제거</RemoveFormattingItalic>
+        <RemoveFormattingUnderline>밑줄 제거</RemoveFormattingUnderline>
+        <RemoveFormattingColor>색상 제거</RemoveFormattingColor>
+        <RemoveFormattingFontName>글꼴 제거</RemoveFormattingFontName>
+        <RemoveFormattingAlignment>정렬 제거</RemoveFormattingAlignment>
         <Underline>밑줄</Underline>
+        <Box>박스</Box>
         <Color>색상</Color>
         <FontName>글꼴</FontName>
+        <Superscript>위 첨자 </Superscript>
+        <Subscript>아래 첨자 </Subscript>
         <Alignment>표시 위치</Alignment>
         <AutoBalanceSelectedLines>줄 자동 조정...</AutoBalanceSelectedLines>
         <RemoveLineBreaksFromSelectedLines>줄바꿈 제거...</RemoveLineBreaksFromSelectedLines>
@@ -1142,7 +1181,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
         <ShowSelectedLinesEarlierLater>싱크 조정...</ShowSelectedLinesEarlierLater>
         <VisualSyncSelectedLines>시각 동기화...</VisualSyncSelectedLines>
         <GoogleAndMicrosoftTranslateSelectedLine>Google/Microsoft 번역</GoogleAndMicrosoftTranslateSelectedLine>
-        <GoogleTranslateSelectedLines>Google 번역</GoogleTranslateSelectedLines>
+        <TranslateSelectedLines>선택한 줄 번역...</TranslateSelectedLines>
         <AdjustDisplayDurationForSelectedLines>표시시간 조정...</AdjustDisplayDurationForSelectedLines>
         <FixCommonErrorsInSelectedLines>일반 오류 수정...</FixCommonErrorsInSelectedLines>
         <ChangeCasingForSelectedLines>대/소문자 바꾸기</ChangeCasingForSelectedLines>
@@ -1151,6 +1190,8 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
         <WebVTTRemoveVoices>음성 제거</WebVTTRemoveVoices>
         <NewActor>새 배우...</NewActor>
         <RemoveActors>배우 제거</RemoveActors>
+        <EditBookmark>책갈피 편집</EditBookmark>
+        <RemoveBookmark>책갈피 제거</RemoveBookmark>
       </ContextMenu>
     </Menu>
     <Controls>
@@ -1166,6 +1207,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     </Controls>
     <VideoControls>
       <Translate>번역</Translate>
+      <CreateAndAdjust>작성/조정</CreateAndAdjust>
       <Create>작성</Create>
       <Adjust>조정</Adjust>
       <SelectCurrentElementWhilePlaying>현재 재생되고 있는 자막 라인을 표시</SelectCurrentElementWhilePlaying>
@@ -1203,8 +1245,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
       <SecondsForwardShort>&gt;&gt;</SecondsForwardShort>
       <VideoPosition>비디오 위치:</VideoPosition>
       <TranslateTip>팁: 이전/다음 자막으로 이동하려면 &lt;alt+↑/↓&gt; 를 사용합니다.</TranslateTip>
-      <CreateTip>팁: &lt;ctrl+←/→&gt; 키를 사용합니다.</CreateTip>
-      <AdjustTip>팁: 이전/다음 자막으로 이동하려면 &lt;alt+↑/↓&gt; 를 사용합니다.</AdjustTip>
       <BeforeChangingTimeInWaveformX>Wave 형태의 시간 변경 전: {0}</BeforeChangingTimeInWaveformX>
       <NewTextInsertAtX>{0}에 새 텍스트가 삽입되었습니다.</NewTextInsertAtX>
       <Center>가운데</Center>
@@ -1309,7 +1349,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <RedoPerformed>다시 실행</RedoPerformed>
     <NothingToUndo>취소할 것이 없습니다!</NothingToUndo>
     <InvalidLanguageNameX>잘못된 언어 이름: {0}</InvalidLanguageNameX>
-    <UnableToChangeLanguage>언어를 변경할 수 없습니다!</UnableToChangeLanguage>
     <DoNotDisplayMessageAgain>다시 표시하지 않음</DoNotDisplayMessageAgain>
     <NumberOfCorrectedWords>수정된 단어: {0}</NumberOfCorrectedWords>
     <NumberOfSkippedWords>무시한 단어: {0}</NumberOfSkippedWords>
@@ -1332,7 +1371,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <BeforeInsertLine>줄 삽입 전</BeforeInsertLine>
     <LineInserted>줄이 삽입됨</LineInserted>
     <BeforeLineUpdatedInListView>줄을 목록보기에 업데이트하기 전</BeforeLineUpdatedInListView>
-    <BeforeSettingFontToNormal>글꼴을 보통으로 설정하기 전</BeforeSettingFontToNormal>
     <BeforeSplitLine>줄 분할 전</BeforeSplitLine>
     <LineSplitted>줄을 분할했습니다.</LineSplitted>
     <BeforeMergeLines>줄 병합 전</BeforeMergeLines>
@@ -1353,7 +1391,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <SubtitleImportedFromMatroskaFile>Matroska 파일에서 자막을 추출했습니다.</SubtitleImportedFromMatroskaFile>
     <DropFileXNotAccepted>파일 '{0}'을 가져올 수 없습니다 - 파일이 너무 큼.</DropFileXNotAccepted>
     <DropOnlyOneFile>하나의 파일만 놓을 수 있습니다.</DropOnlyOneFile>
-    <BeforeCreateAdjustLines>줄 만들기 전</BeforeCreateAdjustLines>
     <OpenAnsiSubtitle>자막 열기...</OpenAnsiSubtitle>
     <BeforeChangeCasing>대/소문자 바꾸기 전</BeforeChangeCasing>
     <CasingCompleteMessageNoNames>대소문자 변경: {0}/{1}(줄)</CasingCompleteMessageNoNames>
@@ -1380,7 +1417,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <ShowSelectedLinesXSecondsLinesLater>선택한 줄을 {0:0.0##}초 느리게 표시합니다.</ShowSelectedLinesXSecondsLinesLater>
     <ShowSelectionAndForwardXSecondsLinesEarlier>선택한 줄 이후로 {0:0.0##}초 빠르게 표시합니다.</ShowSelectionAndForwardXSecondsLinesEarlier>
     <ShowSelectionAndForwardXSecondsLinesLater>선택한 줄 이후로 {0:0.0##}초 느리게 표시합니다.</ShowSelectionAndForwardXSecondsLinesLater>
-    <ShowSelectedLinesEarlierLaterPerformed>선택한 줄 빠르게/느리게 표시하기</ShowSelectedLinesEarlierLaterPerformed>
     <DoubleWordsViaRegEx>정규 표현식을 통해 더블 워드 {0}</DoubleWordsViaRegEx>
     <BeforeSortX>{0} 정렬 전</BeforeSortX>
     <SortedByX>{0} 정렬</SortedByX>
@@ -1399,8 +1435,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <XLinesSelected>선택한 줄: {0}</XLinesSelected>
     <UnicodeMusicSymbolsAnsiWarning>자막 안에 유니코드식 문자가 존재합니다. 만약 ANSI 인코딩으로 저장하게 되면
 이 유니코드식 문자는 손실될 것입니다. 그래도 계속하시겠습니까?</UnicodeMusicSymbolsAnsiWarning>
-    <UnicodeCharactersAnsiWarning>자막 안에 유니코드식 문자가 존재합니다. 만약 ANSI 인코딩으로 저장하게 되면
-이 유니코드식 문자는 손실될 것입니다. 그래도 계속하시겠습니까?</UnicodeCharactersAnsiWarning>
     <NegativeTimeWarning>자막 안에 음수 타임코드가 있습니다. 계속하시겠습니까?</NegativeTimeWarning>
     <BeforeMergeShortLines>짧은 줄 병합 전</BeforeMergeShortLines>
     <MergedShortLinesX>병합된 자막 줄: {0}개</MergedShortLinesX>
@@ -1432,10 +1466,6 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <UserAndAction>사용자 | 동작</UserAndAction>
     <NetworkMode>네트워크 모드</NetworkMode>
     <XStartedSessionYAtZ>-＞[{0}]가 [{2}]에 {1} 세션을 시작함.</XStartedSessionYAtZ>
-    <SpellChekingViaWordXLineYOfX>Word {0}을 사용해 맞춤법을 검사하고 있습니다. - 줄 {1} / {2}</SpellChekingViaWordXLineYOfX>
-    <UnableToStartWord>Microsoft Word를 시작할 수 없습니다.</UnableToStartWord>
-    <SpellCheckAbortedXCorrections>맞춤법 검사 중지! {0} 줄이 변경됨.</SpellCheckAbortedXCorrections>
-    <SpellCheckCompletedXCorrections>맞춤법 검사 완료! {0} 줄이 변경됨.</SpellCheckCompletedXCorrections>
     <OpenOtherSubtitle>다른 자막 열기</OpenOtherSubtitle>
     <BeforeToggleDialogDashes>대화 대시(-) 전환 전</BeforeToggleDialogDashes>
     <ExportPlainTextAs>일반 텍스트 파일로 내보내기</ExportPlainTextAs>
@@ -1451,6 +1481,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <BeforeColumnImportText>열에 텍스트를 가져오기 전</BeforeColumnImportText>
     <BeforeColumnShiftCellsDown>열을 셀 아래로 이동하기 전</BeforeColumnShiftCellsDown>
     <BeforeX>전: {0}</BeforeX>
+    <LinesUpdatedX>업데이트된 줄: {0}</LinesUpdatedX>
     <ErrorLoadingPluginXErrorY>플러그인 로드 오류: {0}: {1}</ErrorLoadingPluginXErrorY>
     <BeforeRunningPluginXVersionY>플러그인을 실행하기 전: {0}: {1}</BeforeRunningPluginXVersionY>
     <UnableToReadPluginResult>플러그인에서 자막 결과를 읽을 수 없습니다!</UnableToReadPluginResult>
@@ -1548,6 +1579,8 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <RegEx>정규 표현식</RegEx>
     <UnequalLines>홀수 라인</UnequalLines>
     <EqualLines>짝수 라인</EqualLines>
+    <DurationLessThan>표시시간 미달</DurationLessThan>
+    <DurationGreaterThan>표시시간 초과</DurationGreaterThan>
   </ModifySelection>
   <MultipleReplace>
     <Title>다중 바꾸기</Title>
@@ -1731,12 +1764,24 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <SettingsName>환경 설정</SettingsName>
     <Help>도움말</Help>
     <UnbreakNoSpace>공백없이 줄바꿈 제거 (CJK)</UnbreakNoSpace>
+    <ToggleBookmarks>책갈피 전환</ToggleBookmarks>
+    <ToggleBookmarksWithComment>책갈피 전환 - 설명 추가</ToggleBookmarksWithComment>
+    <ClearBookmarks>책갈피 지우기</ClearBookmarks>
+    <GoToBookmark>책갈피로 이동</GoToBookmark>
+    <GoToPreviousBookmark>이전 책갈피로 이동</GoToPreviousBookmark>
+    <GoToNextBookmark>다음 책갈피로 이동</GoToNextBookmark>
+    <ChooseProfile>프로필 선택</ChooseProfile>
     <FontInUi>UI 글꼴</FontInUi>
     <ShowFrameRate>도구 모음에 프레임 속도 표시</ShowFrameRate>
     <DefaultFrameRate>기본 프레임 속도</DefaultFrameRate>
     <DefaultFileEncoding>기본 파일 인코딩</DefaultFileEncoding>
     <AutoDetectAnsiEncoding>ANSI 인코딩 자동 검색</AutoDetectAnsiEncoding>
+    <Profile>프로필</Profile>
+    <Profiles>프로필</Profiles>
+    <ImportProfiles>프로필 가져오기</ImportProfiles>
+    <ExportProfiles>프로필 내보내기</ExportProfiles>
     <SubtitleLineMaximumLength>줄당 최대 문자수</SubtitleLineMaximumLength>
+    <OptimalCharactersPerSecond>최적 문자/초</OptimalCharactersPerSecond>
     <MaximumCharactersPerSecond>초당 최대 문자수</MaximumCharactersPerSecond>
     <MaximumWordssPerMinute>분당 최대 문자수</MaximumWordssPerMinute>
     <AutoWrapWhileTyping>타이핑시 자동 줄바꿈</AutoWrapWhileTyping>
@@ -1782,6 +1827,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <AutoBackupDeleteAfterThreeMonths>3 개월</AutoBackupDeleteAfterThreeMonths>
     <AutoBackupDeleteAfterSixMonths>6 개월</AutoBackupDeleteAfterSixMonths>
     <CheckForUpdates>업데이트 확인</CheckForUpdates>
+    <AutoSave>자동 저장</AutoSave>
     <AllowEditOfOriginalSubtitle>원본 자막의 편집을 허용</AllowEditOfOriginalSubtitle>
     <PromptDeleteLines>줄 삭제시 알림</PromptDeleteLines>
     <TimeCodeMode>타임코드 모드</TimeCodeMode>
@@ -1881,11 +1927,13 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <Alt>Alt</Alt>
     <Shift>Shift</Shift>
     <Key>키</Key>
+    <ListViewAndTextBox>목록 보기 및 텍스트 상자</ListViewAndTextBox>
     <ListView>목록 보기</ListView>
     <TextBox>텍스트 상자</TextBox>
     <UpdateShortcut>업데이트</UpdateShortcut>
     <ToggleDockUndockOfVideoControls>비디오 컨트롤 연결 | 해제</ToggleDockUndockOfVideoControls>
     <CreateSetEndAddNewAndGoToNew>끝 지점과 새로 추가할 지점을 정하고 새 지점으로 이동</CreateSetEndAddNewAndGoToNew>
+    <AdjustViaEndAutoStart>끝 지점을 통해 조정</AdjustViaEndAutoStart>
     <AdjustViaEndAutoStartAndGoToNext>끝 지점을 통해 조정하고 다음으로 이동</AdjustViaEndAutoStartAndGoToNext>
     <AdjustSetEndTimeAndGoToNext>끝 지점 정하고 다음으로 이동</AdjustSetEndTimeAndGoToNext>
     <AdjustSetStartAutoDurationAndGoToNext>시작 지점과 표시시간을 정하고 다음으로 이동</AdjustSetStartAutoDurationAndGoToNext>
@@ -1902,7 +1950,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <AdjustSetEndAndOffsetTheRestAndGoToNext>끝 설정, 나머지 보충하고 다음으로 이동</AdjustSetEndAndOffsetTheRestAndGoToNext>
     <AdjustExtendCurrentSubtitle>현재 줄을 다음 자막으로 확장하거나 표시시간 최대화</AdjustExtendCurrentSubtitle>
     <RecalculateDurationOfCurrentSubtitle>현재 자막의 표시시간 다시 계산</RecalculateDurationOfCurrentSubtitle>
-    <MainCreateStartDownEndUp>'↓'키로 새로 만들기, '↑'키로 종료 시간 설정</MainCreateStartDownEndUp>
+    <MainCreateStartDownEndUp>'↓'키로 새로운 자막 삽입, '↑'키로 종료 시간 설정</MainCreateStartDownEndUp>
     <MergeDialog>대화 병합 (대시 삽입)</MergeDialog>
     <GoToNext>다음 줄로 이동</GoToNext>
     <GoToPrevious>이전 줄로 이동</GoToPrevious>
@@ -1914,10 +1962,19 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <ToggleDialogDashes>대화의 대시('-') 전환</ToggleDialogDashes>
     <ToggleMusicSymbols>음악 기호 전환</ToggleMusicSymbols>
     <Alignment>정렬 (선택한 줄)</Alignment>
+    <AlignmentN1>좌측 하단 정렬 - {\an1}</AlignmentN1>
+    <AlignmentN2>중앙 하단 정렬 - {\an2}</AlignmentN2>
+    <AlignmentN3>우측 중앙 정렬 - {\an3}</AlignmentN3>
+    <AlignmentN4>좌측 중앙 정렬 - {\an4}</AlignmentN4>
+    <AlignmentN5>중앙 중심 정렬 - {\an5}</AlignmentN5>
+    <AlignmentN6>우측 중앙 정렬 - {\an6}</AlignmentN6>
+    <AlignmentN7>좌측 상단 정렬 - {\an7}</AlignmentN7>
+    <AlignmentN8>중앙 상단 정렬 - {\an8}</AlignmentN8>
+    <AlignmentN9>우측 상단 정렬 - {\an9}</AlignmentN9>
     <CopyTextOnly>클립보드에 텍스트 복사 (선택한 줄)</CopyTextOnly>
     <CopyTextOnlyFromOriginalToCurrent>원본 텍스트를 현재 줄에 복사</CopyTextOnlyFromOriginalToCurrent>
     <AutoDurationSelectedLines>자동 표시시간 (선택한 줄)</AutoDurationSelectedLines>
-    <ReverseStartAndEndingForRTL>줄의 좌우 처음/끝 문자를 반대로</ReverseStartAndEndingForRTL>
+    <ReverseStartAndEndingForRtl>RTL 시작/끝 반전</ReverseStartAndEndingForRtl>
     <VerticalZoom>세로 확대</VerticalZoom>
     <VerticalZoomOut>세로 축소</VerticalZoomOut>
     <WaveformSeekSilenceForward>이후 무음 탐색</WaveformSeekSilenceForward>
@@ -1950,6 +2007,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <Fullscreen>전체 화면</Fullscreen>
     <PlayRateSlower>재생 속도 느리게</PlayRateSlower>
     <PlayRateFaster>재생 속도 빠르게</PlayRateFaster>
+    <VideoResetSpeedAndZoom>속도/줌 재설정</VideoResetSpeedAndZoom>
     <CustomSearch1>번역, 사용자 지정 검색 1</CustomSearch1>
     <CustomSearch2>번역, 사용자 지정 검색 2</CustomSearch2>
     <CustomSearch3>번역, 사용자 지정 검색 3</CustomSearch3>
@@ -1966,7 +2024,12 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <GoToFirstSelectedLine>첫번째 선택한 줄로 이동</GoToFirstSelectedLine>
     <GoToNextEmptyLine>다음 빈 줄로 이동</GoToNextEmptyLine>
     <MergeSelectedLines>선택한 줄 병합</MergeSelectedLines>
+    <MergeSelectedLinesAndAutoBreak>선택한 줄 병합하고 자동 줄바꿈</MergeSelectedLinesAndAutoBreak>
+    <MergeSelectedLinesAndUnbreak>선택한 줄 병합하고 줄바꿈 제거</MergeSelectedLinesAndUnbreak>
+    <MergeSelectedLinesAndUnbreakCjk>선택한 줄 병합하고 공백없이 줄바꿈 제거 (CJK)</MergeSelectedLinesAndUnbreakCjk>
     <MergeSelectedLinesOnlyFirstText>선택한 줄 병합, 첫번째 있는 텍스트만 유지</MergeSelectedLinesOnlyFirstText>
+    <MergeSelectedLinesBilingual>선택한 줄의 이중언어 병합</MergeSelectedLinesBilingual>
+    <SplitSelectedLineBilingual>선택한 줄 이중언어로 분할</SplitSelectedLineBilingual>
     <ToggleTranslationMode>번역 모드 전환</ToggleTranslationMode>
     <SwitchOriginalAndTranslation>원본과 번역본 바꾸기</SwitchOriginalAndTranslation>
     <MergeOriginalAndTranslation>원본과 번역본 병합</MergeOriginalAndTranslation>
@@ -1975,10 +2038,11 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <ShortcutIsAlreadyDefinedX>이미 정의된 단축키: {0}</ShortcutIsAlreadyDefinedX>
     <ToggleTranslationAndOriginalInPreviews>비디오/오디오 미리 보기에서 번역본 및 원본 전환</ToggleTranslationAndOriginalInPreviews>
     <ListViewColumnDelete>문자열, 텍스트 삭제</ListViewColumnDelete>
+    <ListViewColumnDeleteAndShiftUp>문자열, 텍스트 삭제하고 위로</ListViewColumnDeleteAndShiftUp>
     <ListViewColumnInsert>문자열, 텍스트 삽입</ListViewColumnInsert>
     <ListViewColumnPaste>문자열, 붙여넣기</ListViewColumnPaste>
-    <ListViewColumnTextUp>열, 텍스트 위로</ListViewColumnTextUp>
-    <ListViewColumnTextDown>열, 텍스트 아래로</ListViewColumnTextDown>
+    <ListViewColumnTextUp>문자열, 텍스트 위로</ListViewColumnTextUp>
+    <ListViewColumnTextDown>문자열, 텍스트 아래로</ListViewColumnTextDown>
     <ListViewFocusWaveform>파형/스펙트로그램으로 이동</ListViewFocusWaveform>
     <ListViewGoToNextError>다음 오류로 이동</ListViewGoToNextError>
     <ShowBeamer>전체 화면으로 자막 프로젝터 시작</ShowBeamer>
@@ -1990,14 +2054,17 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <MainTextBoxSelectionToUpper>선택한 영역 대문자로...</MainTextBoxSelectionToUpper>
     <MainTextBoxToggleAutoDuration>자동 표시시간</MainTextBoxToggleAutoDuration>
     <MainTextBoxAutoBreak>자동 줄바꿈</MainTextBoxAutoBreak>
+    <MainTextBoxAutoBreakFromPos>커서 위치에서 첫 번째 공간에 줄바꿈</MainTextBoxAutoBreakFromPos>
+    <MainTextBoxAutoBreakFromPosAndGoToNext>커서 위치에서 첫 번째 공간에 줄바꿈하고 다음으로 이동</MainTextBoxAutoBreakFromPosAndGoToNext>
     <MainTextBoxUnbreak>줄바꿈 제거</MainTextBoxUnbreak>
     <MainFileSaveAll>모두 저장</MainFileSaveAll>
     <Miscellaneous>기타</Miscellaneous>
     <CpsIncludesSpace>초당 문자수(CPS)에 공백도 포함</CpsIncludesSpace>
     <UseDoNotBreakAfterList>'뒤에 줄바꿈을 배제하는 목록' 사용 (자동 줄바꿈 用)</UseDoNotBreakAfterList>
-    <MicrosoftBingTranslator>Microsoft Bing 번역기</MicrosoftBingTranslator>
+    <GoogleTranslate>Google 번역</GoogleTranslate>
+    <GoogleTranslateApiKey>API 키</GoogleTranslateApiKey>
+    <MicrosoftBingTranslator>Microsoft 번역</MicrosoftBingTranslator>
     <HowToSignUp>가입 방법</HowToSignUp>
-    <GoogleTranslateUrl>Google 번역 URL</GoogleTranslateUrl>
     <MicrosoftTranslateApiKey>키</MicrosoftTranslateApiKey>
     <FontNote>※ 참고 : 이 글꼴 설정은 오직 Subtitle Edit UI에만 적용됩니다.
 자막의 글꼴 설정은 일반적으로 비디오 플레이어에서 이루어지나, "Advanced Sub Station Alpha" 또는 이미지 기반 형식으로 내보내기 처럼 
@@ -2064,6 +2131,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <AutoFixNames>자동으로 이름의 대소문자 수정</AutoFixNames>
     <CheckOneLetterWords>알 수 없는 홑문자 단어 알림</CheckOneLetterWords>
     <TreatINQuoteAsING>단어 끝의 "in"→"ing"로 바꿈 (영어 전용)</TreatINQuoteAsING>
+    <RememberUseAlwaysList>"항상 사용" 목록 기억</RememberUseAlwaysList>
     <ImageText>이미지 텍스트</ImageText>
     <SpellCheckCompleted>맞춤법 검사 완료!</SpellCheckCompleted>
     <SpellCheckAborted>맞춤법 검사 중지!</SpellCheckAborted>
@@ -2243,6 +2311,7 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <Title>알 수 없는 자막 형식!</Title>
     <Message>이 문제를 해결하려면 다음 이메일 주소로 자막 복사본을 보내 주십시오.
 # 이메일 주소: mailto:niksedk@gmail.com</Message>
+    <ImportAsPlainText>일반 텍스트로 가져오기...</ImportAsPlainText>
   </UnknownSubtitle>
   <VisualSync>
     <Title>시각 동기화</Title>
@@ -2330,6 +2399,8 @@ C# 코드는 https://github.com/SubtitleEdit/subtitleedit 에 있습니다.
     <DiscardTitle>OCR 변경사항 폐기</DiscardTitle>
     <DiscardText>현재 OCR 세션의 변경사항을 폐기합니까?</DiscardText>
     <MinLineSplitHeight>최소 줄 높이 (분할)</MinLineSplitHeight>
+    <FallbackToX>{0}으로 대체</FallbackToX>
+    <ImagePreProcessing>이미지 사전 처리중...</ImagePreProcessing>
   </VobSubOcr>
   <VobSubOcrCharacter>
     <Title>VobSub의 이미지 자막을 텍스트로...</Title>

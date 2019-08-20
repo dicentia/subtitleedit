@@ -67,7 +67,9 @@ namespace Nikse.SubtitleEdit.Core
             var buffer = new byte[ConstantHeaderSize];
             int bytesRead = stream.Read(buffer, 0, buffer.Length);
             if (bytesRead < buffer.Length)
+            {
                 throw new ArgumentException("Stream is too small");
+            }
 
             // constant header
             ChunkId = Encoding.UTF8.GetString(buffer, 0, 4); // Chunk ID: "RIFF" (Resource Interchange File Format), RF64 = new 64-bit format - see http://tech.ebu.ch/docs/tech/tech3306-2009.pdf
@@ -228,7 +230,9 @@ namespace Nikse.SubtitleEdit.Core
             {
                 int abs = peak.Abs;
                 if (abs > HighestPeak)
+                {
                     HighestPeak = abs;
+                }
             }
         }
 
@@ -275,7 +279,9 @@ namespace Nikse.SubtitleEdit.Core
         public void Load()
         {
             if (_loadFromDirectory == null)
+            {
                 return;
+            }
 
             string directory = _loadFromDirectory;
             _loadFromDirectory = null;
@@ -284,7 +290,10 @@ namespace Nikse.SubtitleEdit.Core
             {
                 string xmlInfoFileName = Path.Combine(directory, "Info.xml");
                 if (!File.Exists(xmlInfoFileName))
+                {
                     return;
+                }
+
                 var doc = new XmlDocument();
                 var culture = CultureInfo.InvariantCulture;
                 doc.Load(xmlInfoFileName);
@@ -334,23 +343,28 @@ namespace Nikse.SubtitleEdit.Core
 
     public class WavePeakGenerator : IDisposable
     {
-        public static string GetPeakWaveFileName(string videoFileName)
+        #region Movie Hasher -
+
+        public static string GetPeakWaveFileName(string videofileName)
         {
             var dir = Configuration.WaveformsDirectory.TrimEnd(Path.DirectorySeparatorChar);
             if (!Directory.Exists(dir))
+            {
                 Directory.CreateDirectory(dir);
+            }
 
-            var file = new FileInfo(videoFileName);
-            var wavePeakName = Utilities.Sha256Hash(file.Name + file.Length + file.CreationTimeUtc.ToShortDateString()) + ".wav";
-            wavePeakName = wavePeakName.RemoveChar('=').RemoveChar('/').RemoveChar(',').RemoveChar('?').RemoveChar('*').RemoveChar('+').RemoveChar('\\');
-            wavePeakName = Path.Combine(dir, wavePeakName);
-            return wavePeakName;
+            var wavePeakName = MovieHasher.GenerateHash(videofileName) + ".wav";
+            return Path.Combine(dir, wavePeakName);
         }
+
+        #endregion Movie Hasher
 
         public static bool IsFileValidForVisualizer(string fileName)
         {
             if (!fileName.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
+            {
                 return false;
+            }
 
             using (var wpg = new WavePeakGenerator(fileName))
             {
@@ -358,8 +372,8 @@ namespace Nikse.SubtitleEdit.Core
             }
         }
 
-        private Stream _stream;
-        private WaveHeader _header;
+        private readonly Stream _stream;
+        private readonly WaveHeader _header;
 
         private delegate int ReadSampleDataValue(byte[] data, ref int index);
 
@@ -406,7 +420,9 @@ namespace Nikse.SubtitleEdit.Core
 
             // ensure that peaks per second is a factor of the sample rate
             while (_header.SampleRate % peaksPerSecond != 0)
+            {
                 peaksPerSecond++;
+            }
 
             int delaySampleCount = (int)(_header.SampleRate * (delayInMilliseconds / TimeCode.BaseUnit));
 
@@ -488,7 +504,9 @@ namespace Nikse.SubtitleEdit.Core
         private static WavePeak CalculatePeak(float[] chunk, int count)
         {
             if (count == 0)
+            {
                 return new WavePeak();
+            }
 
             float max = chunk[0];
             float min = chunk[0];
@@ -496,9 +514,14 @@ namespace Nikse.SubtitleEdit.Core
             {
                 float value = chunk[i];
                 if (value > max)
+                {
                     max = value;
+                }
+
                 if (value < min)
+                {
                     min = value;
+                }
             }
             return new WavePeak((short)(short.MaxValue * max), (short)(short.MaxValue * min));
         }
@@ -509,10 +532,14 @@ namespace Nikse.SubtitleEdit.Core
         internal WavePeakData LoadPeaks()
         {
             if (_header.BitsPerSample != 16)
+            {
                 throw new Exception("Peaks file must be 16 bits per sample.");
+            }
 
             if (_header.NumberOfChannels != 1 && _header.NumberOfChannels != 2)
+            {
                 throw new Exception("Peaks file must have 1 or 2 channels.");
+            }
 
             // load data
             byte[] data = new byte[_header.DataChunkSize];
@@ -541,7 +568,10 @@ namespace Nikse.SubtitleEdit.Core
                 {
                     short value = (short)ReadValue16Bit(data, ref byteIndex);
                     if (value == short.MinValue)
+                    {
                         value = -short.MaxValue;
+                    }
+
                     value = Math.Abs(value);
                     peaks[peakIndex++] = new WavePeak(value, (short)-value);
                 }
@@ -665,7 +695,9 @@ namespace Nikse.SubtitleEdit.Core
         public void Close()
         {
             if (_stream != null)
+            {
                 _stream.Close();
+            }
         }
 
         //////////////////////////////////////// SPECTRUM ///////////////////////////////////////////////////////////
@@ -752,7 +784,6 @@ namespace Nikse.SubtitleEdit.Core
                 if (endPaddingSampleCount > 0)
                 {
                     Array.Clear(chunkSamples, chunkSampleOffset, endPaddingSampleCount);
-                    chunkSampleOffset += endPaddingSampleCount;
                 }
 
                 // generate spectrogram for this chunk
@@ -760,8 +791,7 @@ namespace Nikse.SubtitleEdit.Core
                 images.Add(bmp);
 
                 // wait for previous image to finish saving
-                if (saveImageTask != null)
-                    saveImageTask.Wait();
+                saveImageTask?.Wait();
 
                 // save image
                 string imagePath = Path.Combine(spectrogramDirectory, iChunk + ".gif");
@@ -772,8 +802,7 @@ namespace Nikse.SubtitleEdit.Core
             }
 
             // wait for last image to finish saving
-            if (saveImageTask != null)
-                saveImageTask.Wait();
+            saveImageTask?.Wait();
 
             var doc = new XmlDocument();
             var culture = CultureInfo.InvariantCulture;
@@ -806,13 +835,11 @@ namespace Nikse.SubtitleEdit.Core
             {
                 var dir = Configuration.SpectrogramsDirectory.TrimEnd(Path.DirectorySeparatorChar);
                 if (!Directory.Exists(dir))
+                {
                     Directory.CreateDirectory(dir);
+                }
 
-                var file = new FileInfo(videoFileName);
-                var name = Utilities.Sha256Hash(file.Name + file.Length + file.CreationTimeUtc.ToShortDateString());
-                name = name.RemoveChar('=').RemoveChar('/').RemoveChar(',').RemoveChar('?').RemoveChar('*').RemoveChar('+').RemoveChar('\\');
-                name = Path.Combine(dir, name);
-                return name;
+                return Path.Combine(dir, MovieHasher.GenerateHash(videoFileName));
             }
 
             public SpectrogramDrawer(int nfft)
@@ -861,7 +888,9 @@ namespace Nikse.SubtitleEdit.Core
             {
                 // read a segment of the recorded signal
                 for (int i = 0; i < _nfft; i++)
+                {
                     _segment[i] = samples[offset + i] * _window[i];
+                }
 
                 // transform to the frequency domain
                 _fft.ComputeForward(_segment);
@@ -875,7 +904,10 @@ namespace Nikse.SubtitleEdit.Core
                 double twoPiOverN = Math.PI * 2.0 / n;
                 double[] dst = new double[n];
                 for (int i = 0; i < n; i++)
+                {
                     dst[i] = 0.5 * (1.0 - Math.Cos(twoPiOverN * i));
+                }
+
                 return dst;
             }
 
@@ -883,7 +915,9 @@ namespace Nikse.SubtitleEdit.Core
             {
                 magnitude[0] = Math.Sqrt(SquareSum(segment[0], segment[1]));
                 for (int i = 2; i < segment.Length; i += 2)
+                {
                     magnitude[i / 2] = Math.Sqrt(SquareSum(segment[i], segment[i + 1]) * 2.0);
+                }
             }
 
             private static double SquareSum(double a, double b)
@@ -897,7 +931,9 @@ namespace Nikse.SubtitleEdit.Core
                 if (Configuration.Settings.VideoControls.SpectrogramAppearance == "Classic")
                 {
                     for (int colorIndex = 0; colorIndex < MagnitudeIndexRange; colorIndex++)
+                    {
                         palette[colorIndex] = new FastBitmap.PixelData(PaletteValue(colorIndex, MagnitudeIndexRange));
+                    }
                 }
                 else
                 {
@@ -905,7 +941,9 @@ namespace Nikse.SubtitleEdit.Core
                                                      Configuration.Settings.VideoControls.WaveformColor.G,
                                                      Configuration.Settings.VideoControls.WaveformColor.B, MagnitudeIndexRange);
                     for (int i = 0; i < MagnitudeIndexRange; i++)
+                    {
                         palette[i] = new FastBitmap.PixelData(list[i]);
+                    }
                 }
                 return palette;
             }
@@ -1001,7 +1039,11 @@ namespace Nikse.SubtitleEdit.Core
                 // Less optimized but readable version of the above
                 public static int Map(double magnitude, double decibelRange, int indexMax)
                 {
-                    if (magnitude == 0) return 0;
+                    if (Math.Abs(magnitude) < 0.01)
+                    {
+                        return 0;
+                    }
+
                     double decibelLevel = 20.0 * Math.Log10(magnitude);
                     return decibelLevel >= -decibelRange ? (int)(indexMax * (decibelLevel + decibelRange) / decibelRange) : 0;
                 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using Nikse.SubtitleEdit.Core;
 
 namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
 {
@@ -20,7 +22,9 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
         {
             FileName = fileName;
             if (loadCompareImages)
+            {
                 LoadCompareImages();
+            }
         }
 
         public void Save()
@@ -30,13 +34,19 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
                 foreach (var bob in CompareImages)
                 {
                     if (bob.ExpandCount > 0)
+                    {
                         System.Windows.Forms.MessageBox.Show("Ups, expand image in CompareImages!");
+                    }
+
                     bob.Save(gz);
                 }
                 foreach (var bob in CompareImagesExpanded)
                 {
                     if (bob.ExpandCount == 0)
+                    {
                         System.Windows.Forms.MessageBox.Show("Ups, not expanded image in CompareImagesExpanded!");
+                    }
+
                     bob.Save(gz);
                     if (bob.ExpandedList.Count != bob.ExpandCount - 1)
                     {
@@ -45,7 +55,10 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
                     foreach (var expandedBob in bob.ExpandedList)
                     {
                         if (expandedBob.Text != null)
+                        {
                             throw new Exception("BinaryOcrDb.Save: sub image should have null text");
+                        }
+
                         expandedBob.Save(gz);
                     }
                 }
@@ -81,11 +94,16 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
                                 if (expandedBob.LoadedOk)
                                 {
                                     if (expandedBob.Text != null)
+                                    {
                                         throw new Exception("BinaryOcrDb.LoadCompareImages: sub image should have null text");
+                                    }
+
                                     bob.ExpandedList.Add(expandedBob);
                                 }
                                 else
+                                {
                                     break;
+                                }
                             }
                         }
                         else
@@ -103,14 +121,12 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
             CompareImagesExpanded = expandList;
         }
 
-        private static int MinYDiffPair = 9;
-        private static int MaxYDiffPair = 20;
-
+        private static int MaxCommaQuoteTopDiff = 15;
 
         public static bool AllowEqual(BinaryOcrBitmap match, BinaryOcrBitmap newBob)
         {
             if (match.Text != null && (match.Text == "," || match.Text == "'") &&
-                Math.Min(match.Y, newBob.Y) < MinYDiffPair && Math.Max(match.Y, newBob.Y) > MaxYDiffPair)
+                Math.Abs(match.Y - newBob.Y) > MaxCommaQuoteTopDiff)
             {
                 return false;
             }
@@ -125,7 +141,9 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
                 if (bob.Hash == b.Hash && bob.Width == b.Width && bob.Height == b.Height && bob.NumberOfColoredPixels == b.NumberOfColoredPixels)
                 {
                     if (AllowEqual(b, bob))
+                    {
                         return i;
+                    }
                 }
             }
             return -1;
@@ -153,7 +171,9 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
                         }
                     }
                     if (ok)
+                    {
                         return i;
+                    }
                 }
 
             }
@@ -166,10 +186,15 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
             if (bob.ExpandCount > 0)
             {
                 if (bob.ExpandedList == null || bob.ExpandCount - 1 != bob.ExpandedList.Count)
+                {
                     throw new Exception("BinaryOcrDb.Add: There should be " + (bob.ExpandCount - 1) + " sub image(s)");
+                }
 
                 if (bob.ExpandedList[0].Text != null)
+                {
                     throw new Exception("BinaryOcrDb.Add: sub image should have null text");
+                }
+
                 index = FindExactMatchExpanded(bob);
                 if (index == -1 || CompareImagesExpanded[index].ExpandCount != bob.ExpandCount)
                 {
@@ -181,9 +206,14 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
                     for (int i = 0; i < bob.ExpandCount - 1; i++)
                     {
                         if (bob.ExpandedList[i].Hash != CompareImagesExpanded[index].ExpandedList[i].Hash)
+                        {
                             allAlike = false;
+                        }
+
                         if (bob.ExpandedList[i].Text != null)
+                        {
                             throw new Exception("BinaryOcrDb.Add: sub image should have null text");
+                        }
                     }
                     if (!allAlike)
                     {
@@ -208,6 +238,17 @@ namespace Nikse.SubtitleEdit.Logic.Ocr.Binary
                 }
             }
             return index;
+        }
+
+        public static List<string> GetDatabases()
+        {
+            var list = new List<string>();
+            foreach (string dir in Directory.GetFiles(Configuration.OcrDirectory.TrimEnd(Path.DirectorySeparatorChar), "*.db"))
+            {
+                string s = Path.GetFileNameWithoutExtension(dir);
+                list.Add(s);
+            }
+            return list.OrderBy(p=>p).ToList();
         }
 
     }

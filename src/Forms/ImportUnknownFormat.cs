@@ -3,15 +3,13 @@ using Nikse.SubtitleEdit.Logic;
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Nikse.SubtitleEdit.Forms
 {
     public partial class ImportUnknownFormat : Form
     {
-
-        public Subtitle ImportedSubitle;
+        public Subtitle ImportedSubitle { get; private set; }
         private readonly Timer _refreshTimer = new Timer();
 
         public ImportUnknownFormat(string fileName)
@@ -38,19 +36,23 @@ namespace Nikse.SubtitleEdit.Forms
         private void GeneratePreview()
         {
             if (_refreshTimer.Enabled)
+            {
                 _refreshTimer.Stop();
+            }
+
             _refreshTimer.Start();
         }
 
         private void GeneratePreviewReal()
         {
-            var uknownFormatImporter = new UknownFormatImporter();
-            uknownFormatImporter.UseFrames = radioButtonTimeCodeFrames.Checked;
+            var uknownFormatImporter = new UknownFormatImporter { UseFrames = radioButtonTimeCodeFrames.Checked };
             ImportedSubitle = uknownFormatImporter.AutoGuessImport(textBoxText.Lines.ToList());
             groupBoxImportResult.Text = string.Format(Configuration.Settings.Language.ImportText.PreviewLinesModifiedX, ImportedSubitle.Paragraphs.Count);
             SubtitleListview1.Fill(ImportedSubitle);
             if (ImportedSubitle.Paragraphs.Count > 0)
+            {
                 SubtitleListview1.SelectIndexAndEnsureVisible(0);
+            }
         }
 
         private void RefreshTimerTick(object sender, EventArgs e)
@@ -64,11 +66,11 @@ namespace Nikse.SubtitleEdit.Forms
             try
             {
                 SubtitleListview1.Items.Clear();
-                Encoding encoding = LanguageAutoDetect.GetEncodingFromFile(fileName);
+                var encoding = LanguageAutoDetect.GetEncodingFromFile(fileName);
                 textBoxText.Text = File.ReadAllText(fileName, encoding);
 
                 // check for RTF file
-                if (fileName.EndsWith(".rtf", StringComparison.OrdinalIgnoreCase) && !textBoxText.Text.TrimStart().StartsWith("{\\rtf"))
+                if (fileName.EndsWith(".rtf", StringComparison.OrdinalIgnoreCase) && !textBoxText.Text.TrimStart().StartsWith("{\\rtf", StringComparison.Ordinal))
                 {
                     using (var rtb = new RichTextBox())
                     {

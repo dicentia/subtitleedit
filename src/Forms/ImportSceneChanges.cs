@@ -1,10 +1,12 @@
 ﻿using Nikse.SubtitleEdit.Core;
+using Nikse.SubtitleEdit.Core.SubtitleFormats;
 using Nikse.SubtitleEdit.Logic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -30,7 +32,10 @@ namespace Nikse.SubtitleEdit.Forms
             InitializeComponent();
             UiUtil.FixFonts(this);
             if (videoInfo != null && videoInfo.FramesPerSecond > 1)
+            {
                 _frameRate = videoInfo.FramesPerSecond;
+            }
+
             _videoFileName = videoFileName;
 
             Text = Configuration.Settings.Language.ImportSceneChanges.Title;
@@ -52,8 +57,7 @@ namespace Nikse.SubtitleEdit.Forms
             numericUpDownThreshold.Enabled = !string.IsNullOrWhiteSpace(Configuration.Settings.General.FFmpegLocation) && File.Exists(Configuration.Settings.General.FFmpegLocation);
             var isFfmpegAvailable = !string.IsNullOrEmpty(Configuration.Settings.General.FFmpegLocation) && File.Exists(Configuration.Settings.General.FFmpegLocation);
             buttonDownloadFfmpeg.Visible = !isFfmpegAvailable;
-            decimal thresshold;
-            if (decimal.TryParse(Configuration.Settings.General.FFmpegSceneThreshold, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out thresshold) &&
+            if (decimal.TryParse(Configuration.Settings.General.FFmpegSceneThreshold, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var thresshold) &&
                 thresshold >= numericUpDownThreshold.Minimum &&
                 thresshold <= numericUpDownThreshold.Maximum)
             {
@@ -65,15 +69,17 @@ namespace Nikse.SubtitleEdit.Forms
 
         public sealed override string Text
         {
-            get { return base.Text; }
-            set { base.Text = value; }
+            get => base.Text;
+            set => base.Text = value;
         }
 
         private void buttonOpenText_Click(object sender, EventArgs e)
         {
             openFileDialog1.Title = buttonOpenText.Text;
-            openFileDialog1.Filter = Configuration.Settings.Language.ImportText.TextFiles + "|*.txt;*.scenechanges" +
+            openFileDialog1.Filter = Configuration.Settings.Language.ImportText.TextFiles + "|*.txt;*.scenechanges;*.xml;*.json" +
                                      "|Matroska xml chapter file|*.xml" +
+                                     "|EZTitles shotchanges XML file|*.xml" +
+                                     "|JSON scene changes file|*.json" +
                                      "|" + Configuration.Settings.Language.General.AllFiles + "|*.*";
             openFileDialog1.FileName = string.Empty;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
@@ -94,19 +100,43 @@ namespace Nikse.SubtitleEdit.Forms
                     return;
                 }
 
+                res = LoadFromEZTitlesShotchangesFile(fileName);
+                if (!string.IsNullOrEmpty(res))
+                {
+                    textBoxIImport.Text = res;
+                    radioButtonFrames.Checked = true;
+                    return;
+                }
+
+                res = LoadFromJsonShotchangesFile(fileName);
+                if (!string.IsNullOrEmpty(res))
+                {
+                    textBoxIImport.Text = res;
+                    radioButtonHHMMSSMS.Checked = true;
+                    return;
+                }
+
                 var encoding = LanguageAutoDetect.GetEncodingFromFile(fileName);
                 string s = File.ReadAllText(fileName, encoding).Trim();
                 if (s.Contains('.'))
+                {
                     radioButtonSeconds.Checked = true;
+                }
+
                 if (s.Contains('.') && s.Contains(':'))
+                {
                     radioButtonHHMMSSMS.Checked = true;
+                }
+
                 if (!s.Contains(Environment.NewLine) && s.Contains(';'))
                 {
                     var sb = new StringBuilder();
                     foreach (string line in s.Split(';'))
                     {
                         if (!string.IsNullOrWhiteSpace(line))
+                        {
                             sb.AppendLine(line.Trim());
+                        }
                     }
                     textBoxIImport.Text = sb.ToString();
                 }
@@ -138,7 +168,10 @@ namespace Nikse.SubtitleEdit.Forms
                         if (timeParts?.Length == 4)
                         {
                             if (timeParts[3].Length > 3)
+                            {
                                 timeParts[3] = timeParts[3].Substring(0, 3);
+                            }
+
                             var ts = new TimeSpan(0, Convert.ToInt32(timeParts[0]), Convert.ToInt32(timeParts[1]), Convert.ToInt32(timeParts[2]), Convert.ToInt32(timeParts[3]));
                             sb.AppendLine(new TimeCode(ts).ToShortStringHHMMSSFF());
                         }
@@ -152,6 +185,63 @@ namespace Nikse.SubtitleEdit.Forms
             }
         }
 
+        private string LoadFromEZTitlesShotchangesFile(string fileName)
+        {
+            try
+            {
+                var x = new XmlDocument();
+                x.Load(fileName);
+                var xmlNodeList = x.SelectNodes("/shotchanges/shotchanges_list/shotchange");
+                var sb = new StringBuilder();
+                if (xmlNodeList != null)
+                {
+                    foreach (XmlNode shotChange in xmlNodeList)
+                    {
+                        sb.AppendLine(shotChange.Attributes["frame"]?.InnerText);
+                    }
+                }
+                return sb.ToString();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private string LoadFromJsonShotchangesFile(string fileName)
+        {
+            try
+            {
+                var text = FileUtil.ReadAllTextShared(fileName, Encoding.UTF8);
+                var list = new List<double>();
+                foreach (string line in text.Split(','))
+                {
+                    string s = line.Trim() + "}";
+                    string start = Json.ReadTag(s, "frame_time");
+                    if (start != null)
+                    {
+                        double startSeconds;
+                        if (double.TryParse(start, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out startSeconds))
+                        {
+                            list.Add(startSeconds * 1000.0);
+                        }
+                    }
+                }
+
+                var sb = new StringBuilder();
+                foreach (double ms in list.OrderBy(p => p))
+                {
+                    sb.AppendLine(new TimeCode(ms).ToShortStringHHMMSSFF());
+                }
+                return sb.ToString();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
         private static readonly char[] SplitChars = { ':', '.', ',' };
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -163,17 +253,24 @@ namespace Nikse.SubtitleEdit.Forms
                 {
                     // Parse string (HH:MM:SS.ms)
                     string[] timeParts = line.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
-                    if (timeParts.Length == 2)
+                    try
                     {
-                        SceneChangesInSeconds.Add(new TimeSpan(0, 0, 0, Convert.ToInt32(timeParts[0]), Convert.ToInt32(timeParts[1])).TotalSeconds);
+                        if (timeParts.Length == 2)
+                        {
+                            SceneChangesInSeconds.Add(new TimeSpan(0, 0, 0, Convert.ToInt32(timeParts[0]), Convert.ToInt32(timeParts[1])).TotalSeconds);
+                        }
+                        else if (timeParts.Length == 3)
+                        {
+                            SceneChangesInSeconds.Add(new TimeSpan(0, 0, Convert.ToInt32(timeParts[0]), Convert.ToInt32(timeParts[1]), Convert.ToInt32(timeParts[2])).TotalSeconds);
+                        }
+                        else if (timeParts.Length == 4)
+                        {
+                            SceneChangesInSeconds.Add(new TimeSpan(0, Convert.ToInt32(timeParts[0]), Convert.ToInt32(timeParts[1]), Convert.ToInt32(timeParts[2]), Convert.ToInt32(timeParts[3])).TotalSeconds);
+                        }
                     }
-                    else if (timeParts.Length == 3)
+                    catch
                     {
-                        SceneChangesInSeconds.Add(new TimeSpan(0, 0, Convert.ToInt32(timeParts[0]), Convert.ToInt32(timeParts[1]), Convert.ToInt32(timeParts[2])).TotalSeconds);
-                    }
-                    else if (timeParts.Length == 4)
-                    {
-                        SceneChangesInSeconds.Add(new TimeSpan(0, Convert.ToInt32(timeParts[0]), Convert.ToInt32(timeParts[1]), Convert.ToInt32(timeParts[2]), Convert.ToInt32(timeParts[3])).TotalSeconds);
+                        // ignored
                     }
                 }
                 else
@@ -197,7 +294,14 @@ namespace Nikse.SubtitleEdit.Forms
                 }
             }
             Configuration.Settings.General.FFmpegSceneThreshold = numericUpDownThreshold.Value.ToString(CultureInfo.InvariantCulture);
-            DialogResult = DialogResult.OK;
+            if (SceneChangesInSeconds.Count > 0)
+            {
+                DialogResult = DialogResult.OK;
+            }
+            else
+            {
+                MessageBox.Show(Configuration.Settings.Language.ImportSceneChanges.NoSceneChangesFound);
+            }
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
@@ -284,7 +388,9 @@ namespace Nikse.SubtitleEdit.Forms
             UpdateImportTextBox();
             buttonOK.Enabled = true;
             if (!_pause)
+            {
                 buttonOK_Click(sender, e);
+            }
         }
 
         private void UpdateImportTextBox()

@@ -42,21 +42,21 @@ namespace Nikse.SubtitleEdit.Core.VobSub
 
         private readonly string _subFileName;
         private FileStream _subFile;
-        private readonly StringBuilder _idx = new StringBuilder();
-        private readonly int _screenWidth = 720;
-        private readonly int _screenHeight = 480;
-        private readonly int _bottomMargin = 15;
-        private readonly int _leftRightMargin = 15;
+        private readonly StringBuilder _idx;
+        private readonly int _screenWidth;
+        private readonly int _screenHeight;
+        private readonly int _bottomMargin;
+        private readonly int _leftRightMargin;
         private readonly int _languageStreamId;
-        private Color _background = Color.Transparent;
-        private Color _pattern = Color.White;
-        private Color _emphasis1 = Color.Black;
-        private readonly bool _useInnerAntialiasing = true;
+        private readonly Color _background = Color.Transparent;
+        private readonly Color _pattern;
+        private readonly Color _emphasis1;
+        private readonly bool _useInnerAntiAliasing;
         private Color _emphasis2 = Color.FromArgb(240, Color.Black);
-        private readonly string _languageName = "English";
-        private readonly string _languageNameShort = "en";
+        private readonly string _languageName;
+        private readonly string _languageNameShort;
 
-        public VobSubWriter(string subFileName, int screenWidth, int screenHeight, int bottomMargin, int leftRightMargin, int languageStreamId, Color pattern, Color emphasis1, bool useInnerAntialiasing, DvdSubtitleLanguage language)
+        public VobSubWriter(string subFileName, int screenWidth, int screenHeight, int bottomMargin, int leftRightMargin, int languageStreamId, Color pattern, Color emphasis1, bool useInnerAntiAliasing, DvdSubtitleLanguage language)
         {
             _subFileName = subFileName;
             _screenWidth = screenWidth;
@@ -66,7 +66,7 @@ namespace Nikse.SubtitleEdit.Core.VobSub
             _languageStreamId = languageStreamId;
             _pattern = pattern;
             _emphasis1 = emphasis1;
-            _useInnerAntialiasing = useInnerAntialiasing;
+            _useInnerAntiAliasing = useInnerAntiAliasing;
             _languageName = language.NativeName;
             _languageNameShort = language.Code;
             _idx = CreateIdxHeader();
@@ -83,7 +83,7 @@ namespace Nikse.SubtitleEdit.Core.VobSub
         {
             var ms = new MemoryStream();
 
-            // sup picture datasize
+            // sup picture data size
             WriteEndianWord(twoPartBuffer.Length + 34, ms);
 
             // first display control sequence table address
@@ -124,7 +124,6 @@ namespace Nikse.SubtitleEdit.Core.VobSub
             // Control Sequence Table
             // Write delay - subtitle duration
             WriteEndianWord(Convert.ToInt32(p.Duration.TotalMilliseconds * 90.0) >> 10, ms);
-            //            WriteEndianWord(Convert.ToInt32(p.Duration.TotalMilliseconds * 90.0 - 1023) >> 10, ms);
 
             // next display control sequence table address (use current is last)
             WriteEndianWord(startDisplayControlSequenceTableAddress + 24, ms); // start of display control sequence table address
@@ -132,7 +131,7 @@ namespace Nikse.SubtitleEdit.Core.VobSub
             // Control command 2 = StopDisplay
             ms.WriteByte(2);
 
-            // extra byte - for compatability with gpac/MP4BOX
+            // extra byte - for compatibility with gpac/MP4BOX
             ms.WriteByte(255); // 1 byte
 
             return ms.ToArray();
@@ -141,10 +140,10 @@ namespace Nikse.SubtitleEdit.Core.VobSub
         public void WriteParagraph(Paragraph p, Bitmap bmp, ContentAlignment alignment, Point? overridePosition = null) // inspired by code from SubtitleCreator
         {
             // timestamp: 00:00:33:900, filepos: 000000000
-            _idx.AppendLine($"timestamp: {p.StartTime.Hours:00}:{p.StartTime.Minutes:00}:{p.StartTime.Seconds:00}:{p.StartTime.Milliseconds:000}, filepos: {_subFile.Position.ToString("X").PadLeft(9, '0').ToLower()}");
+            _idx.AppendLine($"timestamp: {p.StartTime.Hours:00}:{p.StartTime.Minutes:00}:{p.StartTime.Seconds:00}:{p.StartTime.Milliseconds:000}, filepos: {_subFile.Position.ToString("X").PadLeft(9, '0').ToLowerInvariant()}");
 
             var nbmp = new NikseBitmap(bmp);
-            _emphasis2 = nbmp.ConverToFourColors(_background, _pattern, _emphasis1, _useInnerAntialiasing);
+            _emphasis2 = nbmp.ConverToFourColors(_background, _pattern, _emphasis1, _useInnerAntiAliasing);
             var twoPartBuffer = nbmp.RunLengthEncodeForDvd(_background, _pattern, _emphasis1, _emphasis2);
             var imageBuffer = GetSubImageBuffer(twoPartBuffer, nbmp, p, alignment, overridePosition);
 
@@ -154,7 +153,7 @@ namespace Nikse.SubtitleEdit.Core.VobSub
             byte[] subHeader = new byte[30];
             byte[] ts = new byte[4];
 
-            // Lended from "Son2VobSub" by Alain Vielle and Petr Vyskocil
+            // Lent from "Son2VobSub" by Alain Vielle and Petr Vyskocil
             // And also from Sup2VobSub by Emmel
             subHeader[0] = 0x00; // MPEG 2 PACK HEADER
             subHeader[1] = 0x00;
@@ -230,16 +229,22 @@ namespace Nikse.SubtitleEdit.Core.VobSub
 
                     // First Write header
                     for (int x = 0; x < headerSize; x++)
+                    {
                         mwsub.WriteByte(subHeader[x]);
+                    }
 
                     // Write Image Data
                     for (int x = 0; x < toWrite; x++)
+                    {
                         mwsub.WriteByte(imageBuffer[bufferIndex++]);
+                    }
 
                     // Pad remaining space
                     long paddingSize = 0x800 - headerSize - toWrite;
                     for (int x = 0; x < paddingSize; x++)
+                    {
                         mwsub.WriteByte(0xff);
+                    }
 
                     toWrite = 0;
                 }
@@ -254,11 +259,15 @@ namespace Nikse.SubtitleEdit.Core.VobSub
 
                     // First Write header
                     for (int x = 0; x < headerSize; x++)
+                    {
                         mwsub.WriteByte(subHeader[x]);
+                    }
 
                     // Write Image Data
                     for (int x = 0; x < blockSize; x++)
+                    {
                         mwsub.WriteByte(imageBuffer[bufferIndex++]);
+                    }
 
                     toWrite -= blockSize;
                 }
@@ -291,7 +300,7 @@ namespace Nikse.SubtitleEdit.Core.VobSub
             }
             if (alignment == ContentAlignment.MiddleLeft || alignment == ContentAlignment.MiddleCenter || alignment == ContentAlignment.MiddleRight)
             {
-                startY = (ushort)((_screenHeight / 2) - (nbmp.Height / 2));
+                startY = (ushort)(_screenHeight / 2 - nbmp.Height / 2);
             }
             if (alignment == ContentAlignment.TopLeft || alignment == ContentAlignment.MiddleLeft || alignment == ContentAlignment.BottomLeft)
             {
@@ -420,7 +429,7 @@ id: " + _languageNameShort + @", index: 0
 
         private static string ToHexColor(Color c)
         {
-            return (c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2")).ToLower();
+            return (c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2")).ToLowerInvariant();
         }
 
         private void ReleaseManagedResources()

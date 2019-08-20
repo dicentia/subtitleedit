@@ -10,6 +10,8 @@ namespace Nikse.SubtitleEdit.Forms
 {
     public sealed partial class RestoreAutoBackup : PositionAndSizeForm
     {
+        private static readonly object _locker = new object();
+
         //2011-12-13_20-19-18_title
         private static readonly Regex RegexFileNamePattern = new Regex(@"^\d\d\d\d-\d\d-\d\d_\d\d-\d\d-\d\d", RegexOptions.Compiled);
         private string[] _files;
@@ -40,7 +42,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void RestoreAutoBackup_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
         }
 
         private void RestoreAutoBackup_Shown(object sender, EventArgs e)
@@ -53,12 +57,16 @@ namespace Nikse.SubtitleEdit.Forms
                 {
                     var path = Path.GetFileName(fileName);
                     if (path != null && RegexFileNamePattern.IsMatch(path))
+                    {
                         AddBackupToListView(fileName);
+                    }
                 }
                 listViewBackups.Sorting = SortOrder.Descending;
                 listViewBackups.Sort();
                 if (_files.Length > 0)
+                {
                     return;
+                }
             }
             linkLabelOpenContainingFolder.Visible = false;
             labelStatus.Left = linkLabelOpenContainingFolder.Left;
@@ -69,7 +77,9 @@ namespace Nikse.SubtitleEdit.Forms
         {
             var path = Path.GetFileName(fileName);
             if (path == null)
+            {
                 return;
+            }
 
             string displayDate = path.Substring(0, 19).Replace('_', ' ');
             displayDate = displayDate.Remove(13, 1).Insert(13, ":");
@@ -77,11 +87,15 @@ namespace Nikse.SubtitleEdit.Forms
 
             string displayName = path.Remove(0, 20);
             if (displayName == "srt")
+            {
                 displayName = "Untitled.srt";
+            }
 
-            var item = new ListViewItem(displayDate);
-            item.UseItemStyleForSubItems = false;
-            item.Tag = fileName;
+            var item = new ListViewItem(displayDate)
+            {
+                UseItemStyleForSubItems = false,
+                Tag = fileName
+            };
             item.SubItems.Add(Path.GetFileNameWithoutExtension(displayName));
             item.SubItems.Add(Path.GetExtension(fileName));
 
@@ -105,7 +119,10 @@ namespace Nikse.SubtitleEdit.Forms
         private void buttonOK_Click(object sender, EventArgs e)
         {
             if (listViewBackups.SelectedItems.Count == 1)
+            {
                 SetAutoBackupFileName();
+            }
+
             DialogResult = DialogResult.OK;
         }
 
@@ -151,28 +168,26 @@ namespace Nikse.SubtitleEdit.Forms
 
         public static void CleanAutoBackupFolder(string autoBackupFolder, int autoBackupDeleteAfterMonths)
         {
-            const int maxCount = 100; // to avoid locking computer
-            if (Directory.Exists(autoBackupFolder))
+            lock (_locker) // only allow one thread
             {
-                var targetDate = DateTime.Now.AddMonths(-autoBackupDeleteAfterMonths);
-                var files = Directory.GetFiles(autoBackupFolder, "*.*");
-                int filesDeleted = 0;
-                foreach (string fileName in files)
+                if (Directory.Exists(autoBackupFolder))
                 {
-                    try
+                    var targetDate = DateTime.Now.AddMonths(-autoBackupDeleteAfterMonths);
+                    var files = Directory.GetFiles(autoBackupFolder, "*.*");
+                    foreach (string fileName in files)
                     {
-                        var name = Path.GetFileName(fileName);
-                        if (name != null && RegexFileNamePattern.IsMatch(name) && Convert.ToDateTime(name.Substring(0, 10), CultureInfo.InvariantCulture) < targetDate)
+                        try
                         {
-                            File.Delete(fileName);
-                            filesDeleted++;
-                            if (filesDeleted > maxCount)
-                                return;
+                            var name = Path.GetFileName(fileName);
+                            if (RegexFileNamePattern.IsMatch(name) && Convert.ToDateTime(name.Substring(0, 10), CultureInfo.InvariantCulture) <= targetDate)
+                            {
+                                File.Delete(fileName);
+                            }
                         }
-                    }
-                    catch (Exception)
-                    {
-                        // ignore
+                        catch
+                        {
+                            // ignore
+                        }
                     }
                 }
             }

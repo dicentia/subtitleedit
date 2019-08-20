@@ -11,11 +11,12 @@ namespace UpdateAssemblyInfo
     internal class Program
     {
         private static readonly Regex LongGitTagRegex; // e.g.: 3.4.8-226-g7037fef
-        private static readonly Regex ShortGitTagRegex; // e.g.: 3.4.8-226-g7037fef
+        private static readonly Regex ShortGitTagRegex; // e.g.: 3.4-226-g7037fef
         private static readonly Regex LongVersionRegex; // e.g.: 3.4.8.226
         private static readonly Regex ShortVersionRegex; // e.g.: 3.4.8 (w/o build number)
         private static readonly Regex TemplateFileVersionRegex; // e.g.: [assembly: AssemblyVersion("3.4.8.[REVNO]")]
         private static readonly Regex AssemblyInfoFileVersionRegex; // e.g.: [assembly: AssemblyVersion("3.4.8.226")]
+        private static readonly Regex TemplateFileCopyrightRegex; // e.g.: [assembly: AssemblyCopyright("Copyright 2001-2019, Nikse")]
         private static readonly Regex AssemblyInfoFileRevisionGuidRegex; // e.g.: [assembly: AssemblyDescription("0e82e5769c9b235383991082c0a0bba96d20c69d")]
         static Program()
         {
@@ -27,6 +28,7 @@ namespace UpdateAssemblyInfo
             options |= RegexOptions.Multiline;
             TemplateFileVersionRegex = new Regex(@"^[ \t]*\[assembly:[ \t]*AssemblyVersion\(""(?<version>[0-9]+\.[0-9]+\.[0-9]+)\.\[REVNO\]""\)\]", options);
             AssemblyInfoFileVersionRegex = new Regex(@"^[ \t]*\[assembly:[ \t]*AssemblyVersion\(""(?<version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)""\)\]", options);
+            TemplateFileCopyrightRegex = new Regex(@"^[ \t]*\[assembly:[ \t]*AssemblyCopyright\(""Copyright 2001-(?<year>[2-9][0-9]{3})[^""]+""\)\]", options);
             AssemblyInfoFileRevisionGuidRegex = new Regex(@"^[ \t]*\[assembly:[ \t]*AssemblyDescription\(""(?<guid>[0-9A-Za-z]*)""\)\]", options);
         }
 
@@ -40,21 +42,9 @@ namespace UpdateAssemblyInfo
             public int Build { get; private set; }
             public string RevisionGuid { get; private set; }
 
-            public string FullVersion
-            {
-                get
-                {
-                    return string.Format(CultureInfo.InvariantCulture, "{0:D}.{1:D}.{2:D}.{3:D} {4}", Major, Minor, Maintenance, Build, RevisionGuid).TrimEnd();
-                }
-            }
-
-            public string ShortVersion
-            {
-                get
-                {
-                    return string.Format(CultureInfo.InvariantCulture, "{0:D}.{1:D}.{2:D}", Major, Minor, Maintenance);
-                }
-            }
+            public string FullVersion  => string.Format(CultureInfo.InvariantCulture, "{0:D}.{1:D}.{2:D}.{3:D} {4}", Major, Minor, Maintenance, Build, RevisionGuid).TrimEnd();
+            public string ShortVersion => string.Format(CultureInfo.InvariantCulture, "{0:D}.{1:D}.{2:D}", Major, Minor, Maintenance);
+            public string MajorMinor => string.Format(CultureInfo.InvariantCulture, "{0:D}.{1:D}", Major, Minor);
 
             public VersionInfo()
             {
@@ -65,9 +55,15 @@ namespace UpdateAssemblyInfo
             {
                 var match = LongGitTagRegex.Match(version);
                 if (!match.Success)
+                {
                     match = LongVersionRegex.Match(version);
+                }
+
                 if (!match.Success)
+                {
                     match = ShortGitTagRegex.Match(version);
+                }
+
                 if (!match.Success || string.IsNullOrWhiteSpace(guid))
                 {
                     Build = UnknownBuild;
@@ -78,13 +74,20 @@ namespace UpdateAssemblyInfo
                     Build = int.Parse(match.Groups["build"].Value, NumberStyles.None, CultureInfo.InvariantCulture);
                     RevisionGuid = guid.Trim().ToLowerInvariant();
                 }
+
                 if (!match.Success)
+                {
                     match = ShortVersionRegex.Match(version);
+                }
+
                 if (!match.Success)
-                    throw new ArgumentException("Invalid version identifier: '" + version + "'");
+                {
+                    throw new ArgumentException($"Invalid version identifier: '{version}'");
+                }
+
                 Major = int.Parse(match.Groups["major"].Value, NumberStyles.None, CultureInfo.InvariantCulture);
                 Minor = int.Parse(match.Groups["minor"].Value, NumberStyles.None, CultureInfo.InvariantCulture);
-                Maintenance = string.IsNullOrEmpty(match.Groups["maintenance"].Value) ? 0 : int.Parse(match.Groups["maintenance"].Value, NumberStyles.None, CultureInfo.InvariantCulture);
+                Maintenance = match.Groups["maintenance"].Success ? int.Parse(match.Groups["maintenance"].Value, NumberStyles.None, CultureInfo.InvariantCulture) : 0;
             }
 
             public int CompareTo(VersionInfo vi)
@@ -94,9 +97,13 @@ namespace UpdateAssemblyInfo
                 {
                     cmp = Major.CompareTo(vi.Major);
                     if (cmp == 0)
+                    {
                         cmp = Minor.CompareTo(vi.Minor);
+                    }
                     if (cmp == 0)
+                    {
                         cmp = Maintenance.CompareTo(vi.Maintenance);
+                    }
                 }
                 return cmp;
             }
@@ -144,16 +151,41 @@ namespace UpdateAssemblyInfo
             //   <language-id> "-" <script-id> ".xml"  (e.g., zh-Hans.xml)
             //   <language-id> "-" <region-id> ".xml"  (e.g., nb-NO.xml)
             var fileNamePattern = string.Format(@"[\{0}\{1}][a-z]{{2,3}}-[A-Z][A-Za-z-]+\.xml\z", Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            var fileNameRegex = new Regex(fileNamePattern, RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+            var fileNameRegex = new Regex(fileNamePattern, RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.CultureInvariant);
             var translation = new XmlDocument { XmlResolver = null };
 
             foreach (var fileName in Directory.EnumerateFiles(languagesFolderName).Where(fn => fileNameRegex.IsMatch(fn)))
             {
                 translation.Load(fileName);
+
                 var node = translation.DocumentElement.SelectSingleNode("General/Version") as XmlElement;
                 if (node != null && node.InnerText.Trim() == oldVersion.ShortVersion)
+                {
                     node.InnerText = newVersion.ShortVersion;
+                }
+
                 translation.Save(fileName);
+            }
+        }
+
+        private static void UpdateTmx14ToolVersion(string tmx14FileName, VersionInfo newVersion, VersionInfo oldVersion)
+        {
+            if (newVersion.MajorMinor != oldVersion.MajorMinor)
+            {
+                var headerPattern = @"<header +creationtool=\\""Subtitle Edit\\"" +creationtoolversion=\\""(?<version>[^\\]+)\\"" ";
+                var headerRegex = new Regex(headerPattern, RegexOptions.ExplicitCapture | RegexOptions.CultureInvariant);
+
+                var tmx14Text = File.ReadAllText(tmx14FileName);
+                var tmx14Match = headerRegex.Match(tmx14Text);
+                if (!tmx14Match.Success)
+                {
+                    throw new FormatException($"Cannot find creationtoolversion attribute in '{tmx14FileName}'");
+                }
+                var index = tmx14Match.Groups["version"].Index;
+                var length = tmx14Match.Groups["version"].Length;
+                tmx14Text = tmx14Text.Remove(index, length).Insert(index, newVersion.MajorMinor);
+
+                File.WriteAllText(tmx14FileName, tmx14Text, Encoding.UTF8);
             }
         }
 
@@ -165,11 +197,21 @@ namespace UpdateAssemblyInfo
                 var templateMatch = TemplateFileVersionRegex.Match(templateText);
                 if (!templateMatch.Success)
                 {
-                    throw new Exception("Malformed template file: '" + templateFileName + "'");
+                    throw new FormatException($"Malformed template file: '{templateFileName}' (missing AssemblyVersion)");
                 }
                 var index = templateMatch.Groups["version"].Index;
                 var length = templateMatch.Groups["version"].Length;
                 templateText = templateText.Remove(index, length).Insert(index, newVersion.ShortVersion);
+
+                templateMatch = TemplateFileCopyrightRegex.Match(templateText);
+                if (!templateMatch.Success)
+                {
+                    throw new FormatException($"Malformed template file: '{templateFileName}' (missing AssemblyCopyright)");
+                }
+                index = templateMatch.Groups["year"].Index;
+                length = templateMatch.Groups["year"].Length;
+                templateText = templateText.Remove(index, length).Insert(index, DateTime.UtcNow.Year.ToString("D4", CultureInfo.InvariantCulture));
+
                 File.WriteAllText(templateFileName, templateText, Encoding.UTF8);
             }
 
@@ -188,7 +230,7 @@ namespace UpdateAssemblyInfo
             {
                 if (!LongGitTagRegex.IsMatch(clrTags.Result) && !ShortGitTagRegex.IsMatch(clrTags.Result))
                 {
-                    throw new Exception("Invalid Git version tag: '" + clrTags.Result + "' (major.minor.maintenance-build expected)");
+                    throw new FormatException($"Invalid Git version tag: '{clrTags.Result}' (major.minor.maintenance-build expected)");
                 }
                 currentRepositoryVersion = new VersionInfo(clrTags.Result, clrHash.Result);
             }
@@ -200,7 +242,7 @@ namespace UpdateAssemblyInfo
             {
                 if (!LongGitTagRegex.IsMatch(clrTags.Result) && !ShortGitTagRegex.IsMatch(clrTags.Result))
                 {
-                    throw new Exception("Invalid Git version tag: '" + clrTags.Result + "' (major.minor.maintenance-build expected)");
+                    throw new FormatException("Invalid Git version tag: '{clrTags.Result}' (major.minor.maintenance-build expected)");
                 }
                 latestRepositoryVersion = new VersionInfo(clrTags.Result, clrHash.Result);
             }
@@ -235,7 +277,7 @@ namespace UpdateAssemblyInfo
             var versionMatch = TemplateFileVersionRegex.Match(templateText);
             if (!versionMatch.Success)
             {
-                throw new Exception("Malformed template file: '" + templateFileName + "'");
+                throw new FormatException($"Malformed template file: '{templateFileName}' (missing AssemblyVersion)");
             }
             return new VersionInfo(versionMatch.Groups["version"].Value);
         }
@@ -298,6 +340,8 @@ namespace UpdateAssemblyInfo
                         var oldVersion = GetTemplateVersion(seTemplateFileName);
                         var languagesFolderName = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(seTemplateFileName)), "Languages");
                         UpdateTranslations(languagesFolderName, newVersion, oldVersion);
+                        var tmx14FileName = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(libSeTemplateFileName)), "SubtitleFormats", "Tmx14.cs");
+                        UpdateTmx14ToolVersion(tmx14FileName, newVersion, oldVersion);
                     }
                     UpdateAssemblyInfo(libSeTemplateFileName, newVersion, updateTemplateFile);
                     UpdateAssemblyInfo(seTemplateFileName, newVersion, updateTemplateFile);
@@ -327,7 +371,9 @@ namespace UpdateAssemblyInfo
                 {
                     var path = Path.Combine(p, "git.exe");
                     if (File.Exists(path))
+                    {
                         return path;
+                    }
                 }
             }
 
@@ -338,7 +384,9 @@ namespace UpdateAssemblyInfo
             {
                 var path = Path.Combine(envProgramFiles, gitPath);
                 if (File.Exists(path))
+                {
                     return path;
+                }
             }
 
             envProgramFiles = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
@@ -346,7 +394,9 @@ namespace UpdateAssemblyInfo
             {
                 var path = Path.Combine(envProgramFiles, gitPath);
                 if (File.Exists(path))
+                {
                     return path;
+                }
             }
 
             var envSystemDrive = Environment.GetEnvironmentVariable("SystemDrive");
@@ -358,15 +408,21 @@ namespace UpdateAssemblyInfo
             {
                 var path = Path.Combine(envSystemDrive, "Program Files", gitPath);
                 if (File.Exists(path))
+                {
                     return path;
+                }
 
                 path = Path.Combine(envSystemDrive, "Program Files (x86)", gitPath);
                 if (File.Exists(path))
+                {
                     return path;
+                }
 
                 path = Path.Combine(envSystemDrive, gitPath);
                 if (File.Exists(path))
+                {
                     return path;
+                }
             }
 
             try
@@ -376,15 +432,21 @@ namespace UpdateAssemblyInfo
                 {
                     var path = Path.Combine(cRoot, "Program Files", gitPath);
                     if (File.Exists(path))
+                    {
                         return path;
+                    }
 
                     path = Path.Combine(cRoot, "Program Files (x86)", gitPath);
                     if (File.Exists(path))
+                    {
                         return path;
+                    }
 
                     path = Path.Combine(cRoot, gitPath);
                     if (File.Exists(path))
+                    {
                         return path;
+                    }
                 }
             }
             catch (Exception exception)

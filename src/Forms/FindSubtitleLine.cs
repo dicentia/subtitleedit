@@ -24,7 +24,7 @@ namespace Nikse.SubtitleEdit.Forms
             UiUtil.PreInitialize(this);
             InitializeComponent();
             UiUtil.FixFonts(this);
-            Icon = Nikse.SubtitleEdit.Properties.Resources.SubtitleEditFormIcon;
+            Icon = Properties.Resources.SubtitleEditFormIcon;
 
             Text = Configuration.Settings.Language.FindSubtitleLine.Title;
             buttonFind.Text = Configuration.Settings.Language.FindSubtitleLine.Find;
@@ -32,6 +32,8 @@ namespace Nikse.SubtitleEdit.Forms
             buttonOK.Text = Configuration.Settings.Language.General.Ok;
             buttonCancel.Text = Configuration.Settings.Language.General.Cancel;
             subtitleListView1.InitializeLanguage(Configuration.Settings.Language.General, Configuration.Settings);
+            UiUtil.InitializeSubtitleFont(subtitleListView1);
+            subtitleListView1.AutoSizeAllColumns(this);
             FixLargeFonts();
         }
 
@@ -105,7 +107,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void TextBoxFindTextKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
+            {
                 ButtonFindClick(sender, null);
+            }
         }
 
         private void TextBoxFindTextTextChanged(object sender, EventArgs e)
@@ -121,7 +125,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void FormFindSubtitleLine_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.F3)
+            {
                 FindText();
+            }
             else if (e.KeyCode == Keys.Escape)
             {
                 DialogResult = DialogResult.Cancel;
@@ -185,7 +191,9 @@ namespace Nikse.SubtitleEdit.Forms
         private void SetFocus()
         {
             if (textBoxFindText.CanFocus)
+            {
                 textBoxFindText.Focus();
+            }
         }
 
         private void SubtitleListView1MouseDoubleClick(object sender, MouseEventArgs e)

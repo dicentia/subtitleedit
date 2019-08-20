@@ -30,7 +30,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     if (fileName.EndsWith(".ted", StringComparison.OrdinalIgnoreCase))
                     {
                         byte[] buffer = FileUtil.ReadAllBytesShared(fileName);
-                        if (buffer[0] == 0x43 && buffer[1] == 0x41 && buffer[2] == 0x50 && buffer[3] == 0x54 && buffer[4] == 0x00 && buffer[5] == 0x32 && buffer[6] == 0x2e) //43 41 50 54 00 32 2E - CAPT.2    
+                        if (buffer[0] == 0x43 && buffer[1] == 0x41 && buffer[2] == 0x50 && buffer[3] == 0x54 && buffer[4] == 0x00 && buffer[5] == 0x32 && buffer[6] == 0x2e) //43 41 50 54 00 32 2E - CAPT.2
                         {
                             var subtitle = new Subtitle();
                             LoadSubtitle(subtitle, lines, fileName);
@@ -83,7 +83,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 {
                     var text = ReadText(buffer, i);
                     texts.Add(text);
-                    
+
                     i += TextBufferSize;
                 }
                 else
@@ -96,7 +96,10 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 var paragraph = subtitle.Paragraphs[index];
                 if (index < texts.Count)
+                {
                     paragraph.Text = texts[index];
+                }
+
                 var next = subtitle.GetParagraphOrDefault(index + 1);
                 if (paragraph.Duration.TotalSeconds > 100)
                 {

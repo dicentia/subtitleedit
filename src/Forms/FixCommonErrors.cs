@@ -9,8 +9,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Nikse.SubtitleEdit.Core.Interfaces;
+using Nikse.SubtitleEdit.Logic.SpellCheck;
 
 namespace Nikse.SubtitleEdit.Forms
 {
@@ -34,8 +37,8 @@ namespace Nikse.SubtitleEdit.Forms
         private const int IndexStartWithUppercaseLetterAfterPeriodInsideParagraph = 15;
         private const int IndexStartWithUppercaseLetterAfterColon = 16;
         private const int IndexAddMissingQuotes = 17;
-        private const int IndexFixHyphens = 18;
-        private const int IndexFixHyphensAdd = 19;
+        private const int IndexFixHyphensAdd = 18;
+        private const int IndexFixHyphens = 19;
         private const int IndexFix3PlusLines = 20;
         private const int IndexFixDoubleDash = 21;
         private const int IndexFixDoubleGreaterThan = 22;
@@ -117,7 +120,9 @@ namespace Nikse.SubtitleEdit.Forms
             foreach (CultureInfo x in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
             {
                 if (!string.IsNullOrWhiteSpace(x.ToString()))
+                {
                     comboBoxLanguage.Items.Add(x);
+                }
             }
             comboBoxLanguage.Sorted = true;
             int languageIndex = 0;
@@ -140,7 +145,10 @@ namespace Nikse.SubtitleEdit.Forms
                 j++;
             }
             if (string.IsNullOrEmpty(language))
+            {
                 languageIndex = 0;
+            }
+
             comboBoxLanguage.SelectedIndex = languageIndex;
             AddFixActions(threeLetterIsoLanguageName);
             FixedSubtitle = new Subtitle(subtitle, false); // copy constructor
@@ -161,7 +169,10 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 var ci = comboBoxLanguage.SelectedItem as CultureInfo;
                 if (ci == null)
+                {
                     return string.Empty;
+                }
+
                 return ci.TwoLetterISOLanguageName;
             }
             set
@@ -170,7 +181,9 @@ namespace Nikse.SubtitleEdit.Forms
                 {
                     var item = comboBoxLanguage.Items[index];
                     if (item.ToString() == value)
+                    {
                         comboBoxLanguage.SelectedIndex = index;
+                    }
                 }
             }
         }
@@ -185,7 +198,10 @@ namespace Nikse.SubtitleEdit.Forms
 
             comboBoxLanguage.Items.Clear();
             foreach (CultureInfo x in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
+            {
                 comboBoxLanguage.Items.Add(x);
+            }
+
             comboBoxLanguage.Sorted = true;
             int languageIndex = 0;
             int j = 0;
@@ -225,15 +241,24 @@ namespace Nikse.SubtitleEdit.Forms
         {
             _autoDetectGoogleLanguage = LanguageAutoDetect.AutoDetectGoogleLanguage(encoding); // Guess language via encoding
             if (string.IsNullOrEmpty(_autoDetectGoogleLanguage))
+            {
                 _autoDetectGoogleLanguage = LanguageAutoDetect.AutoDetectGoogleLanguage(subtitle); // Guess language based on subtitle contents
+            }
+
             if (_autoDetectGoogleLanguage.Equals("zh", StringComparison.OrdinalIgnoreCase))
+            {
                 _autoDetectGoogleLanguage = "zh-CHS"; // Note that "zh-CHS" (Simplified Chinese) and "zh-CHT" (Traditional Chinese) are neutral cultures
+            }
+
             CultureInfo ci = CultureInfo.GetCultureInfo(_autoDetectGoogleLanguage);
             string threeLetterIsoLanguageName = ci.ThreeLetterISOLanguageName;
 
             comboBoxLanguage.Items.Clear();
             foreach (CultureInfo x in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
+            {
                 comboBoxLanguage.Items.Add(x);
+            }
+
             comboBoxLanguage.Sorted = true;
             int languageIndex = 0;
             int j = 0;
@@ -352,8 +377,8 @@ namespace Nikse.SubtitleEdit.Forms
                 new FixItem(_language.StartWithUppercaseLetterAfterPeriodInsideParagraph, string.Empty, () => new FixStartWithUppercaseLetterAfterPeriodInsideParagraph().Fix(Subtitle, this) , ce.StartWithUppercaseLetterAfterPeriodInsideParagraphTicked),
                 new FixItem(_language.StartWithUppercaseLetterAfterColon, string.Empty, () => new FixStartWithUppercaseLetterAfterColon().Fix(Subtitle, this), ce.StartWithUppercaseLetterAfterColonTicked),
                 new FixItem(_language.AddMissingQuotes, _language.AddMissingQuotesExample, () => new AddMissingQuotes().Fix(Subtitle, this), ce.AddMissingQuotesTicked),
-                new FixItem(_language.FixHyphens, string.Empty, () => new FixHyphensRemove().Fix(Subtitle, this), ce.FixHyphensTicked),
                 new FixItem(_language.FixHyphensAdd, string.Empty, () => new FixHyphensAdd().Fix(Subtitle, this), ce.FixHyphensAddTicked),
+                new FixItem(_language.FixHyphens, string.Empty, () => new FixHyphensRemove().Fix(Subtitle, this), ce.FixHyphensTicked),
                 new FixItem(_language.Fix3PlusLines, string.Empty, () => new Fix3PlusLines().Fix(Subtitle, this), ce.Fix3PlusLinesTicked),
                 new FixItem(_language.FixDoubleDash, _language.FixDoubleDashExample, () => new FixDoubleDash().Fix(Subtitle, this), ce.FixDoubleDashTicked),
                 new FixItem(_language.FixDoubleGreaterThan, _language.FixDoubleGreaterThanExample, () => new FixDoubleGreaterThan().Fix(Subtitle, this), ce.FixDoubleGreaterThanTicked),
@@ -390,7 +415,9 @@ namespace Nikse.SubtitleEdit.Forms
 
             listView1.Items.Clear();
             foreach (var fi in _fixActions)
+            {
                 AddFixActionItemToListView(fi);
+            }
         }
 
         public FixCommonErrors()
@@ -431,6 +458,7 @@ namespace Nikse.SubtitleEdit.Forms
             labelDuration.Text = _languageGeneral.Duration;
             buttonAutoBreak.Text = _language.AutoBreak;
             buttonUnBreak.Text = _language.Unbreak;
+            buttonSplitLine.Text = _languageGeneral.SplitLine;
             subtitleListView1.InitializeLanguage(_languageGeneral, Configuration.Settings);
             labelLanguage.Text = Configuration.Settings.Language.ChooseLanguage.Language;
             toolStripMenuItemDelete.Text = Configuration.Settings.Language.Main.Menu.ContextMenu.Delete;
@@ -484,7 +512,9 @@ namespace Nikse.SubtitleEdit.Forms
         public bool AllowFix(Paragraph p, string action)
         {
             if (_onlyListFixes || BatchMode)
+            {
                 return true;
+            }
 
             return _allowedFixes.Contains(p.Number.ToString(CultureInfo.InvariantCulture) + "|" + action);
         }
@@ -493,7 +523,10 @@ namespace Nikse.SubtitleEdit.Forms
         {
             message = message.Replace(Environment.NewLine, "  ");
             if (message.Length > 83)
+            {
                 message = message.Substring(0, 80) + "...";
+            }
+
             labelStatus.Text = message;
             labelStatus.Refresh();
         }
@@ -501,7 +534,10 @@ namespace Nikse.SubtitleEdit.Forms
         public void LogStatus(string sender, string message, bool isImportant)
         {
             if (isImportant)
+            {
                 _numberOfImportantLogMessages++;
+            }
+
             LogStatus(sender, message);
         }
 
@@ -511,9 +547,13 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 message += Environment.NewLine;
                 if (_onlyListFixes)
+                {
                     _newLog.AppendLine(" +  " + sender + ": " + message);
+                }
                 else
+                {
                     _appliedLog.AppendLine(string.Format(_language.FixedOkXY, sender, message));
+                }
             }
         }
 
@@ -542,14 +582,18 @@ namespace Nikse.SubtitleEdit.Forms
         public HashSet<string> GetAbbreviations()
         {
             if (_abbreviationList != null)
+            {
                 return _abbreviationList;
+            }
 
             MakeSureNameListIsLoaded();
             _abbreviationList = new HashSet<string>();
             foreach (string name in _nameList)
             {
                 if (name.EndsWith('.'))
+                {
                     _abbreviationList.Add(name);
+                }
             }
             return _abbreviationList;
         }
@@ -622,9 +666,13 @@ namespace Nikse.SubtitleEdit.Forms
             listViewFixes.Sort();
             subtitleListView1.Fill(FixedSubtitle);
             if (listViewFixes.Items.Count > 0)
+            {
                 listViewFixes.Items[0].Selected = true;
+            }
             else
+            {
                 subtitleListView1.SelectIndexAndEnsureVisible(0);
+            }
         }
 
         private void RunSelectedActions()
@@ -660,7 +708,10 @@ namespace Nikse.SubtitleEdit.Forms
             // build log
             textBoxFixedIssues.Text = string.Empty;
             if (_newLog.Length >= 0)
+            {
                 textBoxFixedIssues.AppendText(_newLog + Environment.NewLine);
+            }
+
             textBoxFixedIssues.AppendText(_appliedLog.ToString());
             subtitleListView1.EndUpdate();
         }
@@ -668,15 +719,25 @@ namespace Nikse.SubtitleEdit.Forms
         private void FormFixKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
+            {
                 DialogResult = DialogResult.Cancel;
+            }
             else if (e.KeyCode == UiUtil.HelpKeys)
+            {
                 Utilities.ShowHelp("#fixcommonerrors");
+            }
             else if (e.KeyCode == Keys.Enter && buttonNextFinish.Text == _language.Next)
+            {
                 ButtonFixClick(null, null);
+            }
             else if (subtitleListView1.Visible && subtitleListView1.Items.Count > 0 && e.KeyData == _goToLine)
+            {
                 GoToLineNumber();
+            }
             else if (e.KeyData == _preview && listViewFixes.Items.Count > 0)
+            {
                 GenerateDiff();
+            }
             else if (_mainGeneralGoToNextSubtitle == e.KeyData || (e.KeyCode == Keys.Down && e.Modifiers == Keys.Alt))
             {
                 int selectedIndex = 0;
@@ -710,14 +771,19 @@ namespace Nikse.SubtitleEdit.Forms
             try
             {
                 if (listViewFixes.SelectedItems.Count > 0)
+                {
                     idx = listViewFixes.SelectedItems[0].Index;
+                }
+
                 idx++;
                 if (listViewFixes.Items.Count > idx)
                 {
                     listViewFixes.Items[idx].Selected = true;
                     listViewFixes.Items[idx].EnsureVisible();
                     if (idx > 0)
+                    {
                         listViewFixes.Items[idx - 1].Selected = false;
+                    }
                 }
             }
             catch
@@ -743,7 +809,7 @@ namespace Nikse.SubtitleEdit.Forms
 
         private void GenerateDiff()
         {
-            string htmlFileName = Path.GetTempFileName() + ".html";
+            string htmlFileName = FileUtil.GetTempFileName(".html");
             var sb = new StringBuilder();
             sb.Append("<html><head><meta charset='utf-8'><title>Subtitle Edit - Fix common errors preview</title><style>body,p,td {font-size:90%; font-family:Tahoma;} td {border:1px solid black;padding:5px} table {border-collapse: collapse;}</style></head><body><table><tbody>");
             sb.AppendLine($"<tr><td style='font-weight:bold'>{_languageGeneral.LineNumber}</td><td style='font-weight:bold'>{_language.Function}</td><td style='font-weight:bold'>{_languageGeneral.Before}</td><td style='font-weight:bold'>{_languageGeneral.After}</td></tr>");
@@ -796,14 +862,22 @@ namespace Nikse.SubtitleEdit.Forms
                         startCharactersOk++;
 
                         if (char.IsWhiteSpace(before[i]))
+                        {
                             beforeBackgroundColors.Add(i, Color.Red);
+                        }
                         else
+                        {
                             beforeColors.Add(i, Color.Red);
+                        }
 
                         if (char.IsWhiteSpace(after[i]))
+                        {
                             afterBackgroundColors.Add(i, Color.Red);
+                        }
                         else
+                        {
                             afterColors.Add(i, Color.Red);
+                        }
                     }
                     else
                     {
@@ -818,16 +892,24 @@ namespace Nikse.SubtitleEdit.Forms
                 if (i < before.Length)
                 {
                     if (char.IsWhiteSpace(before[i]))
+                    {
                         beforeBackgroundColors.Add(i, Color.Red);
+                    }
                     else
+                    {
                         beforeColors.Add(i, Color.Red);
+                    }
                 }
                 if (i < after.Length)
                 {
                     if (char.IsWhiteSpace(after[i]))
+                    {
                         afterBackgroundColors.Add(i, Color.Red);
+                    }
                     else
+                    {
                         afterColors.Add(i, Color.Red);
+                    }
                 }
             }
 
@@ -839,14 +921,24 @@ namespace Nikse.SubtitleEdit.Forms
                 if (before[bLength] == after[aLength])
                 {
                     if (beforeColors.ContainsKey(bLength))
+                    {
                         beforeColors.Remove(bLength);
+                    }
+
                     if (beforeBackgroundColors.ContainsKey(bLength))
+                    {
                         beforeBackgroundColors.Remove(bLength);
+                    }
 
                     if (afterColors.ContainsKey(aLength))
+                    {
                         afterColors.Remove(aLength);
+                    }
+
                     if (afterBackgroundColors.ContainsKey(aLength))
+                    {
                         afterBackgroundColors.Remove(aLength);
+                    }
                 }
                 else
                 {
@@ -932,16 +1024,27 @@ namespace Nikse.SubtitleEdit.Forms
             ce.FixEllipsesStartTicked = listView1.Items[IndexFixEllipsesStart].Checked;
             ce.FixMissingOpenBracketTicked = listView1.Items[IndexFixMissingOpenBracket].Checked;
             if (_indexAloneLowercaseIToUppercaseIEnglish >= 0)
+            {
                 ce.AloneLowercaseIToUppercaseIEnglishTicked = listView1.Items[_indexAloneLowercaseIToUppercaseIEnglish].Checked;
+            }
+
             ce.FixOcrErrorsViaReplaceListTicked = listView1.Items[IndexFixOcrErrorsViaReplaceList].Checked;
             ce.RemoveSpaceBetweenNumberTicked = listView1.Items[IndexRemoveSpaceBetweenNumbers].Checked;
             ce.FixDialogsOnOneLineTicked = listView1.Items[IndexDialogsOnOneLine].Checked;
             if (_danishLetterIIndex >= 0)
+            {
                 ce.DanishLetterITicked = listView1.Items[_danishLetterIIndex].Checked;
+            }
+
             if (_turkishAnsiIndex >= 0)
+            {
                 ce.TurkishAnsiTicked = listView1.Items[_turkishAnsiIndex].Checked;
+            }
+
             if (_spanishInvertedQuestionAndExclamationMarksIndex >= 0)
+            {
                 ce.SpanishInvertedQuestionAndExclamationMarksTicked = listView1.Items[_spanishInvertedQuestionAndExclamationMarksIndex].Checked;
+            }
 
             Configuration.Settings.Save();
         }
@@ -984,13 +1087,17 @@ namespace Nikse.SubtitleEdit.Forms
         private void ButtonSelectAllClick(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listView1.Items)
+            {
                 item.Checked = true;
+            }
         }
 
         private void ButtonInverseSelectionClick(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listView1.Items)
+            {
                 item.Checked = !item.Checked;
+            }
         }
 
         private void ListViewFixesSelectedIndexChanged(object sender, EventArgs e)
@@ -1006,9 +1113,15 @@ namespace Nikse.SubtitleEdit.Forms
                     {
                         var index = lvi.Index;
                         if (index - 1 > 0)
+                        {
                             subtitleListView1.EnsureVisible(index - 1);
+                        }
+
                         if (index + 1 < subtitleListView1.Items.Count)
+                        {
                             subtitleListView1.EnsureVisible(index + 1);
+                        }
+
                         subtitleListView1.SelectedIndexChanged -= SubtitleListView1SelectedIndexChanged;
                         subtitleListView1.SelectNone();
                         subtitleListView1.SelectedIndexChanged += SubtitleListView1SelectedIndexChanged;
@@ -1026,7 +1139,10 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 int firstSelectedIndex = 0;
                 if (subtitleListView1.SelectedItems.Count > 0)
+                {
                     firstSelectedIndex = subtitleListView1.SelectedItems[0].Index;
+                }
+
                 Paragraph p = FixedSubtitle.GetParagraphOrDefault(firstSelectedIndex);
                 if (p != null)
                 {
@@ -1108,7 +1224,9 @@ namespace Nikse.SubtitleEdit.Forms
 
                 Paragraph prevParagraph = FixedSubtitle.GetParagraphOrDefault(firstSelectedIndex - 1);
                 if (prevParagraph != null && prevParagraph.EndTime.TotalMilliseconds > startTime.TotalMilliseconds)
+                {
                     labelStartTimeWarning.Text = string.Format(_languageGeneral.OverlapPreviousLineX, (prevParagraph.EndTime.TotalMilliseconds - startTime.TotalMilliseconds) / TimeCode.BaseUnit);
+                }
 
                 Paragraph nextParagraph = FixedSubtitle.GetParagraphOrDefault(firstSelectedIndex + 1);
                 if (nextParagraph != null)
@@ -1136,13 +1254,17 @@ namespace Nikse.SubtitleEdit.Forms
 
         private void UpdateListSyntaxColoring()
         {
-            if (Subtitle == null || Subtitle.Paragraphs.Count == 0 || _subtitleListViewIndex < 0 || _subtitleListViewIndex >= Subtitle.Paragraphs.Count)
+            if (FixedSubtitle == null || FixedSubtitle.Paragraphs.Count == 0 || _subtitleListViewIndex < 0 || _subtitleListViewIndex >= Subtitle.Paragraphs.Count)
+            {
                 return;
+            }
 
-            subtitleListView1.SyntaxColorLine(Subtitle.Paragraphs, _subtitleListViewIndex, Subtitle.Paragraphs[_subtitleListViewIndex]);
+            subtitleListView1.SyntaxColorLine(FixedSubtitle.Paragraphs, _subtitleListViewIndex, FixedSubtitle.Paragraphs[_subtitleListViewIndex]);
             Paragraph next = Subtitle.GetParagraphOrDefault(_subtitleListViewIndex + 1);
             if (next != null)
-                subtitleListView1.SyntaxColorLine(Subtitle.Paragraphs, _subtitleListViewIndex + 1, Subtitle.Paragraphs[_subtitleListViewIndex + 1]);
+            {
+                subtitleListView1.SyntaxColorLine(FixedSubtitle.Paragraphs, _subtitleListViewIndex + 1, FixedSubtitle.Paragraphs[_subtitleListViewIndex + 1]);
+            }
         }
 
         private void MaskedTextBox_TextChanged(object sender, EventArgs e)
@@ -1174,19 +1296,13 @@ namespace Nikse.SubtitleEdit.Forms
             UiUtil.GetLineLengths(labelSingleLine, text);
 
             string s = text.Replace(Environment.NewLine, " ");
+            labelTextLineTotal.ForeColor = Color.Black;
             buttonSplitLine.Visible = false;
-            if (s.Length < Configuration.Settings.General.SubtitleLineMaximumLength * 1.9)
+            var abl = Utilities.AutoBreakLine(s, _autoDetectGoogleLanguage).SplitToLines();
+            if (abl.Count > Configuration.Settings.General.MaxNumberOfLines || abl.Any(li => li.Length > Configuration.Settings.General.SubtitleLineMaximumLength))
             {
-                labelTextLineTotal.ForeColor = Color.Black;
-            }
-            else if (s.Length < Configuration.Settings.General.SubtitleLineMaximumLength * 2.1)
-            {
-                labelTextLineTotal.ForeColor = Color.Orange;
-            }
-            else
-            {
-                labelTextLineTotal.ForeColor = Color.Red;
                 buttonSplitLine.Visible = true;
+                labelTextLineTotal.ForeColor = Color.Red;
             }
             labelTextLineTotal.Text = string.Format(_languageGeneral.TotalLengthX, s.Length);
         }
@@ -1194,13 +1310,17 @@ namespace Nikse.SubtitleEdit.Forms
         private void ButtonFixesSelectAllClick(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listViewFixes.Items)
+            {
                 item.Checked = true;
+            }
         }
 
         private void ButtonFixesInverseClick(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listViewFixes.Items)
+            {
                 item.Checked = !item.Checked;
+            }
         }
 
         private void ButtonFixesApplyClick(object sender, EventArgs e)
@@ -1213,7 +1333,9 @@ namespace Nikse.SubtitleEdit.Forms
             _subtitleListViewIndex = -1;
             int firstSelectedIndex = 0;
             if (subtitleListView1.SelectedItems.Count > 0)
+            {
                 firstSelectedIndex = subtitleListView1.SelectedItems[0].Index;
+            }
 
             _allowedFixes = new HashSet<string>();
             foreach (ListViewItem item in listViewFixes.Items)
@@ -1222,7 +1344,9 @@ namespace Nikse.SubtitleEdit.Forms
                 {
                     string key = item.SubItems[1].Text + "|" + item.SubItems[2].Text;
                     if (!_allowedFixes.Contains(key))
+                    {
                         _allowedFixes.Add(key);
+                    }
                 }
             }
 
@@ -1234,11 +1358,17 @@ namespace Nikse.SubtitleEdit.Forms
             FixedSubtitle = new Subtitle(Subtitle, false);
             subtitleListView1.Fill(FixedSubtitle);
             if (_totalFixes == 0 && _totalErrors == 0)
+            {
                 ShowStatus(_language.NothingToFix);
+            }
             else if (_totalFixes > 0)
+            {
                 ShowStatus(string.Format(_language.XFixesApplied, _totalFixes));
+            }
             else if (_totalErrors > 0)
+            {
                 ShowStatus(_language.NothingToFixBut);
+            }
 
             RefreshFixes();
             if (listViewFixes.Items.Count == 0)
@@ -1248,9 +1378,14 @@ namespace Nikse.SubtitleEdit.Forms
 
             Cursor = Cursors.Default;
             if (_numberOfImportantLogMessages == 0)
+            {
                 labelNumberOfImportantLogMessages.Text = string.Empty;
+            }
             else
+            {
                 labelNumberOfImportantLogMessages.Text = string.Format(_language.NumberOfImportantLogMessages, _numberOfImportantLogMessages);
+            }
+
             buttonFixesApply.Enabled = true;
         }
 
@@ -1272,12 +1407,18 @@ namespace Nikse.SubtitleEdit.Forms
             {
                 ShowStatus(_language.NothingToFix);
                 if (subtitleListView1.SelectedItems.Count == 0)
+                {
                     subtitleListView1.SelectIndexAndEnsureVisible(0);
+                }
             }
             else if (_totalFixes > 0)
+            {
                 ShowStatus(string.Format(_language.FixesFoundX, _totalFixes));
+            }
             else if (_totalErrors > 0)
+            {
                 ShowStatus(_language.NothingToFixBut);
+            }
 
             TopMost = true;
             BringToFront();
@@ -1293,7 +1434,9 @@ namespace Nikse.SubtitleEdit.Forms
             foreach (ListViewItem item in listViewFixes.Items)
             {
                 if (!item.Checked)
+                {
                     deSelectedFixes.Add(item.SubItems[1].Text + item.SubItems[2].Text + item.SubItems[3].Text);
+                }
             }
 
             listViewFixes.Items.Clear();
@@ -1304,7 +1447,9 @@ namespace Nikse.SubtitleEdit.Forms
             foreach (ListViewItem item in listViewFixes.Items)
             {
                 if (deSelectedFixes.Contains(item.SubItems[1].Text + item.SubItems[2].Text + item.SubItems[3].Text))
+                {
                     item.Checked = false;
+                }
             }
 
             listViewFixes.EndUpdate();
@@ -1317,7 +1462,9 @@ namespace Nikse.SubtitleEdit.Forms
                 string oldText = textBoxListViewText.Text;
                 textBoxListViewText.Text = Utilities.AutoBreakLine(textBoxListViewText.Text, Language);
                 if (oldText != textBoxListViewText.Text)
+                {
                     EnableOkButton();
+                }
             }
         }
 
@@ -1326,7 +1473,9 @@ namespace Nikse.SubtitleEdit.Forms
             string oldText = textBoxListViewText.Text;
             textBoxListViewText.Text = Utilities.UnbreakLine(textBoxListViewText.Text);
             if (oldText != textBoxListViewText.Text)
+            {
                 EnableOkButton();
+            }
         }
 
         private void ToolStripMenuItemDeleteClick(object sender, EventArgs e)
@@ -1337,7 +1486,10 @@ namespace Nikse.SubtitleEdit.Forms
                 _subtitleListViewIndex = -1;
                 var indexes = new List<int>();
                 foreach (ListViewItem item in subtitleListView1.SelectedItems)
+                {
                     indexes.Add(item.Index);
+                }
+
                 int firstIndex = subtitleListView1.SelectedItems[0].Index;
 
                 // save de-seleced fixes
@@ -1348,9 +1500,14 @@ namespace Nikse.SubtitleEdit.Forms
                     {
                         int number = Convert.ToInt32(item.SubItems[1].Text);
                         if (number > firstIndex)
+                        {
                             number -= subtitleListView1.SelectedItems.Count;
+                        }
+
                         if (number >= 0)
+                        {
                             deSelectedFixes.Add(number + item.SubItems[2].Text + item.SubItems[3].Text);
+                        }
                     }
                 }
 
@@ -1377,7 +1534,9 @@ namespace Nikse.SubtitleEdit.Forms
                     foreach (ListViewItem item in listViewFixes.Items)
                     {
                         if (deSelectedFixes.Contains(item.SubItems[1].Text + item.SubItems[2].Text + item.SubItems[3].Text))
+                        {
                             item.Checked = false;
+                        }
                     }
                 }
             }
@@ -1400,7 +1559,10 @@ namespace Nikse.SubtitleEdit.Forms
                         int firstSelectedNumber = subtitleListView1.GetSelectedParagraph(FixedSubtitle).Number;
                         int number = Convert.ToInt32(item.SubItems[1].Text);
                         if (number > firstSelectedNumber)
+                        {
                             number--;
+                        }
+
                         deSelectedFixes.Add(number + item.SubItems[2].Text + item.SubItems[3].Text);
                     }
                 }
@@ -1435,7 +1597,9 @@ namespace Nikse.SubtitleEdit.Forms
                 foreach (ListViewItem item in listViewFixes.Items)
                 {
                     if (deSelectedFixes.Contains(item.SubItems[1].Text + item.SubItems[2].Text + item.SubItems[3].Text))
+                    {
                         item.Checked = false;
+                    }
                 }
             }
         }
@@ -1517,7 +1681,10 @@ namespace Nikse.SubtitleEdit.Forms
                     {
                         int number = Convert.ToInt32(item.SubItems[1].Text);
                         if (number > firstSelectedIndex)
+                        {
                             number++;
+                        }
+
                         deSelectedFixes.Add(number + item.SubItems[2].Text + item.SubItems[3].Text);
                     }
                 }
@@ -1534,24 +1701,50 @@ namespace Nikse.SubtitleEdit.Forms
                 }
                 else
                 {
-                    string s = Utilities.AutoBreakLine(currentParagraph.Text, 5, Configuration.Settings.Tools.MergeLinesShorterThan, Language);
+                    string s = Utilities.AutoBreakLine(currentParagraph.Text, 5, Configuration.Settings.General.MergeLinesShorterThan, Language);
                     lines = s.SplitToLines();
                     if (lines.Count == 2)
                     {
                         currentParagraph.Text = Utilities.AutoBreakLine(lines[0], Language);
                         newParagraph.Text = Utilities.AutoBreakLine(lines[1], Language);
                     }
+                    else if (lines.Count > 2)
+                    {
+                        var half = lines.Count / 2;
+                        var sb1 = new StringBuilder();
+                        for (int i = 0; i < half; i++)
+                        {
+                            sb1.AppendLine(lines[i]);
+                        }
+
+                        currentParagraph.Text = Utilities.AutoBreakLine(sb1.ToString(), _autoDetectGoogleLanguage);
+                        sb1 = new StringBuilder();
+                        for (int i = half; i < lines.Count; i++)
+                        {
+                            sb1.AppendLine(lines[i]);
+                        }
+
+                        newParagraph.Text = Utilities.AutoBreakLine(sb1.ToString(), _autoDetectGoogleLanguage);
+                    }
                 }
 
                 double startFactor = (double)HtmlUtil.RemoveHtmlTags(currentParagraph.Text).Length / HtmlUtil.RemoveHtmlTags(oldText).Length;
                 if (startFactor < 0.20)
+                {
                     startFactor = 0.20;
+                }
+
                 if (startFactor > 0.80)
+                {
                     startFactor = 0.80;
+                }
 
                 double middle = currentParagraph.StartTime.TotalMilliseconds + (currentParagraph.Duration.TotalMilliseconds * startFactor);
                 if (splitSeconds.HasValue && splitSeconds.Value > (currentParagraph.StartTime.TotalSeconds + 0.2) && splitSeconds.Value < (currentParagraph.EndTime.TotalSeconds - 0.2))
+                {
                     middle = splitSeconds.Value * TimeCode.BaseUnit;
+                }
+
                 newParagraph.EndTime.TotalMilliseconds = currentParagraph.EndTime.TotalMilliseconds;
                 currentParagraph.EndTime.TotalMilliseconds = middle;
                 newParagraph.StartTime.TotalMilliseconds = currentParagraph.EndTime.TotalMilliseconds + 1;
@@ -1571,7 +1764,9 @@ namespace Nikse.SubtitleEdit.Forms
                 foreach (ListViewItem item in listViewFixes.Items)
                 {
                     if (deSelectedFixes.Contains(item.SubItems[1].Text + item.SubItems[2].Text + item.SubItems[3].Text))
+                    {
                         item.Checked = false;
+                    }
                 }
             }
         }
@@ -1632,6 +1827,35 @@ namespace Nikse.SubtitleEdit.Forms
                 subtitleListView1.InverseSelection();
                 e.SuppressKeyPress = true;
             }
+        }
+
+        private Hunspell _hunspell;
+
+        public bool DoSpell(string word)
+        {
+            if (_hunspell == null && Language != null)
+            {
+                var fileMatches = Directory.GetFiles(Utilities.DictionaryFolder, Language + "*.dic");
+                if (fileMatches.Length > 0)
+                {
+                    var dictionary = fileMatches[0].Substring(0, fileMatches[0].Length - 4);
+                    try
+                    {
+                        _hunspell = Hunspell.GetHunspell(dictionary);
+                    }
+                    catch
+                    {
+                        _hunspell = null;
+                    }
+                }
+            }
+
+            if (_hunspell == null)
+            {
+                return false;
+            }
+
+            return _hunspell.Spell(word);
         }
     }
 }
