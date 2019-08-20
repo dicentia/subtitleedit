@@ -21,7 +21,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             public bool IsPrimary { get; set; }
         }
 
-        public override string Extension => ".xml";
+        public override string Extension => ".ttml";
 
         public const string NameOfFormat = "Timed Text 1.0";
 
@@ -132,6 +132,8 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 "media";
 
             attrs.Add("ttp:timeBase=\"" + timeBase + "\"");
+
+            Console.WriteLine(timeBase);
 
             string frameRate = ((int)Math.Round(Configuration.Settings.General.CurrentFrameRate)).ToString();
             string frameRateMultiplier = "999 1000";

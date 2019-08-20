@@ -455,15 +455,15 @@ namespace Nikse.SubtitleEdit.Forms
                 args = new string[] {
                     "debug",
                     "/convert",
-                    "Brabançonne_Trailer_24_NL.pac",
+                    "456760_eng.ttml",
                     "TimedText1.0", //ItunesTimedText, TimedText1.0, NetflixTimedText
-                    @"/inputfolder:\\mc-data.dicentia.dk\mediacloud\tests\subtitle-convertion\new-build\in\",
-                    @"/outputfolder:\\mc-data.dicentia.dk\mediacloud\tests\subtitle-convertion\new-build\out\",
-                    "/fps:24",
-                    "/targetfps:25",
-                    "/targettcformat:frames",
-                    "/targetlanguage:du",
-                    "/removeinfoparagraph",
+                    @"/inputfolder:\\mc-data.dicentia.dk\mediacloud\dev\tests\subtitle-convertion\new-build\in\",
+                    @"/outputfolder:\\mc-data.dicentia.dk\mediacloud\dev\tests\subtitle-convertion\new-build\out\",
+                    //"/fps:24",
+                    "/targetfps:24",
+                    "/targettcformat:hh:mm:ss.ms",
+                    //"/targetlanguage:nb",
+                    //"/removeinfoparagraph",
                     "/overwrite"
                 };
 
