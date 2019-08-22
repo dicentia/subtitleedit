@@ -123,7 +123,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             foreach (var ns in NameSpaces)
             {
-                string prefix = (ns.IsPrimary) ?
+                string prefix = ns.IsPrimary ?
                     "xmlns" :
                     "xmlns:" + ns.Prefix;
 
@@ -138,8 +138,6 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 "media";
 
             attrs.Add("ttp:timeBase=\"" + timeBase + "\"");
-
-            Console.WriteLine(timeBase);
 
             string frameRate = ((int)Math.Round(Configuration.Settings.General.CurrentFrameRate)).ToString();
             string frameRateMultiplier = "999 1000";

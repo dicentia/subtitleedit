@@ -481,26 +481,27 @@ namespace Nikse.SubtitleEdit.Forms
                 var commandLineArgs = Environment.GetCommandLineArgs();
                 var fileName = string.Empty;
 
-                /*args = new string[] {
+                /*commandLineArgs = new string[] {
                     "debug",
-                    "/convert",
-                    "/debug"
-                };*/
+                    "/help",
+                    "/formats"
+                };
 
                 commandLineArgs = new string[] {
                     "debug",
                     "/convert",
-                    "456760_eng.ttml",
+                    "496713_6793_TakingWoodstock_Sub_25fps_Dan.pac",
                     "TimedText1.0", //ItunesTimedText, TimedText1.0, NetflixTimedText
-                    @"/inputfolder:\\mc-data.dicentia.dk\mediacloud\dev\tests\subtitle-convertion\new-build\in\",
-                    @"/outputfolder:\\mc-data.dicentia.dk\mediacloud\dev\tests\subtitle-convertion\new-build\out\",
-                    //"/fps:24",
-                    "/targetfps:24",
+                    @"/inputfolder:\\mc-data.dicentia.dk\mediacloud\dev\tests\subtitle-convertion\custom-build\input\",
+                    @"/outputfolder:\\mc-data.dicentia.dk\mediacloud\dev\tests\subtitle-convertion\custom-build\output\",
+                    "/fps:25",
+                    //"/targetfps:24",
                     "/targettcformat:hh:mm:ss.ms",
-                    //"/targetlanguage:nb",
+                    "/targetlanguage:da",
                     //"/removeinfoparagraph",
-                    "/overwrite"
-                };
+                    "/overwrite",
+                    "/debug"
+                };*/
 
                 int srcLineNumber = -1;
                 if (commandLineArgs.Length > 1)
