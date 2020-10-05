@@ -22,6 +22,7 @@ namespace Nikse.SubtitleEdit.Logic
         private static StreamWriter _stdOutWriter;
         private static string _currentFolder;
         private static bool _consoleAttached;
+        private static bool _showDebugInfo;
 
         [FlagsAttribute]
         internal enum BatchAction
@@ -32,6 +33,12 @@ namespace Nikse.SubtitleEdit.Logic
             RemoveFormatting = 4,
             ReDoCasing = 8,
             ReverseRtlStartEnd = 16
+        }
+
+        public static void WriteDebugLine(string line)
+        {
+            if (_showDebugInfo)
+                _stdOutWriter.WriteLine("[debug] " + line);
         }
 
         internal static void ConvertOrReturn(string productIdentifier, string[] commandLineArguments)
@@ -105,6 +112,8 @@ namespace Nikse.SubtitleEdit.Logic
                 _stdOutWriter.WriteLine("        /offset:hh:mm:ss:ms");
                 _stdOutWriter.WriteLine("        /fps:<frame rate>");
                 _stdOutWriter.WriteLine("        /targetfps:<frame rate>");
+                _stdOutWriter.WriteLine("        /targettcformat:<source|seconds|milliseconds|ticks|hh:mm:ss.ms|hh:mm:ss.ms-two-digits|hh:mm:ss,ms|frames>  [Sets the timecode format. Default is <source>. Only valid for TimedText1.0 + variations]");
+                _stdOutWriter.WriteLine("        /targetlanguage:<language code>  [Sets the language code displayed in the output file (E.g. da_DK). Only valid for TimedText1.0 + variations]");
                 _stdOutWriter.WriteLine("        /encoding:<encoding name>");
                 _stdOutWriter.WriteLine("        /pac-codepage:<code page>");
                 _stdOutWriter.WriteLine("        /track-number:<comma separated track number list>");
@@ -116,10 +125,12 @@ namespace Nikse.SubtitleEdit.Logic
                 _stdOutWriter.WriteLine("        /multiplereplace (equivalent to /multiplereplace:.)");
                 _stdOutWriter.WriteLine("        /removeformatting");
                 _stdOutWriter.WriteLine("        /removetextforhi");
+                _stdOutWriter.WriteLine("        /removeinfoparagraph  [Removes any informational paragraph found at frame zero]");
                 _stdOutWriter.WriteLine("        /fixcommonerrors");
                 _stdOutWriter.WriteLine("        /reversertlstartend");
                 _stdOutWriter.WriteLine("        /redocasing");
                 _stdOutWriter.WriteLine("        /forcedonly");
+                _stdOutWriter.WriteLine("        /debug  [Displays debug information in the console window]");
                 _stdOutWriter.WriteLine();
                 _stdOutWriter.WriteLine("    example: SubtitleEdit /convert *.srt sami");
                 _stdOutWriter.WriteLine("    show this usage message: SubtitleEdit /help");
@@ -185,9 +196,22 @@ namespace Nikse.SubtitleEdit.Logic
                 }
 
                 var unconsumedArguments = arguments.Skip(4).Select(s => s.Trim()).Where(s => s.Length > 0).ToList();
+
+                _showDebugInfo = GetArgument(unconsumedArguments, "debug").Equals("debug");
+
+                WriteDebugLine("Processing the following arguments:");
+
+                foreach (var arg in unconsumedArguments.Skip(4).Select(s => s.Trim()))
+                {
+                    WriteDebugLine(arg);
+                }
+
                 var offset = GetOffset(unconsumedArguments);
                 var resolution = GetResolution(unconsumedArguments);
                 var targetFrameRate = GetFrameRate(unconsumedArguments, "targetfps");
+                var targetTimeCodeFormat = GetArgument(unconsumedArguments, "targettcformat:");
+                var targetLanguage = GetArgument(unconsumedArguments, "targetlanguage:");
+                var removeInformationalParagraph = GetArgument(unconsumedArguments, "removeinfoparagraph").Equals("removeinfoparagraph");
                 var frameRate = GetFrameRate(unconsumedArguments, "fps");
                 if (frameRate.HasValue)
                 {
@@ -635,7 +659,7 @@ namespace Nikse.SubtitleEdit.Logic
                         }
                         else if (!done)
                         {
-                            BatchConvertSave(targetFormat, offset, targetEncoding, outputFolder, count, ref converted, ref errors, formats, fileName, sub, format, null, overwrite, pacCodePage, targetFrameRate, multipleReplaceImportFiles, actions, resolution);
+                            BatchConvertSave(targetFormat, offset, targetEncoding, outputFolder, count, ref converted, ref errors, formats, fileName, sub, format, null, overwrite, pacCodePage, targetFrameRate, multipleReplaceImportFiles, actions, resolution, false, targetTimeCodeFormat, targetLanguage, removeInformationalParagraph);
                         }
                     }
                     else
@@ -968,7 +992,7 @@ namespace Nikse.SubtitleEdit.Logic
         internal static bool BatchConvertSave(string targetFormat, TimeSpan offset, Encoding targetEncoding, string outputFolder, int count, ref int converted, ref int errors,
                                               IEnumerable<SubtitleFormat> formats, string fileName, Subtitle sub, SubtitleFormat format, List<IBinaryParagraph> binaryParagraphs, bool overwrite, int pacCodePage,
                                               double? targetFrameRate, ICollection<string> multipleReplaceImportFiles, BatchAction actions = BatchAction.None,
-                                              Point? resolution = null, bool autoDetectLanguage = false)
+                                              Point? resolution = null, bool autoDetectLanguage = false, string targetTimeCodeFormat = "", string targetLanguage = "", bool removeInfoParagraph = false)
         {
             double oldFrameRate = Configuration.Settings.General.CurrentFrameRate;
             try
@@ -1081,6 +1105,14 @@ namespace Nikse.SubtitleEdit.Logic
                         {
                             format.RemoveNativeFormatting(sub, sf);
                         }
+
+                        if (!string.IsNullOrEmpty(targetTimeCodeFormat))
+                            sf.SetTimeCodeFormat(targetTimeCodeFormat);
+
+                        if (!string.IsNullOrEmpty(targetLanguage))
+                            sf.Language = targetLanguage;
+
+                        sf.RemoveInformationalParagraph = removeInfoParagraph;
 
                         try
                         {

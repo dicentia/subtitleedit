@@ -32,6 +32,9 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
         public override string ToText(Subtitle subtitle, string title)
         {
+            //This is the only accepted timecode format
+            SetTimeCodeFormat("frames");
+
             XmlNode styleHead = null;
             bool convertedFromSubStationAlpha = false;
             if (subtitle.Header != null)
@@ -89,26 +92,16 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             var xml = new XmlDocument { XmlResolver = null };
             var nsmgr = new XmlNamespaceManager(xml.NameTable);
-            nsmgr.AddNamespace("ttml", "http://www.w3.org/ns/ttml");
-            nsmgr.AddNamespace("ttp", "http://www.w3.org/ns/10/ttml#parameter");
-            nsmgr.AddNamespace("tts", "http://www.w3.org/ns/10/ttml#style");
-            nsmgr.AddNamespace("ttm", "http://www.w3.org/ns/10/ttml#metadata");
 
-            string frameRate = ((int)Math.Round(Configuration.Settings.General.CurrentFrameRate)).ToString();
-            string frameRateMultiplier = "999 1000";
-            if (Configuration.Settings.General.CurrentFrameRate % 1.0 < 0.01)
+            foreach (var ns in NameSpaces)
             {
-                frameRateMultiplier = "1 1";
-            }
-            string dropMode = "nonDrop";
-            if (Math.Abs(Configuration.Settings.General.CurrentFrameRate - 29.97) < 0.01)
-            {
-                dropMode = "dropNTSC";
+                nsmgr.AddNamespace(ns.Prefix, ns.Url);
             }
 
-            const string language = "en-US";
+            var subBegin = new TimeCode(0);
+
             string xmlStructure = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" + Environment.NewLine +
-            "<tt xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://www.w3.org/ns/ttml\" xmlns:tt=\"http://www.w3.org/ns/ttml\" xmlns:tts=\"http://www.w3.org/ns/ttml#styling\" xmlns:ttp=\"http://www.w3.org/ns/ttml#parameter\" xml:lang=\"" + language + "\" ttp:timeBase=\"smpte\" ttp:frameRate=\"" + frameRate + "\" ttp:frameRateMultiplier=\"" + frameRateMultiplier + "\" ttp:dropMode=\"" + dropMode + "\">" + Environment.NewLine +
+            "<tt " + BuildRootElementAttributes() + ">" + Environment.NewLine +
             "   <head>" + Environment.NewLine +
             "       <styling>" + Environment.NewLine +
             "         <style tts:fontSize=\"100%\" tts:color=\"white\" tts:fontStyle=\"normal\" tts:fontWeight=\"normal\" tts:fontFamily=\"sansSerif\" xml:id=\"normal\"/>" + Environment.NewLine +
@@ -120,8 +113,8 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             "        <region xml:id=\"bottom\" tts:origin=\"0% 85%\" tts:extent=\"100% 15%\" tts:textAlign=\"center\" tts:displayAlign=\"after\"/>" + Environment.NewLine +
             "      </layout>" + Environment.NewLine +
             "   </head>" + Environment.NewLine +
-            "   <body>" + Environment.NewLine +
-            "       <div />" + Environment.NewLine +
+            "   <body style=\"normal\">" + Environment.NewLine +
+            "       <div begin=\"" + ConvertToTimeString(subBegin) + "\" />" + Environment.NewLine +
             "   </body>" + Environment.NewLine +
             "</tt>";
             if (styleHead == null)
@@ -201,8 +194,13 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 }
             }
 
+            var relevantParagraphs = subtitle.Paragraphs;
+
+            if (RemoveInformationalParagraph)
+                relevantParagraphs.RemoveAll(p => p.StartFrame == 0);
+
             var headerStyles = GetStylesFromHeader(subtitle.Header);
-            foreach (Paragraph p in subtitle.Paragraphs)
+            foreach (Paragraph p in relevantParagraphs)
             {
                 XmlNode paragraph = xml.CreateElement("p", "http://www.w3.org/ns/ttml");
                 string text = p.Text;

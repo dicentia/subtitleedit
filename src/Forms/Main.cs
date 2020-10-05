@@ -480,6 +480,29 @@ namespace Nikse.SubtitleEdit.Forms
 
                 var commandLineArgs = Environment.GetCommandLineArgs();
                 var fileName = string.Empty;
+
+                /*commandLineArgs = new string[] {
+                    "debug",
+                    "/help",
+                    "/formats"
+                };
+
+                commandLineArgs = new string[] {
+                    "debug",
+                    "/convert",
+                    "496713_6793_TakingWoodstock_Sub_25fps_Dan.pac",
+                    "TimedText1.0", //ItunesTimedText, TimedText1.0, NetflixTimedText
+                    @"/inputfolder:\\mc-data.dicentia.dk\mediacloud\dev\tests\subtitle-convertion\custom-build\input\",
+                    @"/outputfolder:\\mc-data.dicentia.dk\mediacloud\dev\tests\subtitle-convertion\custom-build\output\",
+                    "/fps:25",
+                    //"/targetfps:24",
+                    "/targettcformat:hh:mm:ss.ms",
+                    "/targetlanguage:da",
+                    //"/removeinfoparagraph",
+                    "/overwrite",
+                    "/debug"
+                };*/
+
                 int srcLineNumber = -1;
                 if (commandLineArgs.Length > 1)
                 {
@@ -3950,13 +3973,6 @@ namespace Nikse.SubtitleEdit.Forms
                 {
                     mediaPlayer.PauseAndDisposePlayer();
                 }
-                timeUpDownVideoPositionAdjust.TimeCode = new TimeCode();
-                timeUpDownVideoPositionAdjust.Enabled = false;
-                timeUpDownVideoPosition.TimeCode = new TimeCode();
-                timeUpDownVideoPosition.Enabled = false;
-                trackBarWaveformPosition.Value = 0;
-                timeUpDownStartTime.TimeCode = new TimeCode();
-                numericUpDownDuration.Value = 0;
             }
 
             _sourceViewChange = false;
@@ -19070,8 +19086,7 @@ namespace Nikse.SubtitleEdit.Forms
             _mainEditReverseStartAndEndingForRTL = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainEditReverseStartAndEndingForRTL);
             _mainListViewCopyText = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewCopyText);
             copyOriginalTextToCurrentToolStripMenuItem.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewCopyTextFromOriginalToCurrent);
-            columnDeleteTextOnlyToolStripMenuItem.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnDeleteText);
-            toolStripMenuItemColumnDeleteText.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnDeleteTextAndShiftUp);
+            toolStripMenuItemColumnDeleteText.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnDeleteText);
             ShiftTextCellsDownToolStripMenuItem.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnInsertText);
             toolStripMenuItemPasteSpecial.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnPaste);
             moveTextUpToolStripMenuItem.ShortcutKeys = UiUtil.GetKeys(Configuration.Settings.Shortcuts.MainListViewColumnTextUp);
@@ -21488,10 +21503,6 @@ namespace Nikse.SubtitleEdit.Forms
             undockVideoControlsToolStripMenuItem.Visible = true;
             redockVideoControlsToolStripMenuItem.Visible = false;
             SubtitleListview1.SelectIndexAndEnsureVisible(_subtitleListViewIndex, true);
-
-            splitContainerMain.SplitterDistance = Configuration.Settings.General.SplitContainerMainSplitterDistance;
-            splitContainer1.SplitterDistance = Configuration.Settings.General.SplitContainer1SplitterDistance;
-            splitContainerListViewAndText.SplitterDistance = Configuration.Settings.General.SplitContainerListViewAndTextSplitterDistance;
         }
 
         private void Bw_DoWork(object sender, DoWorkEventArgs e)

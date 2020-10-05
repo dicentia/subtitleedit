@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -13,7 +14,14 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 {
     public class TimedText10 : SubtitleFormat
     {
-        public override string Extension => ".xml";
+        protected class XmlNameSpace
+        {
+            public string Prefix { get; set; }
+            public string Url { get; set; }
+            public bool IsPrimary { get; set; }
+        }
+
+        public override string Extension => ".ttml";
 
         public const string NameOfFormat = "Timed Text 1.0";
 
@@ -23,6 +31,31 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
         public static string TtmlParameterNamespace => "http://www.w3.org/ns/ttml#parameter";
         public static string TtmlStylingNamespace => "http://www.w3.org/ns/ttml#styling";
         public static string TtmlMetadataNamespace => "http://www.w3.org/ns/ttml#metadata";
+
+        protected List<XmlNameSpace> NameSpaces { get; set; } = new List<XmlNameSpace>
+        {
+            new XmlNameSpace
+            {
+                Prefix = "ttml",
+                Url = "http://www.w3.org/ns/ttml",
+                IsPrimary = true
+            },
+            new XmlNameSpace
+            {
+                Prefix = "ttp",
+                Url = "http://www.w3.org/ns/ttml#parameter"
+            },
+            new XmlNameSpace
+            {
+                Prefix = "tts",
+                Url = "http://www.w3.org/ns/ttml#styling"
+            },
+            new XmlNameSpace
+            {
+                Prefix = "ttm",
+                Url = "http://www.w3.org/ns/ttml#metadata"
+            }
+        };
 
         public override bool IsMine(List<string> lines, string fileName)
         {
@@ -77,6 +110,52 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 }
             }
             return false;
+        }
+
+        public override void SetTimeCodeFormat(string format)
+        {
+            Configuration.Settings.SubtitleSettings.TimedText10TimeCodeFormat = format;
+        }
+
+        protected string BuildRootElementAttributes()
+        {
+            var attrs = new List<string>();
+
+            foreach (var ns in NameSpaces)
+            {
+                string prefix = ns.IsPrimary ?
+                    "xmlns" :
+                    "xmlns:" + ns.Prefix;
+
+                attrs.Add(prefix + "=\"" + ns.Url + "\"");
+            }
+
+            attrs.Add("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+            attrs.Add("xml:lang=\"" + Language + "\"");
+
+            string timeBase = (Configuration.Settings.SubtitleSettings.TimedText10TimeCodeFormat == "frames") ? 
+                "smpte" : 
+                "media";
+
+            attrs.Add("ttp:timeBase=\"" + timeBase + "\"");
+
+            string frameRate = ((int)Math.Round(Configuration.Settings.General.CurrentFrameRate)).ToString();
+            string frameRateMultiplier = "999 1000";
+            if (Configuration.Settings.General.CurrentFrameRate % 1.0 < 0.01)
+            {
+                frameRateMultiplier = "1 1";
+            }
+            string dropMode = "nonDrop";
+            if (Math.Abs(Configuration.Settings.General.CurrentFrameRate - 29.97) < 0.01)
+            {
+                dropMode = "dropNTSC";
+            }
+
+            attrs.Add("ttp:frameRate=\"" + frameRate + "\"");
+            attrs.Add("ttp:frameRateMultiplier=\"" + frameRateMultiplier + "\"");
+            attrs.Add("ttp:dropMode=\"" + dropMode + "\"");
+
+            return string.Join(" ", attrs);
         }
 
         internal static string ConvertToTimeString(TimeCode time)
@@ -171,18 +250,21 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
 
             var xml = new XmlDocument();
             var nsmgr = new XmlNamespaceManager(xml.NameTable);
-            nsmgr.AddNamespace("ttml", TtmlNamespace);
-            nsmgr.AddNamespace("ttp", TtmlParameterNamespace);
-            nsmgr.AddNamespace("tts", TtmlStylingNamespace);
-            nsmgr.AddNamespace("ttm", TtmlMetadataNamespace);
+
+            foreach (var ns in NameSpaces)
+            {
+                nsmgr.AddNamespace(ns.Prefix, ns.Url);
+            }
+
             string xmlStructure = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" + Environment.NewLine +
-            "<tt xmlns=\"" + TtmlNamespace + "\" xmlns:ttp=\"" + TtmlParameterNamespace + "\" ttp:timeBase=\"media\" xmlns:tts=\"" + TtmlStylingNamespace + "\" xml:lang=\"en\" xmlns:ttm=\"" + TtmlMetadataNamespace + "\">" + Environment.NewLine +
+            "<tt " + BuildRootElementAttributes() + ">" + Environment.NewLine +
             "   <head>" + Environment.NewLine +
             "       <metadata>" + Environment.NewLine +
-            "           <ttm:title></ttm:title>" + Environment.NewLine +
+            "           <ttm:title>" + title + "</ttm:title>" + Environment.NewLine +
+            "           <ttm:desc>Automatically generated by Subtitle Edit</ttm:desc>" + Environment.NewLine +
             "      </metadata>" + Environment.NewLine +
             "       <styling>" + Environment.NewLine +
-            "         <style xml:id=\"s0\" tts:backgroundColor=\"black\" tts:fontStyle=\"normal\" tts:fontSize=\"16px\" tts:fontFamily=\"sansSerif\" tts:color=\"white\" />" + Environment.NewLine +
+            "         <style xml:id=\"s0\" tts:backgroundColor=\"black\" tts:fontStyle=\"normal\" tts:fontSize=\"100%\" tts:fontFamily=\"sansSerif\" tts:color=\"white\" />" + Environment.NewLine +
             "      </styling>" + Environment.NewLine +
             "       <layout>" + Environment.NewLine +
             // Left column
@@ -259,10 +341,12 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             }
 
             // Declare namespaces in the root node if not declared
-            xml.DocumentElement.SetAttribute("xmlns", TtmlNamespace);
-            xml.DocumentElement.SetAttribute("xmlns:ttp", TtmlParameterNamespace);
-            xml.DocumentElement.SetAttribute("xmlns:tts", TtmlStylingNamespace);
-            xml.DocumentElement.SetAttribute("xmlns:ttm", TtmlMetadataNamespace);
+            foreach (var ns in NameSpaces)
+            {
+                string prefix = (ns.IsPrimary) ? "xmlns" : "xmlns:" + ns.Prefix;
+
+                xml.DocumentElement.SetAttribute(prefix, ns.Url);
+            }
 
             XmlNode body = xml.DocumentElement.SelectSingleNode("ttml:body", nsmgr);
             string defaultStyle = Guid.NewGuid().ToString();
@@ -283,15 +367,21 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                 body.AppendChild(div);
             }
 
+            var relevantParagraphs = subtitle.Paragraphs;
+
+            if (RemoveInformationalParagraph)
+                relevantParagraphs.RemoveAll(p => p.StartFrame == 0);
+
             int no = 0;
             var headerStyles = GetStylesFromHeader(ToUtf8XmlString(xml));
             var regions = GetRegionsFromHeader(ToUtf8XmlString(xml));
             var languages = GetUsedLanguages(subtitle);
+
             if (languages.Count > 0)
             {
                 var divParentNode = div.ParentNode;
 
-                foreach (Paragraph p in subtitle.Paragraphs)
+                foreach (Paragraph p in relevantParagraphs)
                 {
                     if (p.Language == null)
                     {
@@ -314,7 +404,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
                     div.Attributes.Append(attr);
                     divParentNode.AppendChild(div);
                     bool firstParagraph = true;
-                    foreach (Paragraph p in subtitle.Paragraphs)
+                    foreach (Paragraph p in relevantParagraphs)
                     {
                         if (p.Language != null && p.Language.Equals(language, StringComparison.OrdinalIgnoreCase))
                         {
@@ -343,7 +433,7 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             {
                 var divParentNode = div.ParentNode;
 
-                foreach (Paragraph p in subtitle.Paragraphs)
+                foreach (Paragraph p in relevantParagraphs)
                 {
                     if (p.NewSection)
                     {

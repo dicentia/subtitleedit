@@ -337,6 +337,18 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             get;
         }
 
+        public string Language
+        {
+            get;
+            set;
+        } = "en-US";
+
+        public bool RemoveInformationalParagraph
+        {
+            get;
+            set;
+        }
+
         public virtual bool IsTimeBased => true;
 
         public bool IsFrameBased => !IsTimeBased;
@@ -352,6 +364,11 @@ namespace Nikse.SubtitleEdit.Core.SubtitleFormats
             LoadSubtitle(subtitle, lines, fileName);
             Configuration.Settings.General.CurrentFrameRate = oldFrameRate;
             return subtitle.Paragraphs.Count > _errorCount;
+        }
+
+        public virtual void SetTimeCodeFormat(string format)
+        {
+            throw new NotImplementedException("Setting timecode format for type " + this.GetType().Name + " not supported");
         }
 
         public abstract string ToText(Subtitle subtitle, string title);
